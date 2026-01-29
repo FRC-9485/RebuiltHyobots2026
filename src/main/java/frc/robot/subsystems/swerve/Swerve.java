@@ -1,0 +1,331 @@
+package frc.robot.subsystems.swerve;
+
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.Pigeon2;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.PathPlannerLogging;
+
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator3d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.frc_java9485.constants.ComponentsConsts;
+import frc.frc_java9485.constants.RobotConsts;
+import frc.frc_java9485.constants.RobotConsts.RobotModes;
+import frc.frc_java9485.constants.mechanisms.DriveConsts;
+import frc.frc_java9485.motors.spark.SparkOdometryThread;
+import frc.frc_java9485.utils.MathUtils;
+import frc.robot.subsystems.swerve.IO.GyroIOInputsAutoLogged;
+import frc.robot.subsystems.swerve.IO.PigeonIO;
+import frc.robot.subsystems.swerve.IO.SwerveIO;
+import frc.robot.subsystems.swerve.IO.SwerveInputsAutoLogged;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionInstances;
+
+import java.io.File;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.Logger;
+import swervelib.SwerveDrive;
+import swervelib.SwerveModule;
+import swervelib.parser.SwerveParser;
+import swervelib.simulation.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import swervelib.telemetry.SwerveDriveTelemetry;
+import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+
+public class Swerve extends SubsystemBase implements SwerveIO {
+  public static final Lock odometryLock = new ReentrantLock();
+
+  private final SwerveDrive swerveDrive;
+  private final SwerveDriveKinematics kinematics;
+  private final SwerveDrivePoseEstimator3d poseEstimator;
+
+  private final SwerveInputsAutoLogged swerveInputs;
+  private final GyroIOInputsAutoLogged pigeonInputs;
+
+  private final Pigeon2 pigeon;
+  private final PigeonIO pigeonIO;
+
+  private final CANcoder[] encoders; // FL FR BL BR
+
+  private SwerveDriveSimulation driveSimulator;
+
+  private Vision limelight;
+  private Vision raspberry;
+
+  private SwerveModule[] modules;
+  private SwerveModuleState states[];
+
+  private static Swerve mInstance;
+
+  public static Swerve getInstance() {
+    if (mInstance == null) {
+      mInstance = new Swerve(new File(Filesystem.getDeployDirectory(), "swerve"));
+    }
+    return mInstance;
+  }
+
+  private Swerve(File directory) {
+    try {
+      SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+      swerveDrive = new SwerveParser(directory).createSwerveDrive(DriveConsts.MAX_SPEED);
+
+        if (RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM) {
+        swerveDrive.setHeadingCorrection(false);
+        swerveDrive.setCosineCompensator(false);
+
+        driveSimulator = swerveDrive.getMapleSimDrive().get();
+        driveSimulator.setEnabled(true);
+
+        resetOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
+      }
+
+      encoders =
+          new CANcoder[] {
+            new CANcoder(DriveConsts.CANCODER_MODULE1_ID), // FL
+            new CANcoder(DriveConsts.CANCODER_MODULE2_ID), // FR
+            new CANcoder(DriveConsts.CANCODER_MODULE3_ID), // BR
+            new CANcoder(DriveConsts.CANCODER_MODULE4_ID)  // BL
+          };
+
+      pigeon = new Pigeon2(ComponentsConsts.PIGEON2);
+      pigeonIO = new PigeonIO();
+
+      swerveInputs = new SwerveInputsAutoLogged();
+      pigeonInputs = new GyroIOInputsAutoLogged();
+
+      setupPathPlanner();
+      SparkOdometryThread.getInstance().start();
+
+      kinematics = new SwerveDriveKinematics(DriveConsts.MODULES_TRANSLATIONS);
+      poseEstimator =
+          new SwerveDrivePoseEstimator3d(kinematics, getHeading3d(), swerveDrive.getModulePositions(),
+                                        new Pose3d(), DriveConsts.STATE_STD_DEVS, DriveConsts.VISION_STD_DEVS);
+
+      limelight = VisionInstances.getLimelightInstance();
+      raspberry = VisionInstances.getRaspberryInstance();
+    } catch (Exception e) {
+      throw new RuntimeException("Erro criando Swerve!!!!\n", e);
+    }
+  }
+
+  @Override
+  public void periodic() {
+    if (poseEstimator != null) {
+      raspberry.estimatePose(this::addVisionMeasurement);
+      limelight.estimatePose(this::addVisionMeasurement);
+      poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getHeading3d(), swerveDrive.getModulePositions());
+
+    if (RobotConsts.CURRENT_ROBOT_MODE == RobotModes.REAL) {
+      odometryLock.lock();
+      pigeonIO.updateInputs(pigeonInputs);
+      odometryLock.unlock();
+      Logger.processInputs("Swerve/Odometry", pigeonInputs);
+    }
+    updateInputs(swerveInputs);
+    Logger.processInputs("Swerve", swerveInputs);
+    }
+  }
+
+  @Override
+  public Pose3d getPose3d() {
+    return RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM ?
+    poseEstimator.getEstimatedPosition() :
+    new Pose3d(driveSimulator.getSimulatedDriveTrainPose());
+  }
+
+  @Override
+  public Pose2d getPose2d() {
+    return RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM ?
+     driveSimulator.getSimulatedDriveTrainPose() :
+     poseEstimator.getEstimatedPosition().toPose2d();
+  }
+
+  @Override
+  public Rotation2d getHeading2d() {
+    return RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM ?
+    driveSimulator.getGyroSimulation().getGyroReading() :
+    Rotation2d.fromDegrees(MathUtils.scope0To360(pigeon.getYaw().getValueAsDouble()));
+  }
+
+  @Override
+  public Rotation3d getHeading3d() {
+    return RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM ?
+      new Rotation3d(driveSimulator.getGyroSimulation().getGyroReading()) :
+      pigeon.getRotation3d();
+  }
+
+  @Override
+  public void resetOdometry(Pose3d pose) {
+    if (RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM) {
+      driveSimulator.setSimulationWorldPose(pose.toPose2d());
+    } else {
+      poseEstimator.resetPose(pose);
+    }
+  }
+
+  @Override
+  public void resetOdometry(Pose2d pose) {
+    if (RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM) {
+      driveSimulator.setSimulationWorldPose(pose);
+    } else {
+      poseEstimator.resetPose(new Pose3d(pose));
+    }
+  }
+
+  @Override
+  public ChassisSpeeds getRobotRelativeSpeeds() {
+    return swerveDrive.getRobotVelocity();
+  }
+
+  @Override
+  public void driveFieldOriented(ChassisSpeeds speed) {
+    swerveDrive.driveFieldOriented(speed);
+  }
+
+  @Override
+  public Pigeon2 getPigeon() {
+    return pigeon;
+  }
+
+  @Override
+  public void drive(Translation2d translation2d, double rotation, boolean fieldOriented) {
+    swerveDrive.drive(translation2d, rotation, fieldOriented, false);
+  }
+
+  @Override
+  public void lock() {
+    swerveDrive.lockPose();
+  }
+
+  @Override
+  public void addVisionMeasurement(Pose3d visionMeasurement, double timestampSeconds) {
+    poseEstimator.addVisionMeasurement(visionMeasurement, timestampSeconds);
+  }
+
+  @Override
+  public void addVisionMeasurement(Pose3d visionMeasurement, double timestampSeconds, Matrix<N4, N1> stdDevs) {
+    poseEstimator.addVisionMeasurement(visionMeasurement, timestampSeconds, stdDevs);
+  }
+
+  @Override
+  public Command getAutonomousCommand(String path, boolean altern) {
+    if (altern) {
+      return AutoBuilder.buildAuto(path);
+    }
+    return new PathPlannerAuto(path);
+  }
+
+  @Override
+  public Command driveCommand(DoubleSupplier X, DoubleSupplier Y, DoubleSupplier omega, boolean fieldOriented) {
+    return run(
+        () -> {
+          double Xcontroller = Math.pow(X.getAsDouble(), 3);
+          double Ycontroller = Math.pow(Y.getAsDouble(), 3);
+          double rotation = omega.getAsDouble();
+          double td = 0.02;
+
+          ChassisSpeeds speeds =
+              fieldOriented
+                  ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                      Xcontroller * swerveDrive.getMaximumChassisVelocity(),
+                      Ycontroller * swerveDrive.getMaximumChassisVelocity(),
+                      rotation * swerveDrive.getMaximumChassisAngularVelocity(),
+                      pigeon.getRotation2d())
+                  : new ChassisSpeeds(
+                      Xcontroller * swerveDrive.getMaximumChassisVelocity(),
+                      Ycontroller * swerveDrive.getMaximumChassisVelocity(),
+                      rotation * swerveDrive.getMaximumChassisAngularVelocity());
+
+          ChassisSpeeds discretize = ChassisSpeeds.discretize(speeds, td);
+          states = swerveDrive.kinematics.toSwerveModuleStates(discretize);
+          SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConsts.MAX_SPEED);
+          modules = swerveDrive.getModules();
+
+          for (int i = 0; i < states.length; i++) {
+            modules[i].setDesiredState(states[i], true, true);
+          }
+        });
+  }
+
+  private void setupPathPlanner() {
+    RobotConfig config;
+    try {
+      config = RobotConfig.fromGUISettings();
+      AutoBuilder.configure(
+          this::getPose2d,
+          this::resetOdometry,
+          this::getRobotRelativeSpeeds,
+          (speeds, feedforwards) -> driveFieldOriented(speeds),
+          new PPHolonomicDriveController(
+              new PIDConstants(
+                  DriveConsts.AUTO_TRANSLATION_kP,
+                  DriveConsts.AUTO_TRANSLATION_kI,
+                  DriveConsts.AUTO_TRANSLATION_kD), // Translation
+              new PIDConstants(
+                  DriveConsts.AUTO_ROTATION_kP,
+                  DriveConsts.AUTO_ROTATION_kI,
+                  DriveConsts.AUTO_ROTATION_kD) // Rotation
+              ),
+          config,
+          () -> {
+            var alliance = DriverStation.getAlliance();
+            if (alliance.isPresent()) {
+              return alliance.get() == DriverStation.Alliance.Red;
+            }
+            return false;
+          },
+          this);
+
+      PathPlannerLogging.setLogActivePathCallback(
+          (activePath) -> {
+            Logger.recordOutput(
+                DriveConsts.ACTIVE_TRACJECTORY_LOG_ENTRY,
+                activePath.toArray(new Pose2d[activePath.size()]));
+          });
+
+      PathPlannerLogging.setLogTargetPoseCallback(
+          (targetPose) -> {
+            Logger.recordOutput(DriveConsts.TRAJECTORY_SETPOINT_LOG_ENTRY, targetPose);
+          });
+
+    } catch (Exception e) {
+      System.out.println(e.getMessage());
+    }
+  }
+
+  @Override
+  public void updateInputs(SwerveInputs inputs) {
+    inputs.currentPose2d = getPose2d();
+    inputs.currentPose3d = getPose3d();
+
+    inputs.moduleStates = DriverStation.isDisabled() ? new SwerveModuleState[] {} : states;
+    if (encoders.length == 3) {
+      byte i = 0;
+      double[] cancoderPos = new double[] {};
+      for (CANcoder encoder : encoders) {
+        i++;
+        cancoderPos[i] = encoder.getPosition().getValueAsDouble();
+      }
+      inputs.currentCanCodersPosition = cancoderPos;
+    }
+  }
+}
