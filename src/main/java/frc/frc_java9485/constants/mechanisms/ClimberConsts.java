@@ -1,6 +1,5 @@
 package frc.frc_java9485.constants.mechanisms;
 
-import edu.wpi.first.math.controller.PIDController;
 import frc.frc_java9485.utils.TunableControls.ControlConstants;
 import frc.frc_java9485.utils.TunableControls.TunableControlConstants;
 
@@ -33,7 +32,7 @@ public class ClimberConsts {
 
     public static final TunableControlConstants LEFT_CLIMBER_CONTROL_CONSTANTS =
         new TunableControlConstants("Left Climber PID", LEFT_CONSTANTS);
-    
+
     public static final TunableControlConstants RIGHT_CLIMBER_CONTROL_CONSTANTS =
         new TunableControlConstants("Right Climber PID", RIGHT_CONSTANTS);
 }

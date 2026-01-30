@@ -23,7 +23,7 @@ public class VisionConsts {
     public static final Transform3d LIMELIGHT_ROBOT_TO_CAMERA = new Transform3d(new Translation3d(), new Rotation3d());
 
     public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT =
-        AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+        AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
 
     public static final Matrix<N4, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(2, 2, 2, 0);
     public static final Matrix<N4, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(0.5, 0.5, 1, 0);

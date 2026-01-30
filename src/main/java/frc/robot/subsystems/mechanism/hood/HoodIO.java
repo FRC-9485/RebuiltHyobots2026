@@ -2,6 +2,8 @@ package frc.robot.subsystems.mechanism.hood;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import com.revrobotics.RelativeEncoder;
+
 public interface HoodIO {
 
   @AutoLog
@@ -14,4 +16,6 @@ public interface HoodIO {
   public double getPosition();
 
   public void updateInputs(HoodInputs inputs);
+
+  public RelativeEncoder getEncoder();
 }

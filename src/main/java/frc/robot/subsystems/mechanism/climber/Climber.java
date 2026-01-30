@@ -40,8 +40,8 @@ public class Climber extends SubsystemBase implements ClimberIO {
         left = new SparkMaxMotor(ClimberConsts.LEFT_ID, "Left Climber");
         right = new SparkMaxMotor(ClimberConsts.RIGHT_ID, "Right Climber");
 
-        leftController = new TunableProfiledController(ClimberConsts.LEFT_CLIMBER_CONTROL_CONSTANTS); 
-        rightController = new TunableProfiledController(ClimberConsts.RIGHT_CLIMBER_CONTROL_CONSTANTS); 
+        leftController = new TunableProfiledController(ClimberConsts.LEFT_CLIMBER_CONTROL_CONSTANTS);
+        rightController = new TunableProfiledController(ClimberConsts.RIGHT_CLIMBER_CONTROL_CONSTANTS);
 
         leftEncoder = left.getEncoder();
         rightEncoder = right.getEncoder();

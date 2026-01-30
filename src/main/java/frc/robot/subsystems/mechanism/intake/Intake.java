@@ -6,7 +6,6 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.frc_java9485.constants.mechanisms.IntakeConsts;
 import frc.frc_java9485.motors.spark.SparkFlexMotor;
