@@ -63,7 +63,7 @@ public class Vision extends SubsystemBase implements VisionIO {
                     visionSim = new VisionSystemSim(VisionConsts.LIMELIGHT_CAMERA_NAME);
 
                     visionSim.addAprilTags(VisionConsts.APRIL_TAG_FIELD_LAYOUT);
-                    
+
                     cameraSim.enableRawStream(true);
                     cameraSim.enableProcessedStream(true);
                     cameraSim.enableDrawWireframe(true);
@@ -114,13 +114,29 @@ public class Vision extends SubsystemBase implements VisionIO {
         if (visionSim != null) visionSim.update(Swerve.getInstance().getPose3d());
     }
 
-    private Field2d getSimDebugField() {
-        return visionSim.getDebugField();
-    }
-
     @Override
     public boolean hasTargets() {
         return currentResults.get(0).hasTargets();
+    }
+
+    @Override
+    public double getTX() {
+        return getBestTarget().yaw;
+    }
+
+    @Override
+    public double getTY() {
+        return getBestTarget().pitch;
+    }
+
+    @Override
+    public double getTA() {
+        return getBestTarget().area;
+    }
+
+    @Override
+    public double getTRotation() {
+        return getBestTarget().skew;
     }
 
     @Override
@@ -136,6 +152,10 @@ public class Vision extends SubsystemBase implements VisionIO {
     @Override
     public Matrix<N4, N1> getEstimationStdDevs() {
         return curStdDevs;
+    }
+
+    private Field2d getSimDebugField() {
+        return visionSim.getDebugField();
     }
 
     private List<PhotonPipelineResult> getCurrentResults() {

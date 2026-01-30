@@ -2,6 +2,8 @@ package frc.robot.subsystems.mechanism.intake;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -12,11 +14,11 @@ import frc.frc_java9485.motors.spark.SparkMaxMotor;
 import frc.frc_java9485.utils.TunableControls.TunableProfiledController;
 
 public class Intake extends SubsystemBase implements IntakeIO {
-
   private static Intake m_instance;
 
   private final SparkMaxMotor pivot;
   private final SparkFlexMotor catchBall;
+
 
   private final TunableProfiledController controller;
 
@@ -28,7 +30,7 @@ public class Intake extends SubsystemBase implements IntakeIO {
   private boolean isCollecting = false;
   private Voltage pivotVolts = Volts.of(0);
 
-  private final IntakeInputs inputs;
+  private final IntakeInputsAutoLogged inputs;
 
   public static Intake getInstance() {
     if (m_instance == null) m_instance = new Intake();
@@ -42,7 +44,7 @@ public class Intake extends SubsystemBase implements IntakeIO {
     controller = new TunableProfiledController(IntakeConsts.PIVOT_CONSTANTS);
 
     pivotEncoder = new Encoder(IntakeConsts.ENCODER_A_CHANNEL,
-                                     IntakeConsts.ENCODER_B_CHANNEL);
+                               IntakeConsts.ENCODER_B_CHANNEL);
     pivotEncoder.setDistancePerPulse(IntakeConsts.ENCODER_DISTANCE_PER_PULSE);
     pivotEncoder.setReverseDirection(IntakeConsts.ENCODER_INVERTED);
     pivotEncoder.reset();
@@ -52,13 +54,8 @@ public class Intake extends SubsystemBase implements IntakeIO {
 
   @Override
   public void periodic() {
-    // System.out.println("pivotAngle: " + pivotAngle);
-    // System.out.println("Temperatura: " + pivot.getTemperature() + "ºC");
-    // System.out.println("voltagem: " + pivotVolts + "\n");
-
-    SmartDashboard.putNumber("pivotAngle:", pivotEncoder.getDistance());
     updateInputs(inputs);
-    // Logger.processInputs("Mechanism/Intake", inputs);
+    Logger.processInputs("Mechanism/Intake", inputs);
   }
 
   @Override

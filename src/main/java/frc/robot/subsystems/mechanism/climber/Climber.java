@@ -3,11 +3,11 @@ package frc.robot.subsystems.mechanism.climber;
 
 import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.frc_java9485.constants.mechanisms.ClimberConsts;
 import frc.frc_java9485.motors.spark.SparkMaxMotor;
+import frc.frc_java9485.utils.TunableControls.TunableProfiledController;
 
 public class Climber extends SubsystemBase implements ClimberIO {
     private static Climber m_instance;
@@ -19,8 +19,8 @@ public class Climber extends SubsystemBase implements ClimberIO {
     private final RelativeEncoder leftEncoder;
     private final RelativeEncoder rightEncoder;
 
-    private final PIDController leftController;
-    private final PIDController rightController;
+    private final TunableProfiledController leftController;
+    private final TunableProfiledController rightController;
 
     private double leftOutput;
     private double rightOutput;
@@ -40,11 +40,11 @@ public class Climber extends SubsystemBase implements ClimberIO {
         left = new SparkMaxMotor(ClimberConsts.LEFT_ID, "Left Climber");
         right = new SparkMaxMotor(ClimberConsts.RIGHT_ID, "Right Climber");
 
+        leftController = new TunableProfiledController(ClimberConsts.LEFT_CLIMBER_CONTROL_CONSTANTS); 
+        rightController = new TunableProfiledController(ClimberConsts.RIGHT_CLIMBER_CONTROL_CONSTANTS); 
+
         leftEncoder = left.getEncoder();
         rightEncoder = right.getEncoder();
-
-        leftController = ClimberConsts.LEFT_CONTROLLER;
-        rightController = ClimberConsts.RIGHT_CONTROLLER;
     }
 
     public enum ClimberStates {
@@ -60,20 +60,20 @@ public class Climber extends SubsystemBase implements ClimberIO {
         return run(() -> {
             switch (state) {
                 case L1:
-                    leftController.setSetpoint(ClimberConsts.SETPOINT_LEFT_L1);
-                    rightController.setSetpoint(ClimberConsts.SETPOINT_RIGHT_L1);
+                    leftController.setGoal(ClimberConsts.SETPOINT_LEFT_L1);
+                    rightController.setGoal(ClimberConsts.SETPOINT_RIGHT_L1);
                     break;
                 case L2:
-                    leftController.setSetpoint(ClimberConsts.SETPOINT_LEFT_L2);
-                    rightController.setSetpoint(ClimberConsts.SETPOINT_RIGHT_L2);
+                    leftController.setGoal(ClimberConsts.SETPOINT_LEFT_L2);
+                    rightController.setGoal(ClimberConsts.SETPOINT_RIGHT_L2);
                     break;
                 case L3:
-                    leftController.setSetpoint(ClimberConsts.SETPOINT_LEFT_L3);
-                    rightController.setSetpoint(ClimberConsts.SETPOINT_RIGHT_L3);
+                    leftController.setGoal(ClimberConsts.SETPOINT_LEFT_L3);
+                    rightController.setGoal(ClimberConsts.SETPOINT_RIGHT_L3);
                     break;
                 default:
-                    leftController.setSetpoint(0.0);
-                    rightController.setSetpoint(0.0);
+                    leftController.setGoal(0.0);
+                    rightController.setGoal(0.0);
                     break;
             }
         });

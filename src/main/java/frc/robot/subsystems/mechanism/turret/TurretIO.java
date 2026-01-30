@@ -23,7 +23,7 @@ public interface TurretIO {
 
   public double getSpeed();
 
-  public boolean inAtSetpoint();
+  public boolean turnInSetpoint();
 
   public void updateInputs(TurretInputs inputs);
 }

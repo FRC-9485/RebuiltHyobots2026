@@ -279,11 +279,11 @@ public class Swerve extends SubsystemBase implements SwerveIO {
               new PIDConstants(
                   DriveConsts.AUTO_TRANSLATION_kP,
                   DriveConsts.AUTO_TRANSLATION_kI,
-                  DriveConsts.AUTO_TRANSLATION_kD), // Translation
+                  DriveConsts.AUTO_TRANSLATION_kD),
               new PIDConstants(
                   DriveConsts.AUTO_ROTATION_kP,
                   DriveConsts.AUTO_ROTATION_kI,
-                  DriveConsts.AUTO_ROTATION_kD) // Rotation
+                  DriveConsts.AUTO_ROTATION_kD)
               ),
           config,
           () -> {

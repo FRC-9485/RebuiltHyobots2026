@@ -1,6 +1,8 @@
 package frc.frc_java9485.constants.mechanisms;
 
 import edu.wpi.first.math.controller.PIDController;
+import frc.frc_java9485.utils.TunableControls.ControlConstants;
+import frc.frc_java9485.utils.TunableControls.TunableControlConstants;
 
 public class ClimberConsts {
     public static final int LEFT_ID = 67; // ALTERAR
@@ -15,14 +17,23 @@ public class ClimberConsts {
     public static final double SETPOINT_LEFT_L3 = 0.0;
     public static final double SETPOINT_RIGHT_L3 = 0.0;
 
-    private static final double LEFT_kP = 0.0;
-    private static final double LEFT_kI = 0.0;
-    private static final double LEFT_kD = 0.0;
+    private static final ControlConstants LEFT_CONSTANTS = new ControlConstants()
+      .withPID(0, 0, 0)
+      .withProfile(0, 0)
+      .withFeedforward(0, 0)
+      .withPhysical(0, 0)
+      .withTolerance(0);
 
-    private static final double RIGHT_kP = 0.0;
-    private static final double RIGHT_kI = 0.0;
-    private static final double RIGHT_kD = 0.0;
+    private static final ControlConstants RIGHT_CONSTANTS = new ControlConstants()
+      .withPID(0, 0, 0)
+      .withProfile(0, 0)
+      .withFeedforward(0, 0)
+      .withPhysical(0, 0)
+      .withTolerance(0);
 
-    public static final PIDController LEFT_CONTROLLER = new PIDController(LEFT_kP, LEFT_kI, LEFT_kD);
-    public static final PIDController RIGHT_CONTROLLER = new PIDController(RIGHT_kP, RIGHT_kI, RIGHT_kD);
+    public static final TunableControlConstants LEFT_CLIMBER_CONTROL_CONSTANTS =
+        new TunableControlConstants("Left Climber PID", LEFT_CONSTANTS);
+    
+    public static final TunableControlConstants RIGHT_CLIMBER_CONTROL_CONSTANTS =
+        new TunableControlConstants("Right Climber PID", RIGHT_CONSTANTS);
 }

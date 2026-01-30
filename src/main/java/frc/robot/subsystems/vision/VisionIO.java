@@ -17,4 +17,9 @@ public interface VisionIO {
     public PhotonTrackedTarget getBestTarget();
     public List<PhotonTrackedTarget> getTargets();
     public Matrix<N4, N1> getEstimationStdDevs();
+
+    public double getTX();
+    public double getTY();
+    public double getTA();
+    public double getTRotation();
 }
