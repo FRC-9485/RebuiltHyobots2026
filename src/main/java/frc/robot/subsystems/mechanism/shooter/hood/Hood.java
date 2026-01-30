@@ -1,13 +1,11 @@
-package frc.robot.subsystems.mechanism.hood;
+package frc.robot.subsystems.mechanism.shooter.hood;
 
-import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.frc_java9485.constants.mechanisms.HoodConsts;
 import frc.frc_java9485.motors.spark.SparkMaxMotor;
@@ -45,7 +43,7 @@ public class Hood extends SubsystemBase implements HoodIO {
   public void setPosition(double position) {
     controller.setGoal(position);
     double output = controller.calculate(getPosition());
-    
+
     output = MathUtil.clamp(output, -5, 5);
 
     hood.setVoltage(output);

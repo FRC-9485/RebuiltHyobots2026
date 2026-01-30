@@ -26,6 +26,7 @@ public class Simulation {
         new Translation2d(0.512, 5.9), new Translation2d(0.512, 6.05), new Translation2d(0.512, 6.20),
       };
 
+
   private final RebuiltHub redHub;
   private final RebuiltHub blueHub;
   private final SimulatedArena arena;

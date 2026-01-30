@@ -3,12 +3,15 @@ package frc.robot;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.frc_java9485.autonomous.AutoChooser;
+import frc.frc_java9485.constants.RobotConsts;
+import frc.frc_java9485.constants.RobotConsts.RobotModes;
 import frc.frc_java9485.constants.mechanisms.DriveConsts;
 import frc.frc_java9485.joystick.driver.DriverJoystick;
 import frc.frc_java9485.joystick.mechanism.MechanismJoystick;
 import frc.frc_java9485.utils.RegisterNamedCommands;
 import frc.robot.commands.CatchBall;
 import frc.robot.commands.swerveUtils.ResetPigeon;
+import frc.robot.commands.swerveUtils.ResetSimGyro;
 import frc.robot.subsystems.mechanism.SuperStructure;
 import frc.robot.subsystems.mechanism.SuperStructure.Actions;
 import frc.robot.subsystems.mechanism.intake.Intake;
@@ -45,7 +48,11 @@ public class RobotContainer {
             () -> driverJoystick.getRightX(),
             DriveConsts.FIELD_ORIENTED));
 
-    configureBindings();
+    if (RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM) {
+      configureSimBindings();
+    } else {
+      configureBindings();
+    }
     configureAutonomousCommands();
   }
 
@@ -60,6 +67,13 @@ public class RobotContainer {
     mechanismJoystick.b().whileTrue(superStructure.setAction(Actions.CLOSE_INTAKE));
 
     mechanismJoystick.x().whileTrue(new CatchBall(0.3));
+  }
+
+  private void configureSimBindings() {
+    driverJoystick.getLeftBack().onTrue(new ResetSimGyro());
+
+    driverJoystick.a().whileTrue(superStructure.setActionSim(Actions.CATCH_FUEL));
+    driverJoystick.a().whileFalse(superStructure.setActionSim(Actions.CLOSE_INTAKE));
   }
 
   public Command getAutonomousCommand() {

@@ -47,6 +47,7 @@ import org.littletonrobotics.junction.Logger;
 import swervelib.SwerveDrive;
 import swervelib.SwerveModule;
 import swervelib.parser.SwerveParser;
+import swervelib.simulation.ironmaple.simulation.drivesims.GyroSimulation;
 import swervelib.simulation.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
@@ -148,8 +149,8 @@ public class Swerve extends SubsystemBase implements SwerveIO {
   @Override
   public Pose3d getPose3d() {
     return RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM ?
-    poseEstimator.getEstimatedPosition() :
-    new Pose3d(driveSimulator.getSimulatedDriveTrainPose());
+      new Pose3d(driveSimulator.getSimulatedDriveTrainPose()) :
+      poseEstimator.getEstimatedPosition();
   }
 
   @Override
@@ -162,8 +163,8 @@ public class Swerve extends SubsystemBase implements SwerveIO {
   @Override
   public Rotation2d getHeading2d() {
     return RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM ?
-    driveSimulator.getGyroSimulation().getGyroReading() :
-    Rotation2d.fromDegrees(MathUtils.scope0To360(pigeon.getYaw().getValueAsDouble()));
+      driveSimulator.getGyroSimulation().getGyroReading() :
+      Rotation2d.fromDegrees(MathUtils.scope0To360(pigeon.getYaw().getValueAsDouble()));
   }
 
   @Override
@@ -192,6 +193,11 @@ public class Swerve extends SubsystemBase implements SwerveIO {
   }
 
   @Override
+  public SwerveDriveSimulation getSimulation() {
+      return driveSimulator;
+  }
+
+  @Override
   public ChassisSpeeds getRobotRelativeSpeeds() {
     return swerveDrive.getRobotVelocity();
   }
@@ -204,6 +210,11 @@ public class Swerve extends SubsystemBase implements SwerveIO {
   @Override
   public Pigeon2 getPigeon() {
     return pigeon;
+  }
+
+  @Override
+  public GyroSimulation getGyroSimulation() {
+    return driveSimulator.getGyroSimulation();
   }
 
   @Override

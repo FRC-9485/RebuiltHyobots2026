@@ -13,6 +13,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.wpilibj2.command.Command;
+import swervelib.simulation.ironmaple.simulation.drivesims.GyroSimulation;
+import swervelib.simulation.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.AutoLog;
@@ -38,11 +41,15 @@ public interface SwerveIO {
   public void addVisionMeasurement(Pose3d visionMeasurement, double timestampSeconds);
   public void addVisionMeasurement(Pose3d visionMeasurement, double timestampSeconds, Matrix<N4, N1> stdDevs);
 
+  public Pigeon2 getPigeon();
+  public GyroSimulation getGyroSimulation();
+
+  public SwerveDriveSimulation getSimulation();
+
   public ChassisSpeeds getRobotRelativeSpeeds();
 
   public void driveFieldOriented(ChassisSpeeds speed);
 
-  public Pigeon2 getPigeon();
 
   public Command getAutonomousCommand(String path, boolean altern);
 

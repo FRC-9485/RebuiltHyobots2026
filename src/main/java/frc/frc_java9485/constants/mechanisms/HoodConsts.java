@@ -16,6 +16,6 @@ public class HoodConsts {
     .withTolerance(7)
     .withProfile(100, 50);
 
-    public static final TunableControlConstants TUNABLE_CONSTANTS = 
+    public static final TunableControlConstants TUNABLE_CONSTANTS =
         new TunableControlConstants("electric boss loves jhonny from lipetral, Linhares, ES, Brazil", CONTROL_CONSTANTS);
 }

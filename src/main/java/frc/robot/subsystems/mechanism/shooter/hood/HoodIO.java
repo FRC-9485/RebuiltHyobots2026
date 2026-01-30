@@ -1,4 +1,4 @@
-package frc.robot.subsystems.mechanism.hood;
+package frc.robot.subsystems.mechanism.shooter.hood;
 
 import org.littletonrobotics.junction.AutoLog;
 

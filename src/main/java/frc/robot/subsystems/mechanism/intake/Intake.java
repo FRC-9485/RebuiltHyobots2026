@@ -18,10 +18,9 @@ public class Intake extends SubsystemBase implements IntakeIO {
   private final SparkMaxMotor pivot;
   private final SparkFlexMotor catchBall;
 
+  private final Encoder pivotEncoder;
 
   private final TunableProfiledController controller;
-
-  private final Encoder pivotEncoder;
 
   private double pivotAngle = 0;
   private double catchFuelSpeed = 0;
@@ -37,8 +36,8 @@ public class Intake extends SubsystemBase implements IntakeIO {
   }
 
   private Intake() {
-    catchBall = new SparkFlexMotor(IntakeConsts.CATCH_BALL_ID, "Catch Fuel");
     pivot = new SparkMaxMotor(IntakeConsts.PIVOT_ID, "Pivot");
+    catchBall = new SparkFlexMotor(IntakeConsts.CATCH_BALL_ID, "Catch Fuel");
 
     controller = new TunableProfiledController(IntakeConsts.PIVOT_CONSTANTS);
 
