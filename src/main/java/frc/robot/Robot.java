@@ -12,6 +12,7 @@ import frc.frc_java9485.constants.FieldConsts;
 import frc.frc_java9485.constants.RobotConsts;
 import frc.frc_java9485.constants.RobotConsts.RobotModes;
 import frc.frc_java9485.utils.Elastic;
+import frc.frc_java9485.utils.HubTracker;
 import frc.frc_java9485.utils.Elastic.Notification;
 import frc.frc_java9485.utils.Elastic.Notification.NotificationLevel;
 import frc.frc_java9485.utils.Simulation;
@@ -133,6 +134,15 @@ public class Robot extends LoggedRobot {
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
+    }
+  }
+
+  @Override
+  public void teleopPeriodic() {
+    if(HubTracker.isActive()){
+      Elastic.sendNotification(new Notification(NotificationLevel.INFO,
+                                          "Hub is active",
+                                    "the hub is active"));
     }
   }
 

@@ -1,15 +1,14 @@
 package frc.frc_java9485.utils;
 
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltHub;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltOutpost;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.frc_java9485.constants.FieldConsts;
-import swervelib.simulation.ironmaple.simulation.SimulatedArena;
-import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
-import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
-import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltHub;
-import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltOutpost;
-
-import org.littletonrobotics.junction.Logger;
 
 public class Simulation {
   private static Simulation m_instance;
@@ -56,21 +55,22 @@ public class Simulation {
 
     arena = SimulatedArena.getInstance();
 
-    // Blue Deposit Fuel
-    for (Translation2d fuelPose : blueDepositFuelStartPoses) {
-      arena.addGamePiece(new RebuiltFuelOnField(fuelPose));
-    }
-    // Red Deposit Fuel
-    for (Translation2d fuelPose : blueDepositFuelStartPoses) {
-      arena.addGamePiece(new RebuiltFuelOnField(flipFuelToRed(fuelPose)));
-    }
+    // // Blue Deposit Fuel
+    // for (Translation2d fuelPose : blueDepositFuelStartPoses) {
+    //   arena.addGamePiece(new RebuiltFuelOnField(fuelPose));
+    // }
+    // // Red Deposit Fuel
+    // for (Translation2d fuelPose : blueDepositFuelStartPoses) {
+    //   arena.addGamePiece(new RebuiltFuelOnField(flipFuelToRed(fuelPose)));
+    // }
 
-    generateMiddleFuels();
+    // generateMiddleFuels();
   }
 
   public void updateArena() {
+
     Pose3d[] fuelPoses = arena.getGamePiecesArrayByType("Fuel");
-    Logger.recordOutput("Field Simulation/Fuel poses", fuelPoses);
+    // Logger.recordOutput("Field Simulation/Fuel poses", fuelPoses);
 
     arena.simulationPeriodic();
   }
