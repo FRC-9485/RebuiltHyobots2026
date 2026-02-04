@@ -7,7 +7,7 @@ import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.frc_java9485.constants.mechanisms.HoodConsts;
+import static frc.frc_java9485.constants.mechanisms.HoodConsts.*;
 import frc.frc_java9485.motors.spark.SparkMaxMotor;
 import frc.frc_java9485.utils.TunableControls.TunableProfiledController;
 
@@ -30,7 +30,7 @@ public class Hood extends SubsystemBase implements HoodIO {
     encoder = hood.getEncoder();
 
     inputs = new HoodInputsAutoLogged();
-    controller = new TunableProfiledController(HoodConsts.TUNABLE_CONSTANTS);
+    controller = new TunableProfiledController(TUNABLE_CONSTANTS);
   }
 
   @Override

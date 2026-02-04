@@ -16,9 +16,9 @@ public class IntakeConsts {
     public static final double SETPOINT_DOWN = 10;
 
     public static final ControlConstants PIVOT_CONTROL_CONSTANTS = new ControlConstants()
-      .withPID(0.0, 0, 0.00)
+      .withPID(0.07, 0, 0.007)
       .withTolerance(3)
-      .withProfile(150, 100)
+      .withProfile(10, 5)
       .withFeedforward(1.65, 0.1)
       .withPhysical(0.0, 0.0);
 

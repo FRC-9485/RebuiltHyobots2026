@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.057,
-        "y": 6.03
+        "x": 1.48389156626506,
+        "y": 5.991060240963854
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.8795151037842941,
-        "y": 6.206065645755497
+        "x": 1.73389156626506,
+        "y": 5.991060240963854
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.68,
-        "y": 6.0305
+        "x": 0.45,
+        "y": 5.9912
       },
       "prevControl": {
-        "x": 0.8852275192903051,
-        "y": 5.8877356300544585
+        "x": 0.2,
+        "y": 5.9912
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,10 +31,17 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "coleta",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
-    "maxVelocity": 1.0,
-    "maxAcceleration": 0.3,
+    "maxVelocity": 0.5,
+    "maxAcceleration": 1.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,13 +49,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -179.53000985951988
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Esquerda",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -179.8309516317897
+    "rotation": 0.0
   },
   "useDefaultConstraints": false
 }

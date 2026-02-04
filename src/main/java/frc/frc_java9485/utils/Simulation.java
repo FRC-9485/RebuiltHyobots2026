@@ -1,10 +1,12 @@
 package frc.frc_java9485.utils;
 
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
-import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
-import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltHub;
-import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltOutpost;
+import swervelib.simulation.ironmaple.simulation.SimulatedArena;
+import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
+import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
+import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltHub;
+import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltOutpost;
+
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -26,6 +28,8 @@ public class Simulation {
       };
 
 
+  private final boolean generateFuels = true;
+
   private final RebuiltHub redHub;
   private final RebuiltHub blueHub;
   private final SimulatedArena arena;
@@ -43,7 +47,7 @@ public class Simulation {
 
   private Simulation() {
 
-    rebuiltArena = new Arena2026Rebuilt(true);
+    rebuiltArena = new Arena2026Rebuilt(false);
 
     redHub = new RebuiltHub(rebuiltArena, false);
     blueHub = new RebuiltHub(rebuiltArena, true);
@@ -55,23 +59,23 @@ public class Simulation {
 
     arena = SimulatedArena.getInstance();
 
-    // // Blue Deposit Fuel
-    // for (Translation2d fuelPose : blueDepositFuelStartPoses) {
-    //   arena.addGamePiece(new RebuiltFuelOnField(fuelPose));
-    // }
-    // // Red Deposit Fuel
-    // for (Translation2d fuelPose : blueDepositFuelStartPoses) {
-    //   arena.addGamePiece(new RebuiltFuelOnField(flipFuelToRed(fuelPose)));
-    // }
+    if (generateFuels) {
+      // Blue Deposit Fuel
+      for (Translation2d fuelPose : blueDepositFuelStartPoses) {
+        arena.addGamePiece(new RebuiltFuelOnField(fuelPose));
+      }
+      // Red Deposit Fuel
+      for (Translation2d fuelPose : blueDepositFuelStartPoses) {
+        arena.addGamePiece(new RebuiltFuelOnField(flipFuelToRed(fuelPose)));
+      }
 
-    // generateMiddleFuels();
+      generateMiddleFuels();
+    }
   }
 
   public void updateArena() {
-
     Pose3d[] fuelPoses = arena.getGamePiecesArrayByType("Fuel");
-    // Logger.recordOutput("Field Simulation/Fuel poses", fuelPoses);
-
+    Logger.recordOutput("Field Simulation/Fuel poses", fuelPoses);
     arena.simulationPeriodic();
   }
 

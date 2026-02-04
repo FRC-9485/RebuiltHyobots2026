@@ -3,7 +3,7 @@ package frc.robot.subsystems.mechanism.shooter.turret;
 import org.littletonrobotics.junction.Logger;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.frc_java9485.constants.mechanisms.TurretConsts;
+import static frc.frc_java9485.constants.mechanisms.TurretConsts.*;
 import frc.frc_java9485.motors.spark.SparkMaxMotor;
 import frc.frc_java9485.utils.TunableControls.TunableProfiledController;
 
@@ -30,15 +30,15 @@ public class Turret extends SubsystemBase implements TurretIO {
   }
 
   private Turret() {
-    turn = new SparkMaxMotor(TurretConsts.TURN_ID, "Turn Turret");
-    backSpin = new SparkMaxMotor(TurretConsts.CONTROL_ID, "Backspin");
-    shooter = new SparkMaxMotor(TurretConsts.SHOOTER_ID, "Shooter");
+    turn = new SparkMaxMotor(TURN_ID, "Turn Turret");
+    backSpin = new SparkMaxMotor(CONTROL_ID, "Backspin");
+    shooter = new SparkMaxMotor(SHOOTER_ID, "Shooter");
 
     turnEncoder = turn.getEncoder();
     controlEncoder = backSpin.getEncoder();
 
-    turnController = new TunableProfiledController(TurretConsts.TUNNABLE_TURN_CONSTANTS);
-    backspinnController = new TunableProfiledController(TurretConsts.TUNNABLE_BACKSPIN_CONSTANTS);
+    turnController = new TunableProfiledController(TUNNABLE_TURN_CONSTANTS);
+    backspinnController = new TunableProfiledController(TUNNABLE_BACKSPIN_CONSTANTS);
 
     inputs = new TurretInputsAutoLogged();
   }

@@ -1,10 +1,19 @@
 package frc.robot.subsystems.swerve;
 
+import static frc.frc_java9485.constants.RobotConsts.CURRENT_ROBOT_MODE;
+import static frc.frc_java9485.constants.mechanisms.DriveConsts.*;
+
+import java.io.File;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.DoubleSupplier;
+
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -26,10 +35,8 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.frc_java9485.constants.ComponentsConsts;
-import frc.frc_java9485.constants.RobotConsts;
+import static frc.frc_java9485.constants.ComponentsConsts.*;
 import frc.frc_java9485.constants.RobotConsts.RobotModes;
-import frc.frc_java9485.constants.mechanisms.DriveConsts;
 import frc.frc_java9485.motors.spark.SparkOdometryThread;
 import frc.frc_java9485.utils.MathUtils;
 import frc.robot.subsystems.swerve.IO.GyroIOInputsAutoLogged;
@@ -38,15 +45,10 @@ import frc.robot.subsystems.swerve.IO.SwerveIO;
 import frc.robot.subsystems.swerve.IO.SwerveInputsAutoLogged;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionInstances;
-
-import java.io.File;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.Logger;
 import swervelib.SwerveDrive;
 import swervelib.SwerveModule;
 import swervelib.parser.SwerveParser;
+import swervelib.simulation.ironmaple.simulation.drivesims.COTS;
 import swervelib.simulation.ironmaple.simulation.drivesims.GyroSimulation;
 import swervelib.simulation.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import swervelib.telemetry.SwerveDriveTelemetry;
@@ -87,27 +89,29 @@ public class Swerve extends SubsystemBase implements SwerveIO {
   private Swerve(File directory) {
     try {
       SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
-      swerveDrive = new SwerveParser(directory).createSwerveDrive(DriveConsts.MAX_SPEED);
+      swerveDrive = new SwerveParser(directory).createSwerveDrive(MAX_SPEED);
 
-        if (RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM) {
+        if (CURRENT_ROBOT_MODE == RobotModes.SIM) {
         swerveDrive.setHeadingCorrection(false);
         swerveDrive.setCosineCompensator(false);
 
         driveSimulator = swerveDrive.getMapleSimDrive().get();
         driveSimulator.setEnabled(true);
 
+        driveSimulator.config.gyroSimulationFactory = COTS.ofPigeon2();
+
         resetOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
       }
 
       encoders =
           new CANcoder[] {
-            new CANcoder(DriveConsts.CANCODER_MODULE1_ID), // FL
-            new CANcoder(DriveConsts.CANCODER_MODULE2_ID), // FR
-            new CANcoder(DriveConsts.CANCODER_MODULE3_ID), // BR
-            new CANcoder(DriveConsts.CANCODER_MODULE4_ID)  // BL
+            new CANcoder(CANCODER_MODULE1_ID), // FL
+            new CANcoder(CANCODER_MODULE2_ID), // FR
+            new CANcoder(CANCODER_MODULE3_ID), // BR
+            new CANcoder(CANCODER_MODULE4_ID)  // BL
           };
 
-      pigeon = new Pigeon2(ComponentsConsts.PIGEON2);
+      pigeon = new Pigeon2(PIGEON2);
       pigeonIO = new PigeonIO();
 
       swerveInputs = new SwerveInputsAutoLogged();
@@ -116,10 +120,10 @@ public class Swerve extends SubsystemBase implements SwerveIO {
       setupPathPlanner();
       SparkOdometryThread.getInstance().start();
 
-      kinematics = new SwerveDriveKinematics(DriveConsts.MODULES_TRANSLATIONS);
+      kinematics = new SwerveDriveKinematics(MODULES_TRANSLATIONS);
       poseEstimator =
           new SwerveDrivePoseEstimator3d(kinematics, getHeading3d(), swerveDrive.getModulePositions(),
-                                        new Pose3d(), DriveConsts.STATE_STD_DEVS, DriveConsts.VISION_STD_DEVS);
+                                        new Pose3d(), STATE_STD_DEVS, VISION_STD_DEVS);
 
       limelight = VisionInstances.getLimelightInstance();
       raspberry = VisionInstances.getRaspberryInstance();
@@ -135,7 +139,7 @@ public class Swerve extends SubsystemBase implements SwerveIO {
       limelight.estimatePose(this::addVisionMeasurement);
       poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getHeading3d(), swerveDrive.getModulePositions());
 
-    if (RobotConsts.CURRENT_ROBOT_MODE == RobotModes.REAL) {
+    if (CURRENT_ROBOT_MODE == RobotModes.REAL) {
       odometryLock.lock();
       pigeonIO.updateInputs(pigeonInputs);
       odometryLock.unlock();
@@ -148,35 +152,35 @@ public class Swerve extends SubsystemBase implements SwerveIO {
 
   @Override
   public Pose3d getPose3d() {
-    return RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM ?
+    return CURRENT_ROBOT_MODE == RobotModes.SIM ?
       new Pose3d(driveSimulator.getSimulatedDriveTrainPose()) :
       poseEstimator.getEstimatedPosition();
   }
 
   @Override
   public Pose2d getPose2d() {
-    return RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM ?
+    return CURRENT_ROBOT_MODE == RobotModes.SIM ?
      driveSimulator.getSimulatedDriveTrainPose() :
      poseEstimator.getEstimatedPosition().toPose2d();
   }
 
   @Override
   public Rotation2d getHeading2d() {
-    return RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM ?
+    return CURRENT_ROBOT_MODE == RobotModes.SIM ?
       driveSimulator.getGyroSimulation().getGyroReading() :
       Rotation2d.fromDegrees(MathUtils.scope0To360(pigeon.getYaw().getValueAsDouble()));
   }
 
   @Override
   public Rotation3d getHeading3d() {
-    return RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM ?
+    return CURRENT_ROBOT_MODE == RobotModes.SIM ?
       new Rotation3d(driveSimulator.getGyroSimulation().getGyroReading()) :
       pigeon.getRotation3d();
   }
 
   @Override
   public void resetOdometry(Pose3d pose) {
-    if (RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM) {
+    if (CURRENT_ROBOT_MODE == RobotModes.SIM) {
       driveSimulator.setSimulationWorldPose(pose.toPose2d());
     } else {
       poseEstimator.resetPose(pose);
@@ -185,8 +189,9 @@ public class Swerve extends SubsystemBase implements SwerveIO {
 
   @Override
   public void resetOdometry(Pose2d pose) {
-    if (RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM) {
+    if (CURRENT_ROBOT_MODE == RobotModes.SIM) {
       driveSimulator.setSimulationWorldPose(pose);
+      getGyroSimulation().setRotation(pose.getRotation());
     } else {
       poseEstimator.resetPose(new Pose3d(pose));
     }
@@ -199,7 +204,9 @@ public class Swerve extends SubsystemBase implements SwerveIO {
 
   @Override
   public ChassisSpeeds getRobotRelativeSpeeds() {
-    return swerveDrive.getRobotVelocity();
+    return CURRENT_ROBOT_MODE == RobotModes.SIM ?
+      driveSimulator.getDriveTrainSimulatedChassisSpeedsRobotRelative() :
+      swerveDrive.getRobotVelocity();
   }
 
   @Override
@@ -260,7 +267,9 @@ public class Swerve extends SubsystemBase implements SwerveIO {
                       Xcontroller * swerveDrive.getMaximumChassisVelocity(),
                       Ycontroller * swerveDrive.getMaximumChassisVelocity(),
                       rotation * swerveDrive.getMaximumChassisAngularVelocity(),
-                      pigeon.getRotation2d())
+                      CURRENT_ROBOT_MODE == RobotModes.SIM ?
+                        getGyroSimulation().getGyroReading() :
+                        pigeon.getRotation2d())
                   : new ChassisSpeeds(
                       Xcontroller * swerveDrive.getMaximumChassisVelocity(),
                       Ycontroller * swerveDrive.getMaximumChassisVelocity(),
@@ -268,7 +277,7 @@ public class Swerve extends SubsystemBase implements SwerveIO {
 
           ChassisSpeeds discretize = ChassisSpeeds.discretize(speeds, td);
           states = swerveDrive.kinematics.toSwerveModuleStates(discretize);
-          SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConsts.MAX_SPEED);
+          SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_SPEED);
           modules = swerveDrive.getModules();
 
           for (int i = 0; i < states.length; i++) {
@@ -276,6 +285,8 @@ public class Swerve extends SubsystemBase implements SwerveIO {
           }
         });
   }
+
+
 
   private void setupPathPlanner() {
     RobotConfig config;
@@ -286,16 +297,9 @@ public class Swerve extends SubsystemBase implements SwerveIO {
           this::resetOdometry,
           this::getRobotRelativeSpeeds,
           (speeds, feedforwards) -> driveFieldOriented(speeds),
-          new PPHolonomicDriveController(
-              new PIDConstants(
-                  DriveConsts.AUTO_TRANSLATION_kP,
-                  DriveConsts.AUTO_TRANSLATION_kI,
-                  DriveConsts.AUTO_TRANSLATION_kD),
-              new PIDConstants(
-                  DriveConsts.AUTO_ROTATION_kP,
-                  DriveConsts.AUTO_ROTATION_kI,
-                  DriveConsts.AUTO_ROTATION_kD)
-              ),
+          CURRENT_ROBOT_MODE == RobotModes.SIM ?
+            new PPHolonomicDriveController(SIM_TRANSLATION_PID_CONSTANTS, SIM_ROTATION_PID_CONSTANTS) :
+            new PPHolonomicDriveController(REAL_TRANSLATION_PID_CONSTANTS, REAL_ROTATION_PID_CONSTANTS),
           config,
           () -> {
             var alliance = DriverStation.getAlliance();
@@ -309,13 +313,13 @@ public class Swerve extends SubsystemBase implements SwerveIO {
       PathPlannerLogging.setLogActivePathCallback(
           (activePath) -> {
             Logger.recordOutput(
-                DriveConsts.ACTIVE_TRACJECTORY_LOG_ENTRY,
+                ACTIVE_TRACJECTORY_LOG_ENTRY,
                 activePath.toArray(new Pose2d[activePath.size()]));
           });
 
       PathPlannerLogging.setLogTargetPoseCallback(
           (targetPose) -> {
-            Logger.recordOutput(DriveConsts.TRAJECTORY_SETPOINT_LOG_ENTRY, targetPose);
+            Logger.recordOutput(TRAJECTORY_SETPOINT_LOG_ENTRY, targetPose);
           });
 
     } catch (Exception e) {
@@ -337,6 +341,7 @@ public class Swerve extends SubsystemBase implements SwerveIO {
         cancoderPos[i] = encoder.getPosition().getValueAsDouble();
       }
       inputs.currentCanCodersPosition = cancoderPos;
+      inputs.chassisSpeeds = getRobotRelativeSpeeds();
     }
   }
 }

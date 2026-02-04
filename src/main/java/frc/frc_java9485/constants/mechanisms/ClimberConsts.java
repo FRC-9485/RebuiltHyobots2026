@@ -19,14 +19,12 @@ public class ClimberConsts {
     private static final ControlConstants LEFT_CONSTANTS = new ControlConstants()
       .withPID(0, 0, 0)
       .withProfile(0, 0)
-      .withFeedforward(0, 0)
       .withPhysical(0, 0)
       .withTolerance(0);
 
     private static final ControlConstants RIGHT_CONSTANTS = new ControlConstants()
       .withPID(0, 0, 0)
       .withProfile(0, 0)
-      .withFeedforward(0, 0)
       .withPhysical(0, 0)
       .withTolerance(0);
 

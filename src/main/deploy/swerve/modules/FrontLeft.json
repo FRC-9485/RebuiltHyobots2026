@@ -10,7 +10,7 @@
     "canbus": null
   },
   "angle": {
-    "type": "sparkmax_neo",
+    "type": "sparkmax_wneo",
     "id": 4,
     "canbus": null
   },

@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -19,27 +25,26 @@
                 "data": {
                   "pathName": "Jogar do HP"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "shootar"
+                }
               }
             ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "Climber pro reservatorio"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Pegar no Reservatorio"
-                }
-              }
-            ]
           }
         }
       ]

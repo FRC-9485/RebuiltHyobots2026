@@ -1,14 +1,11 @@
 package frc.robot.subsystems.mechanism.intake;
 
 import static edu.wpi.first.units.Units.Volts;
-
 import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.frc_java9485.constants.mechanisms.IntakeConsts;
-import frc.frc_java9485.motors.spark.SparkFlexMotor;
+import static frc.frc_java9485.constants.mechanisms.IntakeConsts.*;
 import frc.frc_java9485.motors.spark.SparkMaxMotor;
 import frc.frc_java9485.utils.TunableControls.TunableProfiledController;
 
@@ -16,7 +13,7 @@ public class Intake extends SubsystemBase implements IntakeIO {
   private static Intake m_instance;
 
   private final SparkMaxMotor pivot;
-  private final SparkFlexMotor catchBall;
+  private final SparkMaxMotor catchBall;
 
   private final Encoder pivotEncoder;
 
@@ -36,15 +33,15 @@ public class Intake extends SubsystemBase implements IntakeIO {
   }
 
   private Intake() {
-    pivot = new SparkMaxMotor(IntakeConsts.PIVOT_ID, "Pivot");
-    catchBall = new SparkFlexMotor(IntakeConsts.CATCH_BALL_ID, "Catch Fuel");
+    pivot = new SparkMaxMotor(PIVOT_ID, "Pivot");
+    catchBall = new SparkMaxMotor(CATCH_BALL_ID, "Catch Fuel");
 
-    controller = new TunableProfiledController(IntakeConsts.PIVOT_CONSTANTS);
+    controller = new TunableProfiledController(PIVOT_CONSTANTS);
 
-    pivotEncoder = new Encoder(IntakeConsts.ENCODER_A_CHANNEL,
-                               IntakeConsts.ENCODER_B_CHANNEL);
-    pivotEncoder.setDistancePerPulse(IntakeConsts.ENCODER_DISTANCE_PER_PULSE);
-    pivotEncoder.setReverseDirection(IntakeConsts.ENCODER_INVERTED);
+    pivotEncoder = new Encoder(ENCODER_A_CHANNEL,
+                               ENCODER_B_CHANNEL);
+    pivotEncoder.setDistancePerPulse(ENCODER_DISTANCE_PER_PULSE);
+    pivotEncoder.setReverseDirection(ENCODER_INVERTED);
     pivotEncoder.reset();
 
     inputs = new IntakeInputsAutoLogged();

@@ -32,4 +32,10 @@ public final class FieldConsts {
 
     public static final Pose2d FIELD_CENTER_POSE =
         new Pose2d(FIELD_LENGTH_METERS / 2, FIELD_WIDTH_METERS / 2, Rotation2d.fromDegrees(0));
+
+    public static final Pose2d BLUE_OUTPOST_MIN =
+        new Pose2d(0.368, 0.369, Rotation2d.fromDegrees(0));
+
+    public static final Pose2d BLUE_OUTPOST_MAX =
+        new Pose2d(0.368, 1.127, Rotation2d.fromDegrees(0));
   }

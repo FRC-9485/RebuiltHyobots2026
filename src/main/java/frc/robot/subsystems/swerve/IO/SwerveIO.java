@@ -13,6 +13,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.wpilibj2.command.Command;
+
 import swervelib.simulation.ironmaple.simulation.drivesims.GyroSimulation;
 import swervelib.simulation.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 
@@ -27,6 +28,7 @@ public interface SwerveIO {
     public Pose3d currentPose3d = new Pose3d();
     public SwerveModuleState[] moduleStates = {};
     public double[] currentCanCodersPosition = {0, 0, 0, 0};
+    public ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
   }
 
   public Pose2d getPose2d();

@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -30,9 +36,34 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "Climbar"
+            "pathName": "Climber pro reservatorio"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Coletar no reservatorio"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "coleta"
+                }
+              }
+            ]
           }
         }
       ]

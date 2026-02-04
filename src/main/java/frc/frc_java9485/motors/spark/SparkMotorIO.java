@@ -1,6 +1,7 @@
 package frc.frc_java9485.motors.spark;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.units.measure.Voltage;
 
@@ -17,4 +18,5 @@ public interface SparkMotorIO {
     public void setVoltage(double voltage);
     public void setVoltage(Voltage voltage);
     public double getTemperature();
+    public void setIdleMode(IdleMode idleMode);
 }

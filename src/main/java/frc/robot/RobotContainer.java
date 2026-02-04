@@ -57,7 +57,11 @@ public class RobotContainer {
   }
 
   private void configureAutonomousCommands(){
-    namedCommands.configureAllCommands(intake);
+    if (RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM) {
+      namedCommands.configureSimCommands(intake, superStructure);
+    } else {
+      namedCommands.configureRealCommands(intake, superStructure);
+    }
   }
 
   private void configureBindings() {
