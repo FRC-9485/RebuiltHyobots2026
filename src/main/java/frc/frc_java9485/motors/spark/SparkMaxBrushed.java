@@ -4,38 +4,35 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 
-public class SparkFlexMotor implements SparkMotorIO {
+public class SparkMaxBrushed implements SparkMotorIO{
 
-  SparkFlex motor;
-  SparkFlexConfig config;
+  SparkMax motor;
+  SparkMaxConfig config;
   int id;
-  boolean inverted;
+  boolean isFollower;
   String name;
 
   double speed = 0;
   double porcentage = 0;
   double position = 0;
 
-  public SparkFlexMotor(int id, String name) {
+  public SparkMaxBrushed(int id, String name) {
     this(id, name, false);
   }
 
-  public SparkFlexMotor(int id, String name, boolean invert) {
+  public SparkMaxBrushed(int id, String name, boolean isFollower) {
     this.id = id;
-    this.inverted = invert;
+    this.isFollower = isFollower;
     this.name = name;
-    this.motor = new SparkFlex(id, SparkFlex.MotorType.kBrushless);
-    this.config = new SparkFlexConfig();
-
-    config.inverted(invert);
-    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    this.motor = new SparkMax(id, SparkMax.MotorType.kBrushed);
+    this.config = new SparkMaxConfig();
   }
 
   @Override
@@ -88,20 +85,21 @@ public class SparkFlexMotor implements SparkMotorIO {
     return motor.getBusVoltage();
   }
 
-  public SparkFlex getSpark() {
+  public SparkMax getSpark() {
     return motor;
   }
 
   @Override
   public RelativeEncoder getEncoder() {
-    return motor.getEncoder();
+    return motor.getAlternateEncoder();
   }
 
   @Override
   public void followMotor(int id) {
+    if (isFollower) {
       config.follow(id);
-
-      motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    }
+    motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   @Override
@@ -116,7 +114,7 @@ public class SparkFlexMotor implements SparkMotorIO {
 
   @Override
   public double getTemperature() {
-      return motor.getMotorTemperature();
+    return motor.getMotorTemperature();
   }
 
   @Override

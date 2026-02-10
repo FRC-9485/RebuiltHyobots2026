@@ -2,7 +2,6 @@ package frc.frc_java9485.utils;
 
 import com.pathplanner.lib.auto.NamedCommands;
 
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.commands.CatchBall;
 import frc.robot.subsystems.mechanism.SuperStructure;
 import frc.robot.subsystems.mechanism.SuperStructure.Actions;
@@ -30,7 +29,7 @@ public class RegisterNamedCommands {
     }
 
     private void configureIntakeCommands(Intake intake){
-        NamedCommands.registerCommand("CATCH FUELS", new CatchBall(0.3).until(() -> Timer.getFPGATimestamp() > 20));
+        NamedCommands.registerCommand("coleta", new CatchBall(0.7).withTimeout(5));
     }
 
     private void configureIntakeSimCommands(SuperStructure superStructure) {

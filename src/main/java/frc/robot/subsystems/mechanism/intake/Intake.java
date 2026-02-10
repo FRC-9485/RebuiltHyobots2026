@@ -2,8 +2,10 @@ package frc.robot.subsystems.mechanism.intake;
 
 import static edu.wpi.first.units.Units.Volts;
 import org.littletonrobotics.junction.Logger;
+
+
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.frc_java9485.constants.mechanisms.IntakeConsts.*;
 import frc.frc_java9485.motors.spark.SparkMaxMotor;
@@ -15,11 +17,10 @@ public class Intake extends SubsystemBase implements IntakeIO {
   private final SparkMaxMotor pivot;
   private final SparkMaxMotor catchBall;
 
-  private final Encoder pivotEncoder;
+  private final DutyCycleEncoder pivotEncoder;
 
   private final TunableProfiledController controller;
 
-  private double pivotAngle = 0;
   private double catchFuelSpeed = 0;
   private double pivotSetpoint = 0;
   private boolean isCollecting = false;
@@ -38,19 +39,21 @@ public class Intake extends SubsystemBase implements IntakeIO {
 
     controller = new TunableProfiledController(PIVOT_CONSTANTS);
 
-    pivotEncoder = new Encoder(ENCODER_A_CHANNEL,
-                               ENCODER_B_CHANNEL);
-    pivotEncoder.setDistancePerPulse(ENCODER_DISTANCE_PER_PULSE);
-    pivotEncoder.setReverseDirection(ENCODER_INVERTED);
-    pivotEncoder.reset();
+    pivotEncoder = new DutyCycleEncoder(ENCODER_CHANNEL);
+    pivotEncoder.setInverted(ENCODER_INVERTED);
 
     inputs = new IntakeInputsAutoLogged();
+
   }
 
   @Override
   public void periodic() {
     updateInputs(inputs);
     Logger.processInputs("Mechanism/Intake", inputs);
+
+    System.out.println("Angulo: " + pivotEncoder.get() * 360.0);
+    System.out.println("Setpoint: " + pivotSetpoint);
+    System.out.println("Voltagem: " + pivot.getVoltage() + "\n");
   }
 
   @Override
@@ -61,37 +64,12 @@ public class Intake extends SubsystemBase implements IntakeIO {
 
   @Override
   public void enablePivot(double setpoint) {
-    this.pivotSetpoint = setpoint;
-
-    pivotAngle = pivotEncoder.getDistance();
-
     controller.setGoal(setpoint);
+    double angle = pivotEncoder.get() * 360.0;
 
-    Voltage ff = Volts.of(controller.calculate(pivotAngle));
+    double output = controller.calculate(angle);
 
-    pivot.setVoltage(ff);
-    // this.setpoint = setpoint;
-
-    // double clampedngle =
-    //   MathUtil.clamp(setpoint, IntakeConsts.SETPOINT_DOWN, IntakeConsts.SETPOINT_UP);
-    // controller.setGoal(clampedngle);
-
-    // pivotAngle = pivotEncoder.getDistance();
-
-    // Voltage ff = Volts.of(controller.calculateFeedforward());
-    // volts = Volts.of(controller.calculate(pivotAngle));
-
-    // Voltage allVoltage;
-    // if(!controller.atGoal()){
-    //   allVoltage = volts.plus(ff);
-    // } else{
-    //   allVoltage = ff;
-    // }
-
-    // double voltsInDouble = allVoltage.in(Volts);
-    // voltsInDouble = MathUtil.clamp(voltsInDouble, -12.0, 12.0);
-
-    // pivot.setVoltage(voltsInDouble);
+    pivot.setVoltage(output);
   }
 
   @Override
@@ -111,10 +89,10 @@ public class Intake extends SubsystemBase implements IntakeIO {
 
   @Override
   public void updateInputs(IntakeInputs inputs) {
-      inputs.isColecting = isColecting();
+    inputs.isColecting = isColecting();
     inputs.catchFuelSpeed = getCatchFuelSpeed();
     inputs.pivotVolts = pivotVolts;
-    inputs.pivotAngle = pivotEncoder.getDistance();
+    inputs.pivotAngle = pivotEncoder.get()*360.0;
     inputs.pivotSetpoint = pivotSetpoint;
   }
 }

@@ -90,8 +90,9 @@ public class Swerve extends SubsystemBase implements SwerveIO {
     try {
       SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
       swerveDrive = new SwerveParser(directory).createSwerveDrive(MAX_SPEED);
+      swerveDrive.setMotorIdleMode(false);
 
-        if (CURRENT_ROBOT_MODE == RobotModes.SIM) {
+      if (CURRENT_ROBOT_MODE == RobotModes.SIM) {
         swerveDrive.setHeadingCorrection(false);
         swerveDrive.setCosineCompensator(false);
 
@@ -127,7 +128,7 @@ public class Swerve extends SubsystemBase implements SwerveIO {
 
       limelight = VisionInstances.getLimelightInstance();
       raspberry = VisionInstances.getRaspberryInstance();
-    } catch (Exception e) {
+        } catch (Exception e) {
       throw new RuntimeException("Erro criando Swerve!!!!\n", e);
     }
   }
@@ -138,6 +139,8 @@ public class Swerve extends SubsystemBase implements SwerveIO {
       raspberry.estimatePose(this::addVisionMeasurement);
       limelight.estimatePose(this::addVisionMeasurement);
       poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getHeading3d(), swerveDrive.getModulePositions());
+
+      swerveDrive.updateOdometry();
 
     if (CURRENT_ROBOT_MODE == RobotModes.REAL) {
       odometryLock.lock();

@@ -29,13 +29,13 @@ public final class DriveConsts {
   private static final double SIM_AUTO_TRANSLATION_kI = 0.00019;
   private static final double SIM_AUTO_TRANSLATION_kD = 0.00075;
 
-  private static final double REAL_AUTO_TRANSLATION_kP = 0.010;
+  private static final double REAL_AUTO_TRANSLATION_kP = 0.256;
   private static final double REAL_AUTO_TRANSLATION_kI = 0.000;
-  private static final double REAL_AUTO_TRANSLATION_kD = 0.001;
+  private static final double REAL_AUTO_TRANSLATION_kD = 0.000;
 
-  private static final double REAL_AUTO_ROTATION_kP = 0.008;
+  private static final double REAL_AUTO_ROTATION_kP = 0.02;
   private static final double REAL_AUTO_ROTATION_kI = 0.000;
-  private static final double REAL_AUTO_ROTATION_kD = 0.000;
+  private static final double REAL_AUTO_ROTATION_kD = 0.01;
 
   public static final PIDConstants SIM_ROTATION_PID_CONSTANTS =
     new PIDConstants(SIM_AUTO_ROTATION_kP, SIM_AUTO_ROTATION_kI, SIM_AUTO_ROTATION_kD);

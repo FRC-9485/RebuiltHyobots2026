@@ -4,21 +4,21 @@ import org.littletonrobotics.junction.Logger;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.frc_java9485.constants.mechanisms.TurretConsts.*;
+
+import frc.frc_java9485.motors.spark.SparkFlexMotor;
 import frc.frc_java9485.motors.spark.SparkMaxMotor;
 import frc.frc_java9485.utils.TunableControls.TunableProfiledController;
 
 public class Turret extends SubsystemBase implements TurretIO {
   private static Turret m_instance;
 
-  private final SparkMaxMotor turn;
-  private final SparkMaxMotor backSpin;
-  private final SparkMaxMotor shooter;
+  private final SparkMaxMotor turnTurret;
+  private final SparkFlexMotor leftShooterMotor;
+  private final SparkFlexMotor rightShooterMotor;
 
   private final RelativeEncoder turnEncoder;
-  private final RelativeEncoder controlEncoder;
 
   private final TunableProfiledController turnController;
-  private final TunableProfiledController backspinnController;
 
   private TurretInputsAutoLogged inputs;
 
@@ -30,15 +30,13 @@ public class Turret extends SubsystemBase implements TurretIO {
   }
 
   private Turret() {
-    turn = new SparkMaxMotor(TURN_ID, "Turn Turret");
-    backSpin = new SparkMaxMotor(CONTROL_ID, "Backspin");
-    shooter = new SparkMaxMotor(SHOOTER_ID, "Shooter");
+    turnTurret = new SparkMaxMotor(TURN_ID, "Turn Turret");
+    leftShooterMotor = new SparkFlexMotor(LEFT_SHOOTER, "left shooter");
+    rightShooterMotor = new SparkFlexMotor(RIGHT_SHOOTER, "right shooter");
 
-    turnEncoder = turn.getEncoder();
-    controlEncoder = backSpin.getEncoder();
+    turnEncoder = turnTurret.getEncoder();
 
     turnController = new TunableProfiledController(TUNNABLE_TURN_CONSTANTS);
-    backspinnController = new TunableProfiledController(TUNNABLE_BACKSPIN_CONSTANTS);
 
     inputs = new TurretInputsAutoLogged();
   }
@@ -67,7 +65,7 @@ public class Turret extends SubsystemBase implements TurretIO {
 
   @Override
   public double getControlPosition() {
-    return controlEncoder.getVelocity();
+    return 0;
   }
 
   @Override

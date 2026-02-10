@@ -25,8 +25,8 @@ public class VisionConsts {
     public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT =
         AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
 
-    public static final Matrix<N4, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(2, 2, 2, 0);
-    public static final Matrix<N4, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(0.5, 0.5, 1, 0);
+        public static final Matrix<N4, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(0.1, 0.1, 0.1, 0);
+        public static final Matrix<N4, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(0.2, 0.2, 0.2, 0);
 
     public static SimCameraProperties LIMELIGHT_CAMERA_PROPS;
     public static SimCameraProperties RASPBERRY_CAMERA_PROPS;
@@ -56,7 +56,7 @@ public class VisionConsts {
             RASPBERRY_CAMERA_PROPS.setAvgLatencyMs(35);
             RASPBERRY_CAMERA_PROPS.setLatencyStdDevMs(5);
             RASPBERRY_CAMERA_PROPS.setCalibError(0.5, 0.5);
-            RASPBERRY_CAMERA_PROPS.setCalibration(1920, 1080, Rotation2d.fromDegrees(110));
+            RASPBERRY_CAMERA_PROPS.setCalibration(640, 480, Rotation2d.fromDegrees(110));
         }
     }
 }

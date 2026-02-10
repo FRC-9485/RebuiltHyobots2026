@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.frc_java9485.joystick.mechanism.MechanismJoystick;
 import frc.robot.subsystems.mechanism.intake.Intake;
 
 public class CatchBall extends Command{
@@ -31,6 +30,6 @@ public class CatchBall extends Command{
 
     @Override
     public boolean isFinished() {
-        return !MechanismJoystick.getInstance().x().getAsBoolean();
+        return false;
     }
 }

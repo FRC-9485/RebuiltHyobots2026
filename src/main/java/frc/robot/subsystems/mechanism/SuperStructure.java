@@ -1,16 +1,15 @@
 package frc.robot.subsystems.mechanism;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import static edu.wpi.first.units.Units.Meters;
+import static frc.frc_java9485.constants.RobotConsts.*;
+import static frc.frc_java9485.constants.mechanisms.IntakeConsts.*;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.frc_java9485.constants.RobotConsts.*;
-import frc.frc_java9485.constants.RobotConsts.RobotModes;
 import frc.frc_java9485.constants.mechanisms.ConveyorConsts;
-
-import static frc.frc_java9485.constants.mechanisms.IntakeConsts.*;
 import frc.robot.subsystems.mechanism.conveyor.Conveyor;
 import frc.robot.subsystems.mechanism.intake.Intake;
 import frc.robot.subsystems.mechanism.shooter.hood.Hood;
@@ -19,7 +18,7 @@ import frc.robot.subsystems.swerve.Swerve;
 import swervelib.simulation.ironmaple.simulation.IntakeSimulation;
 import swervelib.simulation.ironmaple.simulation.IntakeSimulation.IntakeSide;
 
-public class SuperStructure extends SubsystemBase implements SuperStructureIO {
+public class SuperStructure extends SubsystemBase{
   private final Hood hood;
   private final Turret turret;
   private final Intake intake;
@@ -50,26 +49,25 @@ public class SuperStructure extends SubsystemBase implements SuperStructureIO {
     }
   }
 
+  @Override
+  public void periodic() {
+  }
+
   public enum Actions {
     SHOOT_FUEL,
     CATCH_FUEL,
     CLOSE_INTAKE,
-    RUN_CONVEYOR,
-    STOP_CONVEYOR,
     LOCK_CONVEYOR,
     AUTOMATIC_HOOD,
     MANUAL_HOOD,
     LOCK_HOOD,
     CLIMBER_L1,
-    CLIMBER_L2,
-    CLIMBER_L3,
     AUTOMATIC_TURRET,
     MANUAL_TURRET,
     LOCK_TURRET,
     SECURITY
   }
 
-  @Override
   public Command setAction(Actions actions) {
     return run(() ->{
       switch (actions) {
@@ -77,21 +75,12 @@ public class SuperStructure extends SubsystemBase implements SuperStructureIO {
           break;
 
         case CATCH_FUEL:
-        // intake.catchBall(0.3);
-        intake.enablePivot(SETPOINT_DOWN);
-        // intakeInputs = IntakeConsts.SETPOINT_DOWN;
+            intake.enablePivot(SETPOINT_DOWN);
+            intake.catchFuel(COLLECT_FUEL_SPEED);
           break;
 
         case CLOSE_INTAKE:
-        // intake.catchBall(0);
-        intake.enablePivot(SETPOINT_UP);
-        // intakeInputs = IntakeConsts.SETPOINT_UP;
-          break;
-
-        case RUN_CONVEYOR:
-          break;
-
-        case STOP_CONVEYOR:
+          intake.enablePivot(SETPOINT_UP);
           break;
 
         case LOCK_CONVEYOR:
@@ -103,12 +92,6 @@ public class SuperStructure extends SubsystemBase implements SuperStructureIO {
         case CLIMBER_L1:
           break;
 
-        case CLIMBER_L2:
-          break;
-
-        case CLIMBER_L3:
-          break;
-
         case LOCK_TURRET:
           break;
 
@@ -118,27 +101,23 @@ public class SuperStructure extends SubsystemBase implements SuperStructureIO {
     });
   }
 
-  @Override
   public Command setActionSim(Actions action) {
     return new Command() {
-      @Override
           public void execute() {
               currentAction = action;
           }
 
-      @Override
       public boolean isFinished() {
           return currentAction == action;
       }
     };
   }
 
-  @Override
   public void simulationPeriodic() {
       switch (currentAction) {
         case SHOOT_FUEL:
-            System.out.println("shootando");
-            break;
+
+          break;
 
           case CATCH_FUEL:
             intakeSimulation.startIntake();
@@ -148,22 +127,10 @@ public class SuperStructure extends SubsystemBase implements SuperStructureIO {
             intakeSimulation.stopIntake();
             break;
 
-          case RUN_CONVEYOR:
-            break;
-
-          case STOP_CONVEYOR:
-            break;
-
           case LOCK_HOOD:
             break;
 
           case CLIMBER_L1:
-            break;
-
-          case CLIMBER_L2:
-            break;
-
-          case CLIMBER_L3:
             break;
 
           case LOCK_TURRET:
@@ -175,7 +142,6 @@ public class SuperStructure extends SubsystemBase implements SuperStructureIO {
     Logger.recordOutput("Mechanism/Intake/Fuel Quantity", intakeSimulation.getGamePiecesAmount());
   }
 
-  @Override
   public Actions getAction() {
     return currentAction;
   }

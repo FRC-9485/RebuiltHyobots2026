@@ -44,7 +44,7 @@
             "fov": 82
         },
         {
-            "name": "raspberryphoto",
+            "name": "raspphoto",
             "rotations": [
                 {
                 "axis": "x",

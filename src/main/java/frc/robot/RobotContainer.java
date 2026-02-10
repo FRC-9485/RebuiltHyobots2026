@@ -10,7 +10,6 @@ import frc.frc_java9485.joystick.driver.DriverJoystick;
 import frc.frc_java9485.joystick.mechanism.MechanismJoystick;
 import frc.frc_java9485.utils.RegisterNamedCommands;
 import frc.robot.commands.CatchBall;
-import frc.robot.commands.swerveUtils.ResetPigeon;
 import frc.robot.commands.swerveUtils.ResetSimGyro;
 import frc.robot.subsystems.mechanism.SuperStructure;
 import frc.robot.subsystems.mechanism.SuperStructure.Actions;
@@ -65,12 +64,9 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    driverJoystick.getLeftBack().onTrue(new ResetPigeon());
-
-    mechanismJoystick.a().whileTrue(superStructure.setAction(Actions.CATCH_FUEL));
-    mechanismJoystick.b().whileTrue(superStructure.setAction(Actions.CLOSE_INTAKE));
-
-    mechanismJoystick.x().whileTrue(new CatchBall(0.3));
+    mechanismJoystick.a().onTrue(superStructure.setAction(Actions.CATCH_FUEL));
+    mechanismJoystick.x().whileTrue(new CatchBall(0.7));
+    mechanismJoystick.b().onTrue(superStructure.setAction(Actions.CLOSE_INTAKE));
   }
 
   private void configureSimBindings() {

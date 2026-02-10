@@ -49,6 +49,7 @@ public class Vision extends SubsystemBase implements VisionIO {
                     visionSim = new VisionSystemSim(VisionConsts.RASPBERRY_CAMERA_NAME);
 
                     visionSim.addAprilTags(VisionConsts.APRIL_TAG_FIELD_LAYOUT);
+                    visionSim.addCamera(cameraSim, VisionConsts.RASPBERRY_ROBOT_TO_CAMERA);
                     cameraSim.enableRawStream(true);
                     cameraSim.enableProcessedStream(true);
                     cameraSim.enableDrawWireframe(true);
@@ -59,8 +60,9 @@ public class Vision extends SubsystemBase implements VisionIO {
                 poseEstimator.setRobotToCameraTransform(VisionConsts.LIMELIGHT_ROBOT_TO_CAMERA);
 
                 if (RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM) {
-                    cameraSim = new PhotonCameraSim(camera, VisionConsts.LIMELIGHT_CAMERA_PROPS);
                     visionSim = new VisionSystemSim(VisionConsts.LIMELIGHT_CAMERA_NAME);
+                    cameraSim = new PhotonCameraSim(camera, VisionConsts.LIMELIGHT_CAMERA_PROPS);
+                    visionSim.addCamera(cameraSim, VisionConsts.LIMELIGHT_ROBOT_TO_CAMERA);
 
                     visionSim.addAprilTags(VisionConsts.APRIL_TAG_FIELD_LAYOUT);
 

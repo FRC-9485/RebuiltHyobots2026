@@ -5,10 +5,9 @@ import frc.frc_java9485.utils.TunableControls.TunableControlConstants;
 
 public class TurretConsts {
     public static final int TURN_ID = 72; // ALTERAR, ajeitar torreta
-    public static final int CONTROL_ID = 71; // ALTERAR
-    public static final int SHOOTER_ID = 70; // ALTERAR
+    public static final int RIGHT_SHOOTER = 11;
+    public static final int LEFT_SHOOTER = 12;
 
-    public static final int BACKSPIN_RPM_SETPOINT = 0; // ALTERAR
     public static final int SHOOTER_SPEED = 0; // ALTERAR
 
 
