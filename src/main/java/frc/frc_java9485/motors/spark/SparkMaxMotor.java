@@ -123,4 +123,16 @@ public class SparkMaxMotor implements SparkMotorIO{
 
       motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
+
+  @Override
+  public double getCurrent(){
+    return motor.getOutputCurrent();
+  }
+
+  @Override
+  public void setInvert() {
+      config.inverted(true);
+
+      motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+  }
 }

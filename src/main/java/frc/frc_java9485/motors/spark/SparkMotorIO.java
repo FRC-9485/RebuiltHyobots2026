@@ -19,4 +19,6 @@ public interface SparkMotorIO {
     public void setVoltage(Voltage voltage);
     public double getTemperature();
     public void setIdleMode(IdleMode idleMode);
+    public double getCurrent();
+    public void setInvert();
 }

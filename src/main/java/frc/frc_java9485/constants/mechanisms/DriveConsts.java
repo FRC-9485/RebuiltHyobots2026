@@ -1,13 +1,13 @@
 package frc.frc_java9485.constants.mechanisms;
 
 
-import com.pathplanner.lib.config.PIDConstants;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
+import frc.frc_java9485.loggers.LoggedPathPlannerPIDConstants;
 
 public final class DriveConsts {
   public static final String ACTIVE_TRACJECTORY_LOG_ENTRY = "Swerve/Auto/Active Trajectory";
@@ -21,33 +21,34 @@ public final class DriveConsts {
   public static final int CANCODER_MODULE3_ID = 12;
   public static final int CANCODER_MODULE4_ID = 13;
 
-  private static final double SIM_AUTO_ROTATION_kP = 0.01001;
-  private static final double SIM_AUTO_ROTATION_kI = 0.00001;
-  private static final double SIM_AUTO_ROTATION_kD = 0.00007948059087543;
+  private static final double SIM_ROTATION_kP = 0.01001;
+  private static final double SIM_ROTATION_kI = 0.00001;
+  private static final double SIM_ROTATION_kD = 0.00007948059087543;
 
-  private static final double SIM_AUTO_TRANSLATION_kP = 0.014;
-  private static final double SIM_AUTO_TRANSLATION_kI = 0.00019;
-  private static final double SIM_AUTO_TRANSLATION_kD = 0.00075;
+  private static final double SIM_TRANSLATION_kP = 0.014;
+  private static final double SIM_TRANSLATION_kI = 0.00019;
+  private static final double SIM_TRANSLATION_kD = 0.00075;
 
-  private static final double REAL_AUTO_TRANSLATION_kP = 0.256;
-  private static final double REAL_AUTO_TRANSLATION_kI = 0.000;
-  private static final double REAL_AUTO_TRANSLATION_kD = 0.000;
+  private static final double REAL_TRANSLATION_kP = 0.256;
+  private static final double REAL_TRANSLATION_kI = 0.000;
+  private static final double REAL_TRANSLATION_kD = 0.000;
 
-  private static final double REAL_AUTO_ROTATION_kP = 0.02;
-  private static final double REAL_AUTO_ROTATION_kI = 0.000;
-  private static final double REAL_AUTO_ROTATION_kD = 0.01;
+  private static final double REAL_ROTATION_kP = 0.03;
+  private static final double REAL_ROTATION_kI = 0.000;
+  private static final double REAL_ROTATION_kD = 0.01;
 
-  public static final PIDConstants SIM_ROTATION_PID_CONSTANTS =
-    new PIDConstants(SIM_AUTO_ROTATION_kP, SIM_AUTO_ROTATION_kI, SIM_AUTO_ROTATION_kD);
+  public static LoggedPathPlannerPIDConstants REAL_TRANSLATION_PID =
+    new LoggedPathPlannerPIDConstants("PathPlanner/Tuning/REAL Translation", REAL_TRANSLATION_kP, REAL_TRANSLATION_kI, REAL_TRANSLATION_kD);
 
-  public static final PIDConstants SIM_TRANSLATION_PID_CONSTANTS =
-    new PIDConstants(SIM_AUTO_TRANSLATION_kP, SIM_AUTO_TRANSLATION_kI, SIM_AUTO_TRANSLATION_kD);
+  public static LoggedPathPlannerPIDConstants REAL_ROTATION_PID =
+    new LoggedPathPlannerPIDConstants("PathPlanner/Tuning/REAL Rotation", REAL_ROTATION_kP, REAL_ROTATION_kI, REAL_ROTATION_kD);
 
-  public static final PIDConstants REAL_ROTATION_PID_CONSTANTS =
-    new PIDConstants(REAL_AUTO_ROTATION_kP, REAL_AUTO_ROTATION_kI, REAL_AUTO_ROTATION_kD);
+  public static LoggedPathPlannerPIDConstants SIM_TRANSLATION_PID =
+    new LoggedPathPlannerPIDConstants("PathPlanner/Tuning/SIM Translation", SIM_TRANSLATION_kP, SIM_TRANSLATION_kI, SIM_TRANSLATION_kD);
 
-  public static final PIDConstants REAL_TRANSLATION_PID_CONSTANTS =
-    new PIDConstants(REAL_AUTO_TRANSLATION_kP, REAL_AUTO_TRANSLATION_kI, REAL_AUTO_TRANSLATION_kD);
+  public static LoggedPathPlannerPIDConstants SIM_ROTATION_PID =
+    new LoggedPathPlannerPIDConstants("PathPlanner/Tuning/SIM Rotation", SIM_ROTATION_kP, SIM_ROTATION_kI, SIM_ROTATION_kD);
+
 
   public static final int ODOMETRY_FREQUENCY = 100; //HZ
 

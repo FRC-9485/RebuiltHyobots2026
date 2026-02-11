@@ -14,12 +14,15 @@ import frc.robot.commands.swerveUtils.ResetSimGyro;
 import frc.robot.subsystems.mechanism.SuperStructure;
 import frc.robot.subsystems.mechanism.SuperStructure.Actions;
 import frc.robot.subsystems.mechanism.intake.Intake;
+import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.Turret;
+import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretIO;
 import frc.robot.subsystems.swerve.Swerve;
 
 public class RobotContainer {
   private final Intake intake;
   private final Swerve swerveSubsystem;
   private final SuperStructure superStructure;
+  private final Turret turret;
 
   private final DriverJoystick driverJoystick;
   private final MechanismJoystick mechanismJoystick;
@@ -33,6 +36,7 @@ public class RobotContainer {
     swerveSubsystem = Swerve.getInstance();
     intake = Intake.getInstance();
     superStructure = SuperStructure.getInstance();
+    turret = new Turret(new TurretIO() {},swerveSubsystem::getRobotRelativeSpeeds, swerveSubsystem::getPose2d);
 
     driverJoystick = DriverJoystick.getInstance();
     mechanismJoystick = MechanismJoystick.getInstance();

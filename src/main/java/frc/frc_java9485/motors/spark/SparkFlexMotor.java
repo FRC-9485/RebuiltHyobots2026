@@ -125,4 +125,15 @@ public class SparkFlexMotor implements SparkMotorIO {
 
       motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
+
+  public double getCurrent(){
+    return motor.getOutputCurrent();
+  }
+
+  @Override
+  public void setInvert() {
+    config.inverted(true);
+
+    motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+  }
 }

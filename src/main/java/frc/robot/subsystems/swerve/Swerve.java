@@ -301,8 +301,8 @@ public class Swerve extends SubsystemBase implements SwerveIO {
           this::getRobotRelativeSpeeds,
           (speeds, feedforwards) -> driveFieldOriented(speeds),
           CURRENT_ROBOT_MODE == RobotModes.SIM ?
-            new PPHolonomicDriveController(SIM_TRANSLATION_PID_CONSTANTS, SIM_ROTATION_PID_CONSTANTS) :
-            new PPHolonomicDriveController(REAL_TRANSLATION_PID_CONSTANTS, REAL_ROTATION_PID_CONSTANTS),
+            new PPHolonomicDriveController(SIM_TRANSLATION_PID.getPIDConsants(), SIM_ROTATION_PID.getPIDConsants()) :
+            new PPHolonomicDriveController(REAL_TRANSLATION_PID.getPIDConsants(), REAL_ROTATION_PID.getPIDConsants()),
           config,
           () -> {
             var alliance = DriverStation.getAlliance();

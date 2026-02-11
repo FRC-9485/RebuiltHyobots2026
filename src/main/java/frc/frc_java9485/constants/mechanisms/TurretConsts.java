@@ -1,30 +1,30 @@
 package frc.frc_java9485.constants.mechanisms;
 
+import static edu.wpi.first.units.Units.Inches;
+
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.measure.Distance;
 import frc.frc_java9485.utils.TunableControls.ControlConstants;
 import frc.frc_java9485.utils.TunableControls.TunableControlConstants;
 
 public class TurretConsts {
-    public static final int TURN_ID = 72; // ALTERAR, ajeitar torreta
-    public static final int RIGHT_SHOOTER = 11;
-    public static final int LEFT_SHOOTER = 12;
 
-    public static final int SHOOTER_SPEED = 0; // ALTERAR
+  public static final int RIGHT_SHOOTER = 11;
+  public static final int LEFT_SHOOTER = 12;
+  public static final int TURN_TURRET = 13;
+  public static final int FUEL_TO_TURRET = 14;
 
+  public static final int LOOKAHEAD_ITERATIONS = 3;
+  public static final Distance DISTANCE_ABOVE_FUNNEL = Inches.of(20); // how high to clear the funnel
 
-    private static final ControlConstants TURN_CONSTANTS = new ControlConstants()
-      .withPID(0, 0, 0)
-      .withFeedforward(0, 0)
-      .withPhysical(0, 0)
-      .withProfile(0, 0)
-      .withTolerance(0);
+  public static final Transform3d ROBOT_TO_TURRET_TRANSFORM =
+                new Transform3d(new Translation3d(Inches.zero(), Inches.of(8), Inches.of(17.5)), Rotation3d.kZero);
 
-    private static final ControlConstants BACKSPIN_CONSTANTS = new ControlConstants()
-      .withPID(0, 0, 0)
-      .withFeedforward(0, 0)
-      .withPhysical(0, 0)
-      .withProfile(0, 0)
-      .withTolerance(0);
+  public static final ControlConstants TURRET_CONSTANTS = new ControlConstants()
+  .withProfile(10, 4)//testes
+  .withPID(0.01, 0, 0);
 
-    public static TunableControlConstants TUNNABLE_TURN_CONSTANTS = new TunableControlConstants("Turn PID", TURN_CONSTANTS);
-    public static TunableControlConstants TUNNABLE_BACKSPIN_CONSTANTS = new TunableControlConstants("Backspin PID", BACKSPIN_CONSTANTS);
+  public static final TunableControlConstants TURRET_TUNABLE = new TunableControlConstants("shooter tunableConstants", TURRET_CONSTANTS);
 }
