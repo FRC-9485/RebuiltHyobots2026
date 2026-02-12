@@ -53,4 +53,6 @@ public final class FieldConsts {
 
     public static final Distance FUNNEL_RADIUS = Inches.of(24);
     public static final Distance FUNNEL_HEIGHT = Inches.of(72 - 56.4);
+
+    public static final Distance ALLIANCE_ZONE = Inches.of(156.06);
 }

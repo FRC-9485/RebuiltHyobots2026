@@ -14,6 +14,8 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
@@ -37,7 +39,9 @@ public class Vision extends SubsystemBase implements VisionIO {
     private VisionSystemSim visionSim;
 
     public Vision(Cooprocessor cooprocessor) {
-        poseEstimator = new PhotonPoseEstimator(VisionConsts.APRIL_TAG_FIELD_LAYOUT, new Transform3d());
+        poseEstimator = new PhotonPoseEstimator(VisionConsts.APRIL_TAG_FIELD_LAYOUT,
+                                                PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_RIO,
+                                                new Transform3d(0.1, 0.1, 0.1, Rotation3d.kZero));
 
         switch (cooprocessor) {
             case RASPBERRY:

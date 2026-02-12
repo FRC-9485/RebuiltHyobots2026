@@ -31,13 +31,17 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.frc_java9485.constants.ComponentsConsts.*;
+import static frc.frc_java9485.constants.FieldConsts.ALLIANCE_ZONE;
+import static frc.frc_java9485.constants.FieldConsts.FIELD_LENGTH;
+
 import frc.frc_java9485.constants.RobotConsts.RobotModes;
-import frc.frc_java9485.motors.spark.SparkOdometryThread;
+import frc.frc_java9485.motors.io.SparkOdometryThread;
 import frc.frc_java9485.utils.MathUtils;
 import frc.robot.subsystems.swerve.IO.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.swerve.IO.PigeonIO;
@@ -329,6 +333,15 @@ public class Swerve extends SubsystemBase implements SwerveIO {
       System.out.println(e.getMessage());
     }
   }
+
+  @Override
+  public boolean inAllianceZone() {
+        Pose2d pose = getPose2d();
+        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                        && pose.getMeasureX().lt(ALLIANCE_ZONE)
+                || DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+                        && pose.getMeasureX().gt(FIELD_LENGTH.minus(ALLIANCE_ZONE));
+    }
 
   @Override
   public void updateInputs(SwerveInputs inputs) {

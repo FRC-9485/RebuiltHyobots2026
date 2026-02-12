@@ -9,7 +9,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.frc_java9485.constants.ComponentsConsts;
 import frc.frc_java9485.constants.mechanisms.DriveConsts;
-import frc.frc_java9485.motors.spark.SparkOdometryThread;
+import frc.frc_java9485.motors.io.SparkOdometryThread;
+
 import java.util.Queue;
 
 public class PigeonIO implements GyroIO {

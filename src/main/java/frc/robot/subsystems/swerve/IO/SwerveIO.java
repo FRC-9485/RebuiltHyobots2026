@@ -52,6 +52,7 @@ public interface SwerveIO {
 
   public void driveFieldOriented(ChassisSpeeds speed);
 
+  public boolean inAllianceZone();
 
   public Command getAutonomousCommand(String path, boolean altern);
 

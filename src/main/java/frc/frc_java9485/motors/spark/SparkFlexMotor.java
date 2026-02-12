@@ -10,6 +10,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.frc_java9485.motors.io.SparkMotorIO;
 
 public class SparkFlexMotor implements SparkMotorIO {
 

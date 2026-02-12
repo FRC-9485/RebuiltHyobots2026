@@ -1,29 +1,17 @@
-// // Copyright (c) FIRST and other WPILib contributors.
-// // Open Source Software; you can modify and/or share it under the terms of
-// // the WPILib BSD license file in the root directory of this project.
-
 // package frc.robot.subsystems.mechanism.shooter.turret.turretOFC;
 
 // import static edu.wpi.first.units.Units.Amps;
-// import static edu.wpi.first.units.Units.Radians;
 // import static edu.wpi.first.units.Units.RadiansPerSecond;
-// import static edu.wpi.first.units.Units.Rotations;
 // import static edu.wpi.first.units.Units.Volts;
 
-// import com.ctre.phoenix6.BaseStatusSignal;
-// import com.ctre.phoenix6.StatusSignal;
 // import com.ctre.phoenix6.controls.NeutralOut;
-// import com.ctre.phoenix6.controls.VoltageOut;
-// import com.ctre.phoenix6.hardware.TalonFX;
-// import edu.wpi.first.units.measure.Angle;
-// import edu.wpi.first.units.measure.AngularVelocity;
-// import edu.wpi.first.units.measure.Current;
+
 // import edu.wpi.first.units.measure.Voltage;
+
 // import frc.frc_java9485.constants.mechanisms.TurretConsts;
 // import frc.frc_java9485.motors.spark.SparkFlexMotor;
 // import frc.frc_java9485.motors.spark.SparkMaxMotor;
 
-// /** Add your docs here. */
 // public class TurretSparkMaxIO implements TurretIO {
 //     private final SparkFlexMotor leftMotor;
 //     private final SparkFlexMotor rightMotor;
@@ -33,16 +21,6 @@
 //     private final double turnPosition;
 //     private final double turnVelocity;
 //     private final double turnCurrent;
-
-//     // private final StatusSignal<Angle> hoodPosition;
-//     // private final StatusSignal<AngularVelocity> hoodVelocity;
-//     // private final StatusSignal<Current> hoodCurrent;
-
-//     // private final StatusSignal<AngularVelocity> flywheelSpeed;
-//     // private final StatusSignal<Current> flywheelCurrent;
-
-//     // private final StatusSignal<AngularVelocity> shootSpeed;
-//     // private final StatusSignal<Current> shootCurrent;
 
 //     private final double leftShootSpeed;
 //     private final double rightShootSpeed;

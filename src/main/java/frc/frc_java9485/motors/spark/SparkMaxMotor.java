@@ -10,6 +10,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.frc_java9485.motors.io.SparkMotorIO;
 
 public class SparkMaxMotor implements SparkMotorIO{
 

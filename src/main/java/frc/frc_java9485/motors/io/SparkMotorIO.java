@@ -1,4 +1,4 @@
-package frc.frc_java9485.motors.spark;
+package frc.frc_java9485.motors.io;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
