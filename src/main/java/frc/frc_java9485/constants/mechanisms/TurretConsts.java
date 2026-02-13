@@ -17,6 +17,7 @@ public class TurretConsts {
   public static final int FUEL_TO_TURRET = 14;
 
   public static final int LOOKAHEAD_ITERATIONS = 3;
+  public static final Distance FLY_WHEEL_RADIUS = Inches.of(2);
   public static final Distance DISTANCE_ABOVE_FUNNEL = Inches.of(20); // how high to clear the funnel
 
   public static final Transform3d ROBOT_TO_TURRET_TRANSFORM =

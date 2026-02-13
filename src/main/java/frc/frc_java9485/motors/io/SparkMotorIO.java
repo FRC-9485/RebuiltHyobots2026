@@ -6,19 +6,26 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.units.measure.Voltage;
 
 public interface SparkMotorIO {
+    final int maximumRetries = 5;
+
     public void setSpeed(double speeds);
     public void setPorcentage(double porcentage);
-    public double getPosition();
-    public double getRate();
     public void setSetpoint(double setpoint);
     public void setRampRate(double ramp);
-    public double getVoltage();
-    public RelativeEncoder getEncoder();
+    public void setIdleMode(IdleMode idleMode);
     public void followMotor(int id);
     public void setVoltage(double voltage);
     public void setVoltage(Voltage voltage);
-    public double getTemperature();
-    public void setIdleMode(IdleMode idleMode);
-    public double getCurrent();
     public void setInvert();
+    public void cleanStickFaults();
+    public void burnFlash();
+
+    public double getPosition();
+    public double getRate();
+    public double getVoltage();
+    public double getTemperature();
+    public double getCurrent();
+
+    public RelativeEncoder getEncoder();
+    public IdleMode getIdleMode();
 }

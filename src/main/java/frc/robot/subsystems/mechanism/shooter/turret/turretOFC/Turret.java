@@ -26,6 +26,7 @@ import static edu.wpi.first.units.Units.Volts;
 import static frc.frc_java9485.constants.FieldConsts.*;
 import static frc.frc_java9485.constants.mechanisms.TurretConsts.*;
 
+import frc.frc_java9485.constants.mechanisms.HoodConsts;
 import frc.frc_java9485.motors.spark.SparkFlexMotor;
 import frc.frc_java9485.motors.spark.SparkMaxMotor;
 import frc.frc_java9485.utils.TunableControls.TunableProfiledController;
@@ -43,6 +44,7 @@ public class Turret extends SubsystemBase{
 
     private final SparkMaxMotor turn_turret;
     private final SparkMaxMotor fuel_to_turret;
+    private final SparkMaxMotor hoodMotor;
 
     private final TunableProfiledController turretController;
     private final TurretIOInputsAutoLogged inputs;
@@ -60,6 +62,7 @@ public class Turret extends SubsystemBase{
 
         this.left_motor = new SparkFlexMotor(LEFT_SHOOTER, "left shooter");
         this.right_motor = new SparkFlexMotor(RIGHT_SHOOTER, "right shooter");
+        this.hoodMotor = new SparkMaxMotor(HoodConsts.MOTOR_ID, "hood motor");
 
         this.turn_turret = new SparkMaxMotor(TURN_TURRET, "turn turret");
         this.fuel_to_turret = new SparkMaxMotor(FUEL_TO_TURRET, "catch fuel to turret");
@@ -67,6 +70,17 @@ public class Turret extends SubsystemBase{
 
         this.turretController = new TunableProfiledController(TURRET_TUNABLE);
         this.inputs = new TurretIOInputsAutoLogged();
+
+        configureShooter();
+    }
+
+    private void configureShooter(){
+        right_motor.setInvert();
+        right_motor.followMotor(LEFT_SHOOTER);
+        right_motor.burnFlash();
+
+        hoodMotor.setInvert();
+        hoodMotor.burnFlash();
     }
 
     private void updateInputs(TurretIOInputs inputs){
@@ -103,7 +117,7 @@ public class Turret extends SubsystemBase{
 
         calculateShot();
     }
-
+    
     private void calculateShot(){
         if(isActive){
             currentTarget = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue

@@ -1,6 +1,12 @@
 package frc.frc_java9485.motors.spark;
 
+import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.Seconds;
+
+import java.util.function.Supplier;
+
 import com.revrobotics.PersistMode;
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -10,33 +16,30 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import frc.frc_java9485.motors.io.SparkMotorIO;
 
 public class SparkFlexMotor implements SparkMotorIO {
 
-  SparkFlex motor;
-  SparkFlexConfig config;
-  int id;
-  boolean inverted;
-  String name;
+  private SparkFlex motor;
+  private SparkFlexConfig config;
+  private int id;
+  private boolean inverted;
+  private String name;
 
-  double speed = 0;
-  double porcentage = 0;
-  double position = 0;
+  private double speed = 0;
+  private double porcentage = 0;
+  private double position = 0;
+
+  private IdleMode currentIdleMode;
 
   public SparkFlexMotor(int id, String name) {
-    this(id, name, false);
-  }
-
-  public SparkFlexMotor(int id, String name, boolean invert) {
     this.id = id;
-    this.inverted = invert;
     this.name = name;
     this.motor = new SparkFlex(id, SparkFlex.MotorType.kBrushless);
     this.config = new SparkFlexConfig();
 
-    config.inverted(invert);
-    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    cleanStickFaults();
   }
 
   @Override
@@ -75,13 +78,6 @@ public class SparkFlexMotor implements SparkMotorIO {
   @Override
   public void setRampRate(double ramp) {
     config.closedLoopRampRate(ramp).openLoopRampRate(ramp);
-
-    if (DriverStation.isEnabled()) {
-      System.out.println("ERRO! o motor não pode mudar se a driverStation estiver ligada");
-      return;
-    } else {
-      motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-    }
   }
 
   @Override
@@ -101,8 +97,6 @@ public class SparkFlexMotor implements SparkMotorIO {
   @Override
   public void followMotor(int id) {
       config.follow(id);
-
-      motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   @Override
@@ -122,9 +116,8 @@ public class SparkFlexMotor implements SparkMotorIO {
 
   @Override
   public void setIdleMode(IdleMode idleMode) {
-      config.idleMode(idleMode);
-
-      motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    this.currentIdleMode = idleMode;
+    config.idleMode(idleMode);
   }
 
   public double getCurrent(){
@@ -134,7 +127,35 @@ public class SparkFlexMotor implements SparkMotorIO {
   @Override
   public void setInvert() {
     config.inverted(true);
+  }
 
-    motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+  @Override
+  public IdleMode getIdleMode() {
+      return currentIdleMode;
+  }
+
+  private void configureSparkFLEX(Supplier<REVLibError> config) {
+    for (int i = 0; i < maximumRetries; i++) {
+      if (config.get() == REVLibError.kOk) {
+        return;
+      }
+      Timer.delay(Milliseconds.of(5).in(Seconds));
+    }
+    DriverStation.reportWarning("Failure configuring motor " + motor.getDeviceId(), true);
+  }
+
+  @Override
+  public void cleanStickFaults() {
+    configureSparkFLEX(motor::clearFaults);
+  }
+
+  @Override
+  public void burnFlash() {
+    if (!DriverStation.isDisabled()) {
+      throw new RuntimeException("Config updates cannot be applied while the robot is Enabled!");
+    }
+    configureSparkFLEX(() -> {
+      return motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    });
   }
 }

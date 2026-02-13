@@ -1,6 +1,12 @@
 package frc.frc_java9485.motors.spark;
 
+import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.Seconds;
+
+import java.util.function.Supplier;
+
 import com.revrobotics.PersistMode;
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -10,19 +16,21 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import frc.frc_java9485.motors.io.SparkMotorIO;
 
 public class SparkMaxBrushed implements SparkMotorIO{
 
-  SparkMax motor;
-  SparkMaxConfig config;
-  int id;
-  boolean isFollower;
-  String name;
+  private SparkMax motor;
+  private SparkMaxConfig config;
+  private int id;
+  private boolean isFollower;
+  private String name;
 
-  double speed = 0;
-  double porcentage = 0;
-  double position = 0;
+  private double speed = 0;
+  private double porcentage = 0;
+  private double position = 0;
+  private IdleMode currentIdleMode;
 
   public SparkMaxBrushed(int id, String name) {
     this(id, name, false);
@@ -34,6 +42,7 @@ public class SparkMaxBrushed implements SparkMotorIO{
     this.name = name;
     this.motor = new SparkMax(id, SparkMax.MotorType.kBrushed);
     this.config = new SparkMaxConfig();
+    cleanStickFaults();
   }
 
   @Override
@@ -72,13 +81,6 @@ public class SparkMaxBrushed implements SparkMotorIO{
   @Override
   public void setRampRate(double ramp) {
     config.closedLoopRampRate(ramp).openLoopRampRate(ramp);
-
-    if (DriverStation.isEnabled()) {
-      System.out.println("ERRO! o motor não pode mudar se a driverStation estiver ligada");
-      return;
-    } else {
-      motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-    }
   }
 
   @Override
@@ -97,10 +99,7 @@ public class SparkMaxBrushed implements SparkMotorIO{
 
   @Override
   public void followMotor(int id) {
-    if (isFollower) {
-      config.follow(id);
-    }
-    motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    config.follow(id);
   }
 
   @Override
@@ -120,9 +119,8 @@ public class SparkMaxBrushed implements SparkMotorIO{
 
   @Override
   public void setIdleMode(IdleMode idleMode) {
-      config.idleMode(idleMode);
-
-      motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    this.currentIdleMode = idleMode;
+    config.idleMode(idleMode);
   }
 
   @Override
@@ -133,7 +131,35 @@ public class SparkMaxBrushed implements SparkMotorIO{
   @Override
   public void setInvert() {
       config.inverted(true);
+  }
 
-      motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+   @Override
+  public IdleMode getIdleMode() {
+      return currentIdleMode;
+  }
+
+  private void configureSparkMax(Supplier<REVLibError> config) {
+    for (int i = 0; i < maximumRetries; i++) {
+      if (config.get() == REVLibError.kOk) {
+        return;
+      }
+      Timer.delay(Milliseconds.of(5).in(Seconds));
+    }
+    DriverStation.reportWarning("Failure configuring motor " + motor.getDeviceId(), true);
+  }
+
+  @Override
+  public void cleanStickFaults() {
+      configureSparkMax(motor::clearFaults);
+  }
+
+  @Override
+  public void burnFlash() {
+    if (!DriverStation.isDisabled()) {
+      throw new RuntimeException("Config updates cannot be applied while the robot is Enabled!");
+    }
+    configureSparkMax(() -> {
+      return motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    });
   }
 }

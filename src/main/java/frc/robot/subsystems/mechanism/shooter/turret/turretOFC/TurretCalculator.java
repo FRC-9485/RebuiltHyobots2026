@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static frc.frc_java9485.constants.mechanisms.TurretConsts.*;
 import static frc.frc_java9485.constants.FieldConsts.*;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
@@ -42,6 +44,10 @@ public class TurretCalculator {
 
      public static Distance getDistanceToTarget(Pose2d robot, Translation3d target) {
         return Meters.of(robot.getTranslation().getDistance(target.toTranslation2d()));
+    }
+
+    public static AngularVelocity linearToAngularVelocity(LinearVelocity vel, Distance radius) {
+        return RadiansPerSecond.of(vel.in(MetersPerSecond) / radius.in(Meters));
     }
 
     public static ShotData calculateShotFromFunnelClearance(

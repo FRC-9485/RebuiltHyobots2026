@@ -12,13 +12,11 @@ import org.littletonrobotics.junction.Logger;
 import frc.frc_java9485.constants.mechanisms.ConveyorConsts;
 import frc.robot.subsystems.mechanism.conveyor.Conveyor;
 import frc.robot.subsystems.mechanism.intake.Intake;
-import frc.robot.subsystems.mechanism.shooter.hood.Hood;
 import frc.robot.subsystems.swerve.Swerve;
 import swervelib.simulation.ironmaple.simulation.IntakeSimulation;
 import swervelib.simulation.ironmaple.simulation.IntakeSimulation.IntakeSide;
 
 public class SuperStructure extends SubsystemBase{
-  private final Hood hood;
   private final Intake intake;
   private final Conveyor conveyor;
 
@@ -33,7 +31,6 @@ public class SuperStructure extends SubsystemBase{
   }
 
   private SuperStructure() {
-    hood = Hood.getInstance();
     intake = Intake.getInstance();
     conveyor = Conveyor.getInstance();
 
