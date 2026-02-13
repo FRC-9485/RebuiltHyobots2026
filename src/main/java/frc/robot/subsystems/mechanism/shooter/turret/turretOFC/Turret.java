@@ -34,7 +34,7 @@ import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretCalculator.
 import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretIO.TurretIOInputs;
 
 public class Turret extends SubsystemBase{
-
+    
     private final TurretIO io;
     private final Supplier<ChassisSpeeds> chassisSpeed;
     private final Supplier<Pose2d> pose;
