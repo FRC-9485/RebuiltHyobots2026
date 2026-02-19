@@ -1,5 +1,7 @@
 package frc.frc_java9485.constants;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import org.photonvision.simulation.SimCameraProperties;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -20,7 +22,8 @@ public class VisionConsts {
     public static final Transform3d RASPBERRY_ROBOT_TO_CAMERA = new Transform3d(new Translation3d(), new Rotation3d());
 
     public static final String LIMELIGHT_CAMERA_NAME = "limelightphoto";
-    public static final Transform3d LIMELIGHT_ROBOT_TO_CAMERA = new Transform3d(new Translation3d(), new Rotation3d());
+    public static final Transform3d LIMELIGHT_ROBOT_TO_CAMERA =
+        new Transform3d(new Translation3d(Inches.of(6.3), Inches.of(8), Inches.of(17.5)), Rotation3d.kZero);;
 
     public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT =
         AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);

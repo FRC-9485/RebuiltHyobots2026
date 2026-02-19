@@ -17,9 +17,9 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import frc.frc_java9485.motors.io.SparkMotorIO;
+import frc.frc_java9485.motors.io.MotorIO;
 
-public class SparkMaxMotor implements SparkMotorIO{
+public class SparkMaxMotor implements MotorIO{
 
   private SparkMax motor;
   private SparkMaxConfig config;
@@ -147,6 +147,11 @@ public class SparkMaxMotor implements SparkMotorIO{
       Timer.delay(Milliseconds.of(5).in(Seconds));
     }
     DriverStation.reportWarning("Failure configuring motor " + motor.getDeviceId(), true);
+  }
+
+  @Override
+  public void setCurrentLimit(int current) {
+      config.smartCurrentLimit(current);
   }
 
   @Override

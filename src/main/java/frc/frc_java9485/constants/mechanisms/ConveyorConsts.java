@@ -1,7 +1,7 @@
 package frc.frc_java9485.constants.mechanisms;
 
 public class ConveyorConsts {
-    public static final int MOTOR_ID = 60;
+    public static final int MOTOR_ID = 17;//lembrar de configurar victor
     public static final double MAX_SPEED = 0.8;
 
     public static final int HOME_SENSOR_ID = 29;//alterar

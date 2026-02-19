@@ -5,46 +5,30 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static edu.wpi.first.units.Units.Meters;
 import static frc.frc_java9485.constants.RobotConsts.*;
-import static frc.frc_java9485.constants.mechanisms.IntakeConsts.*;
 
 import org.littletonrobotics.junction.Logger;
 
 import frc.frc_java9485.constants.mechanisms.ConveyorConsts;
-import frc.robot.subsystems.mechanism.conveyor.Conveyor;
-import frc.robot.subsystems.mechanism.index.Index;
-import frc.robot.subsystems.mechanism.intake.Intake;
-import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.Turret;
 import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretIO;
-// import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretSimTeste;
+import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretSim;
 import frc.robot.subsystems.swerve.Swerve;
 import swervelib.simulation.ironmaple.simulation.IntakeSimulation;
 import swervelib.simulation.ironmaple.simulation.IntakeSimulation.IntakeSide;
 
-public class SuperStructure extends SubsystemBase{
-  private final Intake intake;
-  private final Conveyor conveyor;
-  private final Turret turret;
-  private final Index index;
-  // private final TurretSimTeste turretSim;
-
-  private Actions currentAction = Actions.SECURITY;
-  private static SuperStructure m_instance;
-
+public class SuperStructureSim extends SubsystemBase{
+  private final TurretSim turretSim;
   private IntakeSimulation intakeSimulation;
 
-  public SuperStructure() {
-    intake = Intake.getInstance();
-    conveyor = Conveyor.getInstance();
-    index = Index.getInstance();
-    // turretSim = new TurretSimTeste(new TurretIO() {
+  private static SuperStructureSim m_instance;
 
-    // }, Swerve.getInstance()::getRobotRelativeSpeeds, Swerve.getInstance()::getPose2d);
-    this.turret = new Turret(new TurretIO() {
+  private SimAction currentAction = SimAction.SECURITY;
 
-    }, Swerve.getInstance()::getRobotRelativeSpeeds, Swerve.getInstance()::getPose2d);
+  public SuperStructureSim() {
+    turretSim =
+        new TurretSim(new TurretIO() {}, Swerve.getInstance()::getRobotRelativeSpeeds, Swerve.getInstance()::getPose2d);
 
 
-    if (isSimulation()) {
+    if (CURRENT_ROBOT_MODE == RobotModes.SIM) {
       intakeSimulation = IntakeSimulation.InTheFrameIntake("Fuel",
                                                            Swerve.getInstance().getSimulation(),
                                                            Meters.of(0.36),
@@ -57,7 +41,7 @@ public class SuperStructure extends SubsystemBase{
   public void periodic() {
   }
 
-  public enum Actions {
+  public enum SimAction {
     SHOOT_FUEL,
     CATCH_FUEL,
     CLOSE_INTAKE,
@@ -72,43 +56,7 @@ public class SuperStructure extends SubsystemBase{
     SECURITY
   }
 
-  public Command setAction(Actions actions) {
-    return run(() ->{
-      switch (actions) {
-        case SHOOT_FUEL:
-            index.turnOn();
-            turret.start();
-          break;
-
-        case CATCH_FUEL:
-            intake.enablePivot(SETPOINT_DOWN);
-            intake.catchFuel(COLLECT_FUEL_SPEED);
-          break;
-
-        case CLOSE_INTAKE:
-            intake.catchFuel(STOPPED_FUEL_SPEED);
-            intake.enablePivot(SETPOINT_UP);
-          break;
-
-        case LOCK_CONVEYOR:
-          break;
-
-        case LOCK_HOOD:
-          break;
-
-        case CLIMBER_L1:
-          break;
-
-        case LOCK_TURRET:
-          break;
-
-        default:
-          break;
-      }
-    });
-  }
-
-  public Command setActionSim(Actions action) {
+  public Command setSimAction(SimAction action) {
     return new Command() {
           public void execute() {
               currentAction = action;
@@ -149,7 +97,7 @@ public class SuperStructure extends SubsystemBase{
     Logger.recordOutput("Mechanism/Intake/Fuel Quantity", intakeSimulation.getGamePiecesAmount());
   }
 
-  public Actions getAction() {
+  public SimAction getAction() {
     return currentAction;
   }
 }

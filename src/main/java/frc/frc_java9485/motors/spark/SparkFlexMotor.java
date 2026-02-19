@@ -17,9 +17,9 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import frc.frc_java9485.motors.io.SparkMotorIO;
+import frc.frc_java9485.motors.io.MotorIO;
 
-public class SparkFlexMotor implements SparkMotorIO {
+public class SparkFlexMotor implements MotorIO {
 
   private SparkFlex motor;
   private SparkFlexConfig config;
@@ -142,6 +142,11 @@ public class SparkFlexMotor implements SparkMotorIO {
       Timer.delay(Milliseconds.of(5).in(Seconds));
     }
     DriverStation.reportWarning("Failure configuring motor " + motor.getDeviceId(), true);
+  }
+
+  @Override
+  public void setCurrentLimit(int current) {
+      config.smartCurrentLimit(current);
   }
 
   @Override

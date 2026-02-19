@@ -83,6 +83,8 @@ public class Swerve extends SubsystemBase implements SwerveIO {
 
   private static Swerve mInstance;
 
+  private final boolean isSimulation;
+
   public static Swerve getInstance() {
     if (mInstance == null) {
       mInstance = new Swerve(new File(Filesystem.getDeployDirectory(), "swerve"));
@@ -97,6 +99,7 @@ public class Swerve extends SubsystemBase implements SwerveIO {
       swerveDrive.setMotorIdleMode(false);
 
       if (CURRENT_ROBOT_MODE == RobotModes.SIM) {
+        isSimulation = true;
         swerveDrive.setHeadingCorrection(false);
         swerveDrive.setCosineCompensator(false);
 
@@ -106,6 +109,8 @@ public class Swerve extends SubsystemBase implements SwerveIO {
         driveSimulator.config.gyroSimulationFactory = COTS.ofPigeon2();
 
         resetOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
+      } else {
+        isSimulation = false;
       }
 
       encoders =
@@ -140,18 +145,20 @@ public class Swerve extends SubsystemBase implements SwerveIO {
   @Override
   public void periodic() {
     if (poseEstimator != null) {
-      raspberry.estimatePose(this::addVisionMeasurement);
+      // raspberry.estimatePose(this::addVisionMeasurement);
       limelight.estimatePose(this::addVisionMeasurement);
       poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getHeading3d(), swerveDrive.getModulePositions());
 
-      swerveDrive.updateOdometry();
-
-    if (CURRENT_ROBOT_MODE == RobotModes.REAL) {
-      odometryLock.lock();
-      pigeonIO.updateInputs(pigeonInputs);
-      odometryLock.unlock();
-      Logger.processInputs("Swerve/Odometry", pigeonInputs);
+      if (isSimulation) {
+        poseEstimator.addVisionMeasurement(new Pose3d(driveSimulator.getSimulatedDriveTrainPose()), Timer.getFPGATimestamp());
+      } else if (!isSimulation) {
+        odometryLock.lock();
+        pigeonIO.updateInputs(pigeonInputs);
+        odometryLock.unlock();
+        Logger.processInputs("Swerve/Odometry", pigeonInputs);
     }
+
+    swerveDrive.updateOdometry();
     updateInputs(swerveInputs);
     Logger.processInputs("Swerve", swerveInputs);
     }
@@ -159,48 +166,45 @@ public class Swerve extends SubsystemBase implements SwerveIO {
 
   @Override
   public Pose3d getPose3d() {
-    return CURRENT_ROBOT_MODE == RobotModes.SIM ?
-      new Pose3d(driveSimulator.getSimulatedDriveTrainPose()) :
-      poseEstimator.getEstimatedPosition();
+    return poseEstimator.getEstimatedPosition();
   }
 
   @Override
   public Pose2d getPose2d() {
-    return CURRENT_ROBOT_MODE == RobotModes.SIM ?
-     driveSimulator.getSimulatedDriveTrainPose() :
-     poseEstimator.getEstimatedPosition().toPose2d();
+    return poseEstimator.getEstimatedPosition().toPose2d();
   }
 
   @Override
   public Rotation2d getHeading2d() {
-    return CURRENT_ROBOT_MODE == RobotModes.SIM ?
+    return isSimulation ?
       driveSimulator.getGyroSimulation().getGyroReading() :
       Rotation2d.fromDegrees(MathUtils.scope0To360(pigeon.getYaw().getValueAsDouble()));
   }
 
   @Override
   public Rotation3d getHeading3d() {
-    return CURRENT_ROBOT_MODE == RobotModes.SIM ?
+    return isSimulation ?
       new Rotation3d(driveSimulator.getGyroSimulation().getGyroReading()) :
       pigeon.getRotation3d();
   }
 
   @Override
   public void resetOdometry(Pose3d pose) {
-    if (CURRENT_ROBOT_MODE == RobotModes.SIM) {
-      driveSimulator.setSimulationWorldPose(pose.toPose2d());
-    } else {
+    if (poseEstimator != null) {
       poseEstimator.resetPose(pose);
+    }
+    if (isSimulation) {
+      driveSimulator.setSimulationWorldPose(pose.toPose2d());
     }
   }
 
   @Override
   public void resetOdometry(Pose2d pose) {
-    if (CURRENT_ROBOT_MODE == RobotModes.SIM) {
-      driveSimulator.setSimulationWorldPose(pose);
-      getGyroSimulation().setRotation(pose.getRotation());
-    } else {
+    if (poseEstimator != null) {
       poseEstimator.resetPose(new Pose3d(pose));
+    }
+    if (isSimulation) {
+      driveSimulator.setSimulationWorldPose(pose);
     }
   }
 
@@ -211,7 +215,7 @@ public class Swerve extends SubsystemBase implements SwerveIO {
 
   @Override
   public ChassisSpeeds getRobotRelativeSpeeds() {
-    return CURRENT_ROBOT_MODE == RobotModes.SIM ?
+    return isSimulation ?
       driveSimulator.getDriveTrainSimulatedChassisSpeedsRobotRelative() :
       swerveDrive.getRobotVelocity();
   }
@@ -274,7 +278,7 @@ public class Swerve extends SubsystemBase implements SwerveIO {
                       Xcontroller * swerveDrive.getMaximumChassisVelocity(),
                       Ycontroller * swerveDrive.getMaximumChassisVelocity(),
                       rotation * swerveDrive.getMaximumChassisAngularVelocity(),
-                      CURRENT_ROBOT_MODE == RobotModes.SIM ?
+                      isSimulation ?
                         getGyroSimulation().getGyroReading() :
                         pigeon.getRotation2d())
                   : new ChassisSpeeds(

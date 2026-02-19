@@ -15,6 +15,7 @@ public class IntakeConsts {
     public static final double SETPOINT_UP = 359.0;
     public static final double SETPOINT_DOWN = 117.0;
 
+    public static final double STOPPED_FUEL_SPEED = 0;
     public static final double COLLECT_FUEL_SPEED = 0.7;
 
     public static final ControlConstants PIVOT_CONTROL_CONSTANTS = new ControlConstants()

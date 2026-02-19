@@ -64,19 +64,19 @@ public class Simulation {
       for (Translation2d fuelPose : blueDepositFuelStartPoses) {
         arena.addGamePiece(new RebuiltFuelOnField(fuelPose));
       }
-      // Red Deposit Fuel
-      for (Translation2d fuelPose : blueDepositFuelStartPoses) {
-        arena.addGamePiece(new RebuiltFuelOnField(flipFuelToRed(fuelPose)));
-      }
+      // // Red Deposit Fuel
+      // for (Translation2d fuelPose : blueDepositFuelStartPoses) {
+      //   arena.addGamePiece(new RebuiltFuelOnField(flipFuelToRed(fuelPose)));
+      // }
 
-      generateMiddleFuels();
+      // generateMiddleFuels();
     }
   }
 
   public void updateArena() {
+    arena.simulationPeriodic();
     Pose3d[] fuelPoses = arena.getGamePiecesArrayByType("Fuel");
     Logger.recordOutput("Field Simulation/Fuel poses", fuelPoses);
-    arena.simulationPeriodic();
   }
 
   private Translation2d flipFuelToRed(Translation2d translation) {

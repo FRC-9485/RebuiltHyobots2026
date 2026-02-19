@@ -17,9 +17,9 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import frc.frc_java9485.motors.io.SparkMotorIO;
+import frc.frc_java9485.motors.io.MotorIO;
 
-public class SparkMaxBrushed implements SparkMotorIO{
+public class SparkMaxBrushed implements MotorIO{
 
   private SparkMax motor;
   private SparkMaxConfig config;
@@ -151,6 +151,11 @@ public class SparkMaxBrushed implements SparkMotorIO{
   @Override
   public void cleanStickFaults() {
       configureSparkMax(motor::clearFaults);
+  }
+
+  @Override
+  public void setCurrentLimit(int current) {
+      config.smartCurrentLimit(current);
   }
 
   @Override

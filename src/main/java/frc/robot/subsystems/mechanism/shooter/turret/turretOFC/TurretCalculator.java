@@ -78,6 +78,10 @@ public class TurretCalculator {
         return new ShotData(InchesPerSecond.of(v0), Radians.of(theta), predictedTarget);
     }
 
+    public static LinearVelocity angularToLinearVelocity(AngularVelocity vel, Distance radius) {
+        return MetersPerSecond.of(vel.in(RadiansPerSecond) * radius.in(Meters));
+    }
+
      public static Time calculateTimeOfFlight(LinearVelocity exitVelocity, Angle hoodAngle, Distance distance) {
         double vel = exitVelocity.in(MetersPerSecond);
         double angle = hoodAngle.in(Radians);

@@ -1,22 +1,21 @@
 package frc.robot.subsystems.mechanism.conveyor;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static edu.wpi.first.units.Units.Volts;
 import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.*;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-import frc.frc_java9485.motors.spark.SparkMaxBrushed;
 import frc.frc_java9485.sensor.DigitalSensor;
 
 public class Conveyor extends SubsystemBase implements ConveyorIO{
     private static Conveyor m_instance;
 
-    private final SparkMaxBrushed conveyor;
+    private final VictorSPX conveyor;
 
     private final DigitalSensor homeSensor;
     private final DigitalSensor limitSensor;
@@ -24,15 +23,13 @@ public class Conveyor extends SubsystemBase implements ConveyorIO{
     private final ConveyorInputsAutoLogged conveyorInputs;
     private final ConveyorInputs inputs;
 
-    private IdleMode currentIdleMode = IdleMode.kBrake;
-
     public static Conveyor getInstance() {
         if (m_instance == null) m_instance = new Conveyor();
         return m_instance;
     }
 
     private Conveyor() {
-        conveyor = new SparkMaxBrushed(MOTOR_ID, "Conveyor Motor");
+        conveyor = new VictorSPX(MOTOR_ID);
 
         homeSensor = new DigitalSensor(HOME_SENSOR_ID, INVERT_HOME);
         limitSensor = new DigitalSensor(LIMIT_SENSOR_ID, INVERT_LIMIT);
@@ -49,12 +46,16 @@ public class Conveyor extends SubsystemBase implements ConveyorIO{
 
     @Override
     public void runConveyor(double speed) {
-        conveyor.setSpeed(speed >= MAX_SPEED ? MAX_SPEED : speed);
+        if(Math.abs(speed) > MAX_SPEED){
+            speed = MAX_SPEED;
+        }
+
+        conveyor.set(VictorSPXControlMode.Velocity, speed);
     }
 
     @Override
     public void stopConveyor() {
-        conveyor.setSpeed(0);
+        conveyor.set(VictorSPXControlMode.Velocity, 0);
     }
 
     @Override
@@ -68,19 +69,8 @@ public class Conveyor extends SubsystemBase implements ConveyorIO{
     }
 
     @Override
-    public Command setConveyorIdleMode(IdleMode idleMode) {
-        return runOnce(() ->{
-            currentIdleMode = idleMode;
-            conveyor.setIdleMode(idleMode);
-        });
-    }
-
-    @Override
     public void updateInputs(ConveyorInputs inputs) {
         inputs.atHome = conveyorIsInHome();
         inputs.atLimit = conveyorInLimit();
-        inputs.isLocked = currentIdleMode == IdleMode.kBrake;
-        inputs.speed = conveyor.getRate();
-        inputs.voltage = Volts.of(conveyor.getVoltage());
     }
 }

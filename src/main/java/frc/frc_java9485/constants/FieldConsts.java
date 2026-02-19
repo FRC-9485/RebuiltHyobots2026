@@ -54,5 +54,12 @@ public final class FieldConsts {
     public static final Distance FUNNEL_RADIUS = Inches.of(24);
     public static final Distance FUNNEL_HEIGHT = Inches.of(72 - 56.4);
 
+    public static final Translation3d PASSING_SPOT_LEFT = new Translation3d(
+            Inches.of(90), FIELD_WIDTH.div(2).plus(Inches.of(85)), Inches.zero());
+    public static final Translation3d PASSING_SPOT_CENTER =
+            new Translation3d(Inches.of(90), FIELD_WIDTH.div(2), Inches.zero());
+    public static final Translation3d PASSING_SPOT_RIGHT = new Translation3d(
+            Inches.of(90), FIELD_WIDTH.div(2).minus(Inches.of(85)), Inches.zero());
+
     public static final Distance ALLIANCE_ZONE = Inches.of(156.06);
 }

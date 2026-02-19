@@ -8,6 +8,8 @@ public class HoodConsts {
 
     public static final int MAX_POSITION = 0; // ALTERAR
     public static final int MIN_POSITION = 0; // ALTERAR
+    
+    public static final int HOOD_CURRENT_LIMIT = 30;
 
     private static final ControlConstants CONTROL_CONSTANTS = new ControlConstants()
     .withPID(0.06, 0, 0)

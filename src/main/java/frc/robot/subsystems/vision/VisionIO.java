@@ -4,6 +4,7 @@ package frc.robot.subsystems.vision;
 
 import java.util.List;
 
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.Matrix;
@@ -22,4 +23,5 @@ public interface VisionIO {
     public double getTY();
     public double getTA();
     public double getTRotation();
+    public List<PhotonPipelineResult> getCurrentResults();
 }

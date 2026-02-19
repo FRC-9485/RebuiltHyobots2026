@@ -5,7 +5,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.units.measure.Voltage;
 
-public interface SparkMotorIO {
+public interface MotorIO {
     final int maximumRetries = 5;
 
     public void setSpeed(double speeds);
@@ -19,6 +19,7 @@ public interface SparkMotorIO {
     public void setInvert();
     public void cleanStickFaults();
     public void burnFlash();
+    public void setCurrentLimit(int current);
 
     public double getPosition();
     public double getRate();

@@ -14,4 +14,8 @@ public class RobotConsts {
       SIM,
       REAL
     }
+
+    public static boolean isSimulation() {
+      return CURRENT_ROBOT_MODE == RobotModes.SIM;
+    }
   }

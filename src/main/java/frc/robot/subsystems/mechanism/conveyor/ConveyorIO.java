@@ -4,10 +4,8 @@ import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj2.command.Command;
 
 public interface ConveyorIO {
 
@@ -26,6 +24,5 @@ public interface ConveyorIO {
     public boolean conveyorIsInHome();
     public boolean conveyorInLimit();
 
-    public Command setConveyorIdleMode(IdleMode idleMode);
     public void updateInputs(ConveyorInputs inputs);
 }

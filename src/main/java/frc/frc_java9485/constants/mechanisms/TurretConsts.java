@@ -27,5 +27,9 @@ public class TurretConsts {
   .withProfile(10, 4)//testes
   .withPID(0.01, 0, 0);
 
+  public static final int SHOOTER_CURRENT_LIMIT = 40;
+  public static final int TURN_TURRET_CURRENT_LIMIT = 20;
+  public static final int FUEL_TO_TURRET_CURRENT_LIMIT = 30;
+
   public static final TunableControlConstants TURRET_TUNABLE = new TunableControlConstants("shooter tunableConstants", TURRET_CONSTANTS);
 }
