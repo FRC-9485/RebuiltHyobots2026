@@ -3,16 +3,16 @@ package frc.robot.subsystems.vision;
 import frc.frc_java9485.constants.VisionConsts.Cooprocessor;
 
 public class VisionInstances {
-    private static Vision limelight;
-    private static Vision raspberry;
+    private static VisionSubsystem limelight;
+    private static VisionSubsystem raspberry;
 
-    public static Vision getLimelightInstance() {
-        if (limelight == null) limelight = new Vision(Cooprocessor.LIMELIGHT);
+    public static VisionSubsystem getLimelightInstance() {
+        if (limelight == null) limelight = new VisionSubsystem(Cooprocessor.LIMELIGHT);
         return limelight;
     }
 
-    public static Vision getRaspberryInstance() {
-        if (raspberry == null) raspberry = new Vision(Cooprocessor.RASPBERRY);
+    public static VisionSubsystem getRaspberryInstance() {
+        if (raspberry == null) raspberry = new VisionSubsystem(Cooprocessor.RASPBERRY);
         return raspberry;
     }
 }

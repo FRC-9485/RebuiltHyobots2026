@@ -11,8 +11,8 @@ import static frc.frc_java9485.constants.mechanisms.IntakeConsts.*;
 import frc.frc_java9485.motors.spark.SparkMaxMotor;
 import frc.frc_java9485.utils.TunableControls.TunableProfiledController;
 
-public class Intake extends SubsystemBase implements IntakeIO {
-  private static Intake m_instance;
+public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
+  private static IntakeSubsystem m_instance;
 
   private final SparkMaxMotor pivot;
   private final SparkMaxMotor catchBall;
@@ -28,12 +28,12 @@ public class Intake extends SubsystemBase implements IntakeIO {
 
   private final IntakeInputsAutoLogged inputs;
 
-  public static Intake getInstance() {
-    if (m_instance == null) m_instance = new Intake();
+  public static IntakeSubsystem getInstance() {
+    if (m_instance == null) m_instance = new IntakeSubsystem();
     return m_instance;
   }
 
-  private Intake() {
+  private IntakeSubsystem() {
     pivot = new SparkMaxMotor(PIVOT_ID, "Pivot");
     catchBall = new SparkMaxMotor(CATCH_BALL_ID, "Catch Fuel");
 
@@ -44,6 +44,12 @@ public class Intake extends SubsystemBase implements IntakeIO {
 
     inputs = new IntakeInputsAutoLogged();
 
+    configureIntakeMotor();
+  }
+
+  private void configureIntakeMotor(){
+    pivot.setCurrentLimit(30);
+    pivot.burnFlash();
   }
 
   @Override
@@ -51,9 +57,9 @@ public class Intake extends SubsystemBase implements IntakeIO {
     updateInputs(inputs);
     Logger.processInputs("Mechanism/Intake", inputs);
 
-    System.out.println("Angulo: " + pivotEncoder.get() * 360.0);
-    System.out.println("Setpoint: " + pivotSetpoint);
-    System.out.println("Voltagem: " + pivot.getVoltage() + "\n");
+    // System.out.println("Angulo: " + pivotEncoder.get() * 360.0);
+    // System.out.println("Setpoint: " + pivotSetpoint);
+    // System.out.println("Voltagem: " + pivot.getVoltage() + "\n");
   }
 
   @Override

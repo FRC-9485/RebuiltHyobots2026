@@ -10,13 +10,13 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.frc_java9485.constants.VisionConsts;
-import frc.robot.subsystems.swerve.Swerve;
-import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.vision.VisionInstances;
 
 public class AlignWithTag extends Command {
-    private final Swerve swerve;
-    private final Vision limelight;
+    private final SwerveSubsystem swerve;
+    private final VisionSubsystem limelight;
 
     private Optional<Pose3d> tagPose;
 
@@ -25,7 +25,7 @@ public class AlignWithTag extends Command {
     private final AprilTagFieldLayout fieldLayout;
 
     public AlignWithTag() {
-        swerve = Swerve.getInstance();
+        swerve = SwerveSubsystem.getInstance();
         limelight = VisionInstances.getLimelightInstance();
 
         fieldLayout = VisionConsts.APRIL_TAG_FIELD_LAYOUT;

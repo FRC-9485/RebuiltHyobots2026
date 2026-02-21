@@ -1,15 +1,15 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.mechanism.intake.Intake;
+import frc.robot.subsystems.mechanism.intake.IntakeSubsystem;
 
 public class CatchBall extends Command{
 
-    Intake intake;
+    IntakeSubsystem intake;
     double speed;
 
     public CatchBall(double speed){
-        this.intake = Intake.getInstance();
+        this.intake = IntakeSubsystem.getInstance();
         this.speed = speed;
 
         addRequirements(intake);

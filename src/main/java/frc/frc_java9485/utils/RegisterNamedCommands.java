@@ -5,7 +5,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import frc.robot.commands.CatchBall;
 import frc.robot.subsystems.mechanism.SuperStructure;
 import frc.robot.subsystems.mechanism.SuperStructure.Actions;
-import frc.robot.subsystems.mechanism.intake.Intake;
+import frc.robot.subsystems.mechanism.intake.IntakeSubsystem;
 
 public class RegisterNamedCommands {
     public static RegisterNamedCommands mInstance = null;
@@ -19,16 +19,16 @@ public class RegisterNamedCommands {
 
     private RegisterNamedCommands(){}
 
-    public void configureRealCommands(Intake intake, SuperStructure superStructure){
+    public void configureRealCommands(IntakeSubsystem intake, SuperStructure superStructure){
         configureIntakeCommands(intake);
     }
 
-    public void configureSimCommands(Intake intke, SuperStructure superStructure) {
+    public void configureSimCommands(IntakeSubsystem intke, SuperStructure superStructure) {
         configureIntakeSimCommands(superStructure);
         configureTurretSimCommands(superStructure);
     }
 
-    private void configureIntakeCommands(Intake intake){
+    private void configureIntakeCommands(IntakeSubsystem intake){
         NamedCommands.registerCommand("coleta", new CatchBall(0.7).withTimeout(5));
     }
 

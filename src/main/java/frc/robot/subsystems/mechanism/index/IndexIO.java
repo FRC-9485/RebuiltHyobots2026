@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Volts;
 import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj2.command.Command;
 
 public interface IndexIO {
 
@@ -18,10 +17,8 @@ public interface IndexIO {
     }
 
     public void updateInputs(IndexInputs indexInputs);
-
-    public Command turnOn();
+    public void turnOn();
+    public void stopIndex();
 
     public boolean isCollecting();
-
-    public Command stopIndex();
 }

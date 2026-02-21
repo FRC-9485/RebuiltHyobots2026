@@ -10,6 +10,7 @@ import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -34,9 +35,9 @@ public class SparkFlexMotor implements MotorIO {
   private IdleMode currentIdleMode;
 
   public SparkFlexMotor(int id, String name) {
+    this.motor = new SparkFlex(id, MotorType.kBrushless);
     this.id = id;
     this.name = name;
-    this.motor = new SparkFlex(id, SparkFlex.MotorType.kBrushless);
     this.config = new SparkFlexConfig();
 
     cleanStickFaults();
@@ -162,5 +163,10 @@ public class SparkFlexMotor implements MotorIO {
     configureSparkFLEX(() -> {
       return motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     });
+  }
+
+  @Override
+  public void resetPositionByEncoder(double posisition) {
+      motor.getEncoder().setPosition(posisition);
   }
 }

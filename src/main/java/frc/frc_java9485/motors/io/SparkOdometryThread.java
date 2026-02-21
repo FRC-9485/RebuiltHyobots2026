@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.frc_java9485.constants.RobotConsts;
 import frc.frc_java9485.constants.mechanisms.DriveConsts;
-import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.SwerveSubsystem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -64,13 +64,13 @@ public class SparkOdometryThread {
   /** Registers a Spark signal to be read from the thread. */
   public Queue<Double> registerSignal(SparkBase spark, DoubleSupplier signal) {
     Queue<Double> queue = new ArrayBlockingQueue<>(20);
-    Swerve.odometryLock.lock();
+    SwerveSubsystem.odometryLock.lock();
     try {
       sparks.add(spark);
       sparkSignals.add(signal);
       sparkQueues.add(queue);
     } finally {
-      Swerve.odometryLock.unlock();
+      SwerveSubsystem.odometryLock.unlock();
     }
     return queue;
   }
@@ -78,12 +78,12 @@ public class SparkOdometryThread {
   /** Registers a generic signal to be read from the thread. */
   public Queue<Double> registerSignal(DoubleSupplier signal) {
     Queue<Double> queue = new ArrayBlockingQueue<>(20);
-    Swerve.odometryLock.lock();
+    SwerveSubsystem.odometryLock.lock();
     try {
       genericSignals.add(signal);
       genericQueues.add(queue);
     } finally {
-      Swerve.odometryLock.unlock();
+      SwerveSubsystem.odometryLock.unlock();
     }
     return queue;
   }
@@ -91,18 +91,18 @@ public class SparkOdometryThread {
   /** Returns a new queue that returns timestamp values for each sample. */
   public Queue<Double> makeTimestampQueue() {
     Queue<Double> queue = new ArrayBlockingQueue<>(20);
-    Swerve.odometryLock.lock();
+    SwerveSubsystem.odometryLock.lock();
     try {
       timestampQueues.add(queue);
     } finally {
-      Swerve.odometryLock.unlock();
+      SwerveSubsystem.odometryLock.unlock();
     }
     return queue;
   }
 
   private void run() {
     // Save new data to queues
-    Swerve.odometryLock.lock();
+    SwerveSubsystem.odometryLock.lock();
     try {
       // Get sample timestamp
       double timestamp = RobotController.getFPGATime() / 1e6;
@@ -130,7 +130,7 @@ public class SparkOdometryThread {
         }
       }
     } finally {
-      Swerve.odometryLock.unlock();
+      SwerveSubsystem.odometryLock.unlock();
     }
   }
 }

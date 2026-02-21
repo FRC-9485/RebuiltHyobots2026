@@ -13,19 +13,22 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.frc_java9485.constants.RobotConsts;
-import frc.frc_java9485.constants.RobotConsts.RobotModes;
 import frc.frc_java9485.constants.VisionConsts.Cooprocessor;
 import frc.frc_java9485.constants.VisionConsts.EstimateConsumer;
-import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.SwerveSubsystem;
+
+import static edu.wpi.first.units.Units.Meter;
+import static frc.frc_java9485.constants.RobotConsts.isSimulation;
 import static frc.frc_java9485.constants.VisionConsts.*;
 
-public class Vision extends SubsystemBase implements VisionIO {
+public class VisionSubsystem extends SubsystemBase implements VisionIO {
     private Matrix<N4, N1> curStdDevs;
     private List<PhotonPipelineResult> currentResults;
 
@@ -36,12 +39,12 @@ public class Vision extends SubsystemBase implements VisionIO {
 
     private Cooprocessor currentCooprocessor;
 
-    public Vision(Cooprocessor cooprocessor) {
+    public VisionSubsystem(Cooprocessor cooprocessor) {
         switch (cooprocessor) {
             case RASPBERRY:
                 camera = new PhotonCamera(RASPBERRY_CAMERA_NAME);
 
-                if (RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM) {
+                if (isSimulation()) {
                     cameraSim = new PhotonCameraSim(camera, RASPBERRY_CAMERA_PROPS);
                     visionSim = new VisionSystemSim(RASPBERRY_CAMERA_NAME);
 
@@ -55,7 +58,7 @@ public class Vision extends SubsystemBase implements VisionIO {
             case LIMELIGHT:
                 camera = new PhotonCamera(LIMELIGHT_CAMERA_NAME);
 
-                if (RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM) {
+                if (isSimulation()) {
                     visionSim = new VisionSystemSim(LIMELIGHT_CAMERA_NAME);
                     cameraSim = new PhotonCameraSim(camera, LIMELIGHT_CAMERA_PROPS);
                     visionSim.addCamera(cameraSim, LIMELIGHT_ROBOT_TO_CAMERA);
@@ -91,7 +94,17 @@ public class Vision extends SubsystemBase implements VisionIO {
 
     @Override
     public void simulationPeriodic() {
-        if (visionSim != null) visionSim.update(Swerve.getInstance().getPose3d());
+        Pose3d pose = SwerveSubsystem.getInstance().getPose3d();
+        Pose3d metersPose = new Pose3d(
+            new Translation3d(
+                Meter.of(pose.getX()),
+                Meter.of(pose.getY()),
+                Meter.of(pose.getZ())
+            ),
+            pose.getRotation()
+        );
+
+        if (visionSim != null) visionSim.update(metersPose);
 
         switch (currentCooprocessor) {
             case LIMELIGHT:

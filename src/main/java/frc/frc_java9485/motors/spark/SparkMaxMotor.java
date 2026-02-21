@@ -139,6 +139,11 @@ public class SparkMaxMotor implements MotorIO{
       return currentIdleMode;
   }
 
+  @Override
+  public void resetPositionByEncoder(double posisition) {
+      motor.getEncoder().setPosition(posisition);
+  }
+
   private void configureSparkMax(Supplier<REVLibError> config) {
     for (int i = 0; i < maximumRetries; i++) {
       if (config.get() == REVLibError.kOk) {

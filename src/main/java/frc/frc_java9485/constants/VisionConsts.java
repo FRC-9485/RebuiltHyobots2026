@@ -1,6 +1,7 @@
 package frc.frc_java9485.constants;
 
 import static edu.wpi.first.units.Units.Inches;
+import static frc.frc_java9485.constants.RobotConsts.isSimulation;
 
 import org.photonvision.simulation.SimCameraProperties;
 
@@ -15,7 +16,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
-import frc.frc_java9485.constants.RobotConsts.RobotModes;
 
 public class VisionConsts {
     public static final String RASPBERRY_CAMERA_NAME = "raspphoto";
@@ -34,24 +34,24 @@ public class VisionConsts {
     public static SimCameraProperties LIMELIGHT_CAMERA_PROPS;
     public static SimCameraProperties RASPBERRY_CAMERA_PROPS;
 
-    @FunctionalInterface
-    public static interface EstimateConsumer {
-        public void accept(Pose3d pose, double timestamp, Matrix<N4, N1> estimationStdDevs);
-    }
-
     public enum Cooprocessor {
         RASPBERRY,
         LIMELIGHT
     }
 
+    @FunctionalInterface
+    public static interface EstimateConsumer {
+        public void accept(Pose3d pose, double timestamp, Matrix<N4, N1> estimationStdDevs);
+    }
+
     static {
-        if (RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM) {
+        if (isSimulation()) {
             LIMELIGHT_CAMERA_PROPS = new SimCameraProperties();
             RASPBERRY_CAMERA_PROPS = new SimCameraProperties();
 
-            LIMELIGHT_CAMERA_PROPS.setFPS(60);
-            LIMELIGHT_CAMERA_PROPS.setAvgLatencyMs(35);
-            LIMELIGHT_CAMERA_PROPS.setLatencyStdDevMs(10);
+            LIMELIGHT_CAMERA_PROPS.setFPS(92);
+            LIMELIGHT_CAMERA_PROPS.setAvgLatencyMs(27);
+            LIMELIGHT_CAMERA_PROPS.setLatencyStdDevMs(12);
             LIMELIGHT_CAMERA_PROPS.setCalibError(0.2, 0.2);
             LIMELIGHT_CAMERA_PROPS.setCalibration(640, 480, Rotation2d.fromDegrees(82));
 

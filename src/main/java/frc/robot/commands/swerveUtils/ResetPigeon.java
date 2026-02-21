@@ -2,15 +2,15 @@ package frc.robot.commands.swerveUtils;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 public class ResetPigeon extends Command {
 
   Pigeon2 pigeon2;
-  Swerve swerveSubsystem;
+  SwerveSubsystem swerveSubsystem;
 
   public ResetPigeon() {
-    this.swerveSubsystem = Swerve.getInstance();
+    this.swerveSubsystem = SwerveSubsystem.getInstance();
     this.pigeon2 = swerveSubsystem.getPigeon();
     addRequirements(swerveSubsystem);
   }

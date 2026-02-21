@@ -1,156 +1,156 @@
-package frc.robot.subsystems.mechanism.shooter.turret.turretOFC;
+// package frc.robot.subsystems.mechanism.shooter.turret.turretOFC;
 
-import java.util.function.Supplier;
+// import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.Logger;
+// import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.util.FlippingUtil;
-import com.revrobotics.RelativeEncoder;
+// import com.pathplanner.lib.util.FlippingUtil;
+// import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+// import edu.wpi.first.math.geometry.Pose2d;
+// import edu.wpi.first.math.geometry.Pose3d;
+// import edu.wpi.first.math.geometry.Rotation3d;
+// import edu.wpi.first.math.geometry.Translation2d;
+// import edu.wpi.first.math.geometry.Translation3d;
+// import edu.wpi.first.math.kinematics.ChassisSpeeds;
+// import edu.wpi.first.units.measure.Angle;
+// import edu.wpi.first.units.measure.AngularVelocity;
+// import edu.wpi.first.units.measure.Voltage;
+// import edu.wpi.first.wpilibj.DriverStation;
+// import edu.wpi.first.wpilibj.DriverStation.Alliance;
+// import edu.wpi.first.wpilibj2.command.Command;
+// import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-import static frc.frc_java9485.constants.FieldConsts.*;
-import static frc.frc_java9485.constants.mechanisms.TurretConsts.*;
+// import static edu.wpi.first.units.Units.Degrees;
+// import static edu.wpi.first.units.Units.Inches;
+// import static edu.wpi.first.units.Units.Radians;
+// import static edu.wpi.first.units.Units.RadiansPerSecond;
+// import static edu.wpi.first.units.Units.Volts;
+// import static frc.frc_java9485.constants.FieldConsts.*;
+// import static frc.frc_java9485.constants.mechanisms.TurretConsts.*;
 
-import frc.frc_java9485.constants.mechanisms.HoodConsts;
-import frc.frc_java9485.motors.spark.SparkFlexMotor;
-import frc.frc_java9485.motors.spark.SparkMaxMotor;
-import frc.frc_java9485.utils.TunableControls.TunableProfiledController;
-import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretCalculator.ShotData;
-import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretIO.TurretIOInputs;
+// import frc.frc_java9485.constants.mechanisms.HoodConsts;
+// import frc.frc_java9485.motors.spark.SparkFlexMotor;
+// import frc.frc_java9485.motors.spark.SparkMaxMotor;
+// import frc.frc_java9485.utils.TunableControls.TunableProfiledController;
+// import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretCalculator.ShotData;
+// import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretIO.TurretIOInputs;
 
-public class TurretSim extends SubsystemBase{
+// public class TurretSim extends SubsystemBase{
 
-    private final TurretIO io;
-    private final Supplier<ChassisSpeeds> chassisSpeed;
-    private final Supplier<Pose2d> pose;
+//     private final TurretIO io;
+//     private final Supplier<ChassisSpeeds> chassisSpeed;
+//     private final Supplier<Pose2d> pose;
 
-    private final SparkFlexMotor left_motor;
-    private final SparkFlexMotor right_motor;
+//     private final SparkFlexMotor left_motor;
+//     private final SparkFlexMotor right_motor;
 
-    private final SparkMaxMotor turn_turret;
-    private final SparkMaxMotor fuel_to_turret;
-    private final SparkMaxMotor hoodMotor;
+//     private final SparkMaxMotor turn_turret;
+//     private final SparkMaxMotor fuel_to_turret;
+//     private final SparkMaxMotor hoodMotor;
 
-    private final TunableProfiledController turretController;
-    private final TurretIOInputsAutoLogged inputs;
+//     private final TunableProfiledController turretController;
+//     private final TurretIOInputsAutoLogged inputs;
 
-    private final RelativeEncoder encoder;
+//     private final RelativeEncoder encoder;
 
-    private boolean isActive = false;
+//     private boolean isActive = false;
 
-    private Translation3d currentTarget;
+//     private Translation3d currentTarget;
 
-    public TurretSim(TurretIO io,Supplier<ChassisSpeeds> chassisSpeed, Supplier<Pose2d> pose){
-        this.chassisSpeed = chassisSpeed;
-        this.pose = pose;
-        this.io = io;
+//     public TurretSim(TurretIO io,Supplier<ChassisSpeeds> chassisSpeed, Supplier<Pose2d> pose){
+//         this.chassisSpeed = chassisSpeed;
+//         this.pose = pose;
+//         this.io = io;
 
-        this.left_motor = new SparkFlexMotor(LEFT_SHOOTER, "left shooter");
-        this.right_motor = new SparkFlexMotor(RIGHT_SHOOTER, "right shooter");
-        this.hoodMotor = new SparkMaxMotor(HoodConsts.MOTOR_ID, "hood motor");
+//         this.left_motor = new SparkFlexMotor(LEFT_SHOOTER, "left shooter");
+//         this.right_motor = new SparkFlexMotor(RIGHT_SHOOTER, "right shooter");
+//         this.hoodMotor = new SparkMaxMotor(HoodConsts.MOTOR_ID, "hood motor");
 
-        this.turn_turret = new SparkMaxMotor(TURN_TURRET, "turn turret");
-        this.fuel_to_turret = new SparkMaxMotor(FUEL_TO_TURRET, "catch fuel to turret");
-        this.encoder = turn_turret.getEncoder();
+//         this.turn_turret = new SparkMaxMotor(TURN_TURRET, "turn turret");
+//         this.fuel_to_turret = new SparkMaxMotor(FUEL_TO_TURRET, "catch fuel to turret");
+//         this.encoder = turn_turret.getEncoder();
 
-        this.turretController = new TunableProfiledController(TURRET_TUNABLE);
-        this.inputs = new TurretIOInputsAutoLogged();
+//         this.turretController = new TunableProfiledController(TURRET_TUNABLE);
+//         this.inputs = new TurretIOInputsAutoLogged();
 
-        configureShooter();
-    }
+//         configureShooter();
+//     }
 
-    private void configureShooter(){
-        right_motor.setInvert();
-        right_motor.followMotor(LEFT_SHOOTER);
-        right_motor.burnFlash();
+//     private void configureShooter(){
+//         right_motor.setInvert();
+//         right_motor.followMotor(LEFT_SHOOTER);
+//         right_motor.burnFlash();
 
-        hoodMotor.setInvert();
-        hoodMotor.burnFlash();
-    }
+//         hoodMotor.setInvert();
+//         hoodMotor.burnFlash();
+//     }
 
-    private void updateInputs(TurretIOInputs inputs){
+//     private void updateInputs(TurretIOInputs inputs){
 
-    }
+//     }
 
-    public Command setTarget(Translation3d target) {
-        return this.runOnce(() -> {
-            currentTarget = target;
-            if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-                Translation2d flipped = FlippingUtil.flipFieldPosition(target.toTranslation2d());
-                currentTarget = new Translation3d(flipped.getX(), flipped.getY(), target.getZ());
-            }
-        });
-    }
+//     public Command setTarget(Translation3d target) {
+//         return this.runOnce(() -> {
+//             currentTarget = target;
+//             if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+//                 Translation2d flipped = FlippingUtil.flipFieldPosition(target.toTranslation2d());
+//                 currentTarget = new Translation3d(flipped.getX(), flipped.getY(), target.getZ());
+//             }
+//         });
+//     }
 
-    public Command stop(){
-        return runOnce(() ->{
-            turn_turret.setVoltage(0);
-            isActive = false;
-        });
-    }
+//     public Command stop(){
+//         return runOnce(() ->{
+//             turn_turret.setVoltage(0);
+//             isActive = false;
+//         });
+//     }
 
-    public Command start(){
-        return runOnce(() ->{
-            isActive = true;
-        });
-    }
-    double x = 0;
-    @Override
-    public void periodic() {
-        x++;
-        if (x > 360) x = 0;
-        Logger.recordOutput("torreta", new Pose3d(
-            Inches.of(8), //x
-            Inches.of(0), //y
-            Inches.of(35.2), //z
-            new Rotation3d(
-                Degrees.of(0), //yaw
-                Degrees.of(0), //pitch
-                Degrees.of(x)) //roll
-            ));
-        updateInputs(inputs);
-        Logger.processInputs("turret inputs", inputs);
+//     public Command start(){
+//         return runOnce(() ->{
+//             isActive = true;
+//         });
+//     }
+//     double x = 0;
+//     @Override
+//     public void periodic() {
+//         x++;
+//         if (x > 360) x = 0;
+//         Logger.recordOutput("torreta", new Pose3d(
+//             Inches.of(8), //x
+//             Inches.of(0), //y
+//             Inches.of(35.2), //z
+//             new Rotation3d(
+//                 Degrees.of(0), //yaw
+//                 Degrees.of(0), //pitch
+//                 Degrees.of(x)) //roll
+//             ));
+//         updateInputs(inputs);
+//         Logger.processInputs("turret inputs", inputs);
 
-        calculateShot();
-    }
+//         calculateShot();
+//     }
 
-    private void calculateShot(){
-        if(isActive){
-            currentTarget = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                ? HUB_BLUE
-                : HUB_RED;
+//     private void calculateShot(){
+//         if(isActive){
+//             currentTarget = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+//                 ? HUB_BLUE
+//                 : HUB_RED;
 
-            Pose2d robot = pose.get();
-            ChassisSpeeds fieldSpeeds = chassisSpeed.get();
+//             Pose2d robot = pose.get();
+//             ChassisSpeeds fieldSpeeds = chassisSpeed.get();
 
-            ShotData calculatedShot = TurretCalculator.iterativeMovingShotFromFunnelClearance(
-                        robot, fieldSpeeds, currentTarget, LOOKAHEAD_ITERATIONS);
-            Angle azimuthAngle = TurretCalculator.calculateAzimuthAngle(robot, calculatedShot.target());
-            AngularVelocity azimuthVelocity = RadiansPerSecond.of(-fieldSpeeds.omegaRadiansPerSecond);
+//             ShotData calculatedShot = TurretCalculator.iterativeMovingShotFromFunnelClearance(
+//                         robot, fieldSpeeds, currentTarget, LOOKAHEAD_ITERATIONS);
+//             Angle azimuthAngle = TurretCalculator.calculateAzimuthAngle(robot, calculatedShot.target());
+//             AngularVelocity azimuthVelocity = RadiansPerSecond.of(-fieldSpeeds.omegaRadiansPerSecond);
 
-            turretController.setGoal(azimuthAngle.in(Radians), azimuthVelocity.in(RadiansPerSecond));
+//             turretController.setGoal(azimuthAngle.in(Radians), azimuthVelocity.in(RadiansPerSecond));
 
-            Voltage turnVoltage = Volts.of(turretController.calculate(Radians.of(inputs.turnPosition).in(Radians)));
+//             Voltage turnVoltage = Volts.of(turretController.calculate(Radians.of(inputs.turnPosition).in(Radians)));
 
-            turn_turret.setVoltage(turnVoltage);
-        }
-    }
-}
+//             turn_turret.setVoltage(turnVoltage);
+//         }
+//     }
+// }

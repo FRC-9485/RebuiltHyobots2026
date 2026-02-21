@@ -12,14 +12,14 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Led extends SubsystemBase implements LedIO {
+public class LedSubsystem extends SubsystemBase implements LedIO {
   private LEDPattern pattern;
-  private static Led mInstance = null;
+  private static LedSubsystem mInstance = null;
 
   private final AddressableLEDBuffer buffer;
   private final AddressableLED addressableLED;
 
-  private Led() {
+  private LedSubsystem() {
     this.addressableLED = new AddressableLED(9);
     this.buffer = new AddressableLEDBuffer(60);
     this.pattern = LEDPattern.solid(Color.kBlack);
@@ -28,9 +28,9 @@ public class Led extends SubsystemBase implements LedIO {
     this.addressableLED.start();
   }
 
-  public static Led getInstance() {
+  public static LedSubsystem getInstance() {
     if (mInstance == null) {
-      mInstance = new Led();
+      mInstance = new LedSubsystem();
     }
     return mInstance;
   }

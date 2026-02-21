@@ -167,4 +167,9 @@ public class SparkMaxBrushed implements MotorIO{
       return motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     });
   }
+
+  @Override
+  public void resetPositionByEncoder(double posisition) {
+      motor.getEncoder().setPosition(posisition);
+  }
 }

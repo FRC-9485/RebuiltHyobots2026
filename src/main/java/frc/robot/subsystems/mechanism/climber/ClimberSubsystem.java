@@ -9,8 +9,8 @@ import frc.frc_java9485.constants.mechanisms.ClimberConsts;
 import frc.frc_java9485.motors.spark.SparkMaxMotor;
 import frc.frc_java9485.utils.TunableControls.TunableProfiledController;
 
-public class Climber extends SubsystemBase implements ClimberIO {
-    private static Climber m_instance;
+public class ClimberSubsystem extends SubsystemBase implements ClimberIO {
+    private static ClimberSubsystem m_instance;
     private final ClimberInputs inputs;
 
     private final SparkMaxMotor left;
@@ -28,12 +28,12 @@ public class Climber extends SubsystemBase implements ClimberIO {
     private double rightPosition;
     private ClimberStates currentState;
 
-    public static Climber getInstance() {
-        if (m_instance == null) m_instance = new Climber();
+    public static ClimberSubsystem getInstance() {
+        if (m_instance == null) m_instance = new ClimberSubsystem();
         return m_instance;
     }
 
-    private Climber() {
+    private ClimberSubsystem() {
         inputs = new ClimberInputsAutoLogged();
         currentState = ClimberStates.DEFAULT;
 

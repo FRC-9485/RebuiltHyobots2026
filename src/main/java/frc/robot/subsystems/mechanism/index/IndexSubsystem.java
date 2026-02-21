@@ -5,29 +5,30 @@ import static frc.frc_java9485.constants.mechanisms.IndexConsts.*;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.frc_java9485.motors.spark.SparkMaxMotor;
 
-public class Index extends SubsystemBase implements IndexIO{
+public class IndexSubsystem extends SubsystemBase implements IndexIO{
 
     private final SparkMaxMotor index;
     private boolean isActive;
     private final IndexInputsAutoLogged inputs;
 
-    private static Index mInstance = null;
+    private static IndexSubsystem mInstance = null;
 
-    public static Index getInstance(){
+    public static IndexSubsystem getInstance(){
         if (mInstance == null) {
-            mInstance = new Index();
+            mInstance = new IndexSubsystem();
         }
         return mInstance;
     }
 
-    private Index(){
+    private IndexSubsystem(){
         this.index = new SparkMaxMotor(INDEX_ID, "index motor");
         inputs = new IndexInputsAutoLogged();
-        
+
+        isActive = false;
+
         configureIndexMotor();
     }
 
@@ -47,7 +48,7 @@ public class Index extends SubsystemBase implements IndexIO{
     @Override
     public void periodic() {
         if(isActive){
-            index.setSpeed(MAX_SPEED);
+            index.setSpeed(-MAX_SPEED);
         }
 
         updateInputs(inputs);
@@ -55,10 +56,8 @@ public class Index extends SubsystemBase implements IndexIO{
     }
 
     @Override
-    public Command turnOn(){
-        return runOnce(() ->{
-            isActive = true;
-        });
+    public void turnOn(){
+        isActive = true;
     }
 
     @Override
@@ -67,9 +66,9 @@ public class Index extends SubsystemBase implements IndexIO{
     }
 
     @Override
-    public Command stopIndex(){
-        return runOnce(() ->{
-            isActive = false;
-        });
+    public void stopIndex(){
+        index.setSpeed(0);
+        index.setVoltage(0);
+        isActive = false;
     }
 }

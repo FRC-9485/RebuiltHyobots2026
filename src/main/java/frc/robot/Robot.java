@@ -10,13 +10,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.frc_java9485.constants.FieldConsts;
 import frc.frc_java9485.constants.RobotConsts;
-import frc.frc_java9485.constants.RobotConsts.RobotModes;
 import frc.frc_java9485.utils.Elastic;
 import frc.frc_java9485.utils.HubTracker;
 import frc.frc_java9485.utils.Elastic.Notification;
 import frc.frc_java9485.utils.Elastic.Notification.NotificationLevel;
 import frc.frc_java9485.utils.Simulation;
-import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.SwerveSubsystem;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
@@ -33,7 +32,7 @@ public class Robot extends LoggedRobot {
   private final PowerDistribution powerDistribution;
 
   private Simulation simulator;
-  private final Swerve swerve;
+  private final SwerveSubsystem swerve;
   private final RobotContainer m_robotContainer;
 
   public Robot() {
@@ -53,7 +52,7 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     m_robotContainer = new RobotContainer();
-    swerve = Swerve.getInstance();
+    swerve = SwerveSubsystem.getInstance();
 
     timer = new Timer();
     powerDistribution = new PowerDistribution();
@@ -100,7 +99,7 @@ public class Robot extends LoggedRobot {
   public void teleopInit() {
     Elastic.sendNotification(new Notification(NotificationLevel.INFO, "Inicio do teleop!!", ""));
 
-    if (RobotConsts.CURRENT_ROBOT_MODE == RobotModes.SIM) {
+    // if (isSimulation()) {
       if (!runnedAutonomous) {
         var alliancePosition = DriverStation.getRawAllianceStation();
         switch (alliancePosition) {
@@ -130,7 +129,7 @@ public class Robot extends LoggedRobot {
             break;
         }
       }
-    }
+    // }
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();

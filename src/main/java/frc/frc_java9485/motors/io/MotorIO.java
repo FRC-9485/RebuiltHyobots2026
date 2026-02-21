@@ -20,6 +20,7 @@ public interface MotorIO {
     public void cleanStickFaults();
     public void burnFlash();
     public void setCurrentLimit(int current);
+    public void resetPositionByEncoder(double posisition);
 
     public double getPosition();
     public double getRate();

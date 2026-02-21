@@ -36,18 +36,17 @@ public class MechanismJoystick implements MechanismJoystickIO {
 
   @Override
   public Trigger y() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'y'");
+    return joystick.y();
   }
 
   @Override
   public Trigger rightTrigger() {
-    return joystick.rightTrigger(0.1);
+    return joystick.rightTrigger();
   }
 
   @Override
   public Trigger letTrigger() {
-    return joystick.leftTrigger(0.1);
+    return joystick.leftTrigger();
   }
 
   @Override

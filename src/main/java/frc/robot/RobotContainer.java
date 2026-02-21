@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.frc_java9485.autonomous.AutoChooser;
 import frc.frc_java9485.constants.mechanisms.DriveConsts;
 import frc.frc_java9485.joystick.driver.DriverJoystick;
@@ -9,21 +10,22 @@ import frc.frc_java9485.joystick.mechanism.MechanismJoystick;
 import frc.frc_java9485.utils.RegisterNamedCommands;
 import frc.robot.commands.CatchBall;
 import frc.robot.commands.swerveUtils.ResetSimGyro;
-// import frc.robot.subsystems.mechanism.SuperStructure;
-import frc.robot.subsystems.mechanism.SuperStructureSim;
-import frc.robot.subsystems.mechanism.SuperStructureSim.SimAction;
-import frc.robot.subsystems.mechanism.intake.Intake;
-import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.mechanism.SuperStructure;
+import frc.robot.subsystems.mechanism.SuperStructure.Actions;
+import frc.robot.subsystems.mechanism.intake.IntakeSubsystem;
+import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretSubsystem;
+import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretIO;
+import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 import static frc.frc_java9485.constants.RobotConsts.*;
 
 public class RobotContainer {
-  private final Intake intake;
-  private final Swerve swerveSubsystem;
-  // private final Turret turret;
+  private final IntakeSubsystem intake;
+  private final SwerveSubsystem swerveSubsystem;
+  private final TurretSubsystem turret;
 
-  // private SuperStructure superStructure;
-  private SuperStructureSim superStructureSim;
+  private SuperStructure superStructure;
+  // private SuperStructureSim superStructureSim;
 
   private final DriverJoystick driverJoystick;
   private final MechanismJoystick mechanismJoystick;
@@ -34,10 +36,10 @@ public class RobotContainer {
   public RobotContainer() {
     DriverStation.silenceJoystickConnectionWarning(true);
 
-    swerveSubsystem = Swerve.getInstance();
-    intake = Intake.getInstance();
-    // turret = new Turret(new TurretIO() {},swerveSubsystem::getRobotRelativeSpeeds, swerveSubsystem::getPose2d);
-    // superStructure = new SuperStructure();
+    swerveSubsystem = SwerveSubsystem.getInstance();
+    intake = IntakeSubsystem.getInstance();
+    turret = new TurretSubsystem(new TurretIO() {}, swerveSubsystem::getRobotRelativeSpeeds, swerveSubsystem::getPose2d);
+    superStructure = new SuperStructure(turret);
 
     driverJoystick = DriverJoystick.getInstance();
     mechanismJoystick = MechanismJoystick.getInstance();
@@ -53,10 +55,9 @@ public class RobotContainer {
             DriveConsts.FIELD_ORIENTED));
 
     if (isSimulation()) {
-      superStructureSim = new SuperStructureSim();
+      // superStructureSim = new SuperStructureSim();
       configureSimBindings();
     } else {
-      // superStructure = new SuperStructure();
       configureBindings();
     }
     configureAutonomousCommands();
@@ -64,23 +65,32 @@ public class RobotContainer {
 
   private void configureAutonomousCommands(){
     if (isSimulation()) {
-      // namedCommands.configureSimCommands(intake, superStructure);
+      namedCommands.configureSimCommands(intake, superStructure);
     } else {
-      // namedCommands.configureRealCommands(intake, superStructure);
+      namedCommands.configureRealCommands(intake, superStructure);
     }
   }
 
   private void configureBindings() {
-    // mechanismJoystick.a().onTrue(superStructure.setAction(Actions.CATCH_FUEL));
+    driverJoystick.a().onTrue(Commands.runOnce(() -> superStructure.setAction(Actions.SHOOT_FUEL), superStructure))
+    .onFalse(Commands.runOnce(() -> superStructure.setAction(Actions.LOCK_TURRET), superStructure));
+
+    driverJoystick.x().whileTrue(new CatchBall(0.7));
+
+    mechanismJoystick.rightTrigger().onTrue(Commands.runOnce(() -> superStructure.setAction(Actions.SHOOT_FUEL), superStructure));
+    mechanismJoystick.rightTrigger().onFalse(Commands.runOnce(() -> superStructure.setAction(Actions.LOCK_TURRET), superStructure));
+
     mechanismJoystick.x().whileTrue(new CatchBall(0.7));
-    // mechanismJoystick.b().onTrue(superStructure.setAction(Actions.CLOSE_INTAKE));
+
+    mechanismJoystick.a().onTrue(Commands.runOnce(() -> superStructure.setAction(Actions.CATCH_FUEL), superStructure));
+    mechanismJoystick.b().onTrue(Commands.runOnce(() -> superStructure.setAction(Actions.CLOSE_INTAKE), superStructure));
   }
 
   private void configureSimBindings() {
     driverJoystick.getLeftBack().onTrue(new ResetSimGyro());
 
-    driverJoystick.a().whileTrue(superStructureSim.setSimAction(SimAction.CATCH_FUEL));
-    driverJoystick.a().whileTrue(superStructureSim.setSimAction(SimAction.CLOSE_INTAKE));
+    // driverJoystick.a().whileTrue(superStructureSim.setSimAction(SimAction.CATCH_FUEL));
+    // driverJoystick.a().whileTrue(superStructureSim.setSimAction(SimAction.CLOSE_INTAKE));
   }
 
   public Command getAutonomousCommand() {

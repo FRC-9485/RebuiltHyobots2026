@@ -3,7 +3,7 @@ package frc.robot.subsystems.mechanism.climber;
 import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.mechanism.climber.Climber.ClimberStates;
+import frc.robot.subsystems.mechanism.climber.ClimberSubsystem.ClimberStates;
 
 public interface ClimberIO {
     public Command climbRobot(ClimberStates state);

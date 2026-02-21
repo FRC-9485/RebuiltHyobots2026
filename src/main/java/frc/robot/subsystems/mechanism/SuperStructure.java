@@ -10,21 +10,20 @@ import static frc.frc_java9485.constants.mechanisms.IntakeConsts.*;
 import org.littletonrobotics.junction.Logger;
 
 import frc.frc_java9485.constants.mechanisms.ConveyorConsts;
-import frc.robot.subsystems.mechanism.conveyor.Conveyor;
-import frc.robot.subsystems.mechanism.index.Index;
-import frc.robot.subsystems.mechanism.intake.Intake;
-import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.Turret;
-import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretIO;
-// import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretSimTeste;
-import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.mechanism.conveyor.ConveyorSubsystem;
+import frc.robot.subsystems.mechanism.index.IndexSubsystem;
+import frc.robot.subsystems.mechanism.intake.IntakeSubsystem;
+import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretSubsystem;
+import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretSubsystem.TurretGoal;
+import frc.robot.subsystems.swerve.SwerveSubsystem;
 import swervelib.simulation.ironmaple.simulation.IntakeSimulation;
 import swervelib.simulation.ironmaple.simulation.IntakeSimulation.IntakeSide;
 
 public class SuperStructure extends SubsystemBase{
-  private final Intake intake;
-  private final Conveyor conveyor;
-  private final Turret turret;
-  private final Index index;
+  private final IntakeSubsystem intake;
+  private final ConveyorSubsystem conveyor;
+  private final TurretSubsystem turret;
+  private final IndexSubsystem index;
   // private final TurretSimTeste turretSim;
 
   private Actions currentAction = Actions.SECURITY;
@@ -32,21 +31,15 @@ public class SuperStructure extends SubsystemBase{
 
   private IntakeSimulation intakeSimulation;
 
-  public SuperStructure() {
-    intake = Intake.getInstance();
-    conveyor = Conveyor.getInstance();
-    index = Index.getInstance();
-    // turretSim = new TurretSimTeste(new TurretIO() {
-
-    // }, Swerve.getInstance()::getRobotRelativeSpeeds, Swerve.getInstance()::getPose2d);
-    this.turret = new Turret(new TurretIO() {
-
-    }, Swerve.getInstance()::getRobotRelativeSpeeds, Swerve.getInstance()::getPose2d);
-
+  public SuperStructure(TurretSubsystem turret) {
+    intake = IntakeSubsystem.getInstance();
+    conveyor = ConveyorSubsystem.getInstance();
+    index = IndexSubsystem.getInstance();
+    this.turret = turret;
 
     if (isSimulation()) {
       intakeSimulation = IntakeSimulation.InTheFrameIntake("Fuel",
-                                                           Swerve.getInstance().getSimulation(),
+                                                           SwerveSubsystem.getInstance().getSimulation(),
                                                            Meters.of(0.36),
                                                            IntakeSide.BACK,
                                                            ConveyorConsts.MAX_FUELS);
@@ -55,6 +48,7 @@ public class SuperStructure extends SubsystemBase{
 
   @Override
   public void periodic() {
+    executeAction(getAction());
   }
 
   public enum Actions {
@@ -72,21 +66,20 @@ public class SuperStructure extends SubsystemBase{
     SECURITY
   }
 
-  public Command setAction(Actions actions) {
-    return run(() ->{
+  public void executeAction(Actions actions){
       switch (actions) {
         case SHOOT_FUEL:
             index.turnOn();
-            turret.start();
-          break;
+            turret.setGoal(TurretGoal.SCORING);
+            break;
 
         case CATCH_FUEL:
             intake.enablePivot(SETPOINT_DOWN);
-            intake.catchFuel(COLLECT_FUEL_SPEED);
+            // intake.catchFuel(COLLECT_FUEL_SPEED);
           break;
 
         case CLOSE_INTAKE:
-            intake.catchFuel(STOPPED_FUEL_SPEED);
+            // intake.catchFuel(STOPPED_FUEL_SPEED);
             intake.enablePivot(SETPOINT_UP);
           break;
 
@@ -100,12 +93,52 @@ public class SuperStructure extends SubsystemBase{
           break;
 
         case LOCK_TURRET:
+            turret.setGoal(TurretGoal.OFF);
+            index.stopIndex();
           break;
 
         default:
           break;
       }
-    });
+  }
+
+  public Actions setAction(Actions actions) {
+      if(currentAction != actions){
+        currentAction = actions;
+      }
+      switch (actions) {
+        case SHOOT_FUEL:
+            currentAction = Actions.SHOOT_FUEL;
+          break;
+
+        case CATCH_FUEL:
+            currentAction = Actions.CATCH_FUEL;
+          break;
+
+        case CLOSE_INTAKE:
+            currentAction = Actions.CLOSE_INTAKE;
+          break;
+
+        case LOCK_CONVEYOR:
+            currentAction = Actions.LOCK_CONVEYOR;
+          break;
+
+        case LOCK_HOOD:
+            currentAction = Actions.LOCK_HOOD;
+          break;
+
+        case CLIMBER_L1:
+            currentAction = Actions.CLIMBER_L1;
+          break;
+
+        case LOCK_TURRET:
+            currentAction = Actions.LOCK_TURRET;
+          break;
+
+        default:
+          break;
+      }
+      return currentAction;
   }
 
   public Command setActionSim(Actions action) {

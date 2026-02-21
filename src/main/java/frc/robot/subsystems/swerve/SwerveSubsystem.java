@@ -47,7 +47,7 @@ import frc.robot.subsystems.swerve.IO.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.swerve.IO.PigeonIO;
 import frc.robot.subsystems.swerve.IO.SwerveIO;
 import frc.robot.subsystems.swerve.IO.SwerveInputsAutoLogged;
-import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.vision.VisionInstances;
 import swervelib.SwerveDrive;
 import swervelib.SwerveModule;
@@ -58,7 +58,7 @@ import swervelib.simulation.ironmaple.simulation.drivesims.SwerveDriveSimulation
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
-public class Swerve extends SubsystemBase implements SwerveIO {
+public class SwerveSubsystem extends SubsystemBase implements SwerveIO {
   public static final Lock odometryLock = new ReentrantLock();
 
   private final SwerveDrive swerveDrive;
@@ -75,24 +75,24 @@ public class Swerve extends SubsystemBase implements SwerveIO {
 
   private SwerveDriveSimulation driveSimulator;
 
-  private Vision limelight;
-  private Vision raspberry;
+  private VisionSubsystem limelight;
+  private VisionSubsystem raspberry;
 
   private SwerveModule[] modules;
   private SwerveModuleState states[];
 
-  private static Swerve mInstance;
+  private static SwerveSubsystem mInstance;
 
   private final boolean isSimulation;
 
-  public static Swerve getInstance() {
+  public static SwerveSubsystem getInstance() {
     if (mInstance == null) {
-      mInstance = new Swerve(new File(Filesystem.getDeployDirectory(), "swerve"));
+      mInstance = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
     }
     return mInstance;
   }
 
-  private Swerve(File directory) {
+  private SwerveSubsystem(File directory) {
     try {
       SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
       swerveDrive = new SwerveParser(directory).createSwerveDrive(MAX_SPEED);
