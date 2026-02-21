@@ -83,7 +83,7 @@ public class TurretConsts {
 
   public static final ControlConstants TURRET_CONSTANTS = new ControlConstants()
   .withProfile(1000, 700)//testes
-  .withPID(6, 0.0, 0.0);
+  .withPID(0.237, 0.0, 0.0);
 
   public static final int SHOOTER_CURRENT_LIMIT = 40;
   public static final int TURN_TURRET_CURRENT_LIMIT = 20;

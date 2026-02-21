@@ -51,6 +51,7 @@ public class TurretSubsystem extends SubsystemBase{
     private final SparkMaxMotor hoodMotor;
 
     private final TunableProfiledController turretController;
+    private final TunableProfiledController hoodController;
     private final TurretIOInputsAutoLogged inputs;
 
     private TurretGoal goal = TurretGoal.OFF;
@@ -78,6 +79,8 @@ public class TurretSubsystem extends SubsystemBase{
         this.fuel_to_turret = new SparkMaxMotor(FUEL_TO_TURRET, "catch fuel to turret");
 
         this.turretController = new TunableProfiledController(TURRET_TUNABLE);
+        this.hoodController = new TunableProfiledController(TUNABLE_CONSTANTS);
+
         this.inputs = new TurretIOInputsAutoLogged();
 
         if (isSimulation()) {
@@ -123,11 +126,12 @@ public class TurretSubsystem extends SubsystemBase{
         updateInputs(inputs);
         Logger.processInputs("turret inputs", inputs);
         System.out.println("turret Goal:" + goal.toString());
+        System.out.println("hood: " + hoodMotor.getPosition());
 
          if (goal == TurretGoal.SCORING || goal == TurretGoal.PASSING) {
-            // fuel_to_turret.setSpeed(-0.8);
-            // left_motor.setSpeed(0.9);
-            // right_motor.setSpeed(-0.9);
+            fuel_to_turret.setSpeed(-0.8);
+            left_motor.setSpeed(0.9);
+            right_motor.setSpeed(-0.9);
             calculateShot();
         }
 
@@ -181,10 +185,13 @@ public class TurretSubsystem extends SubsystemBase{
 
         AngularVelocity azimuthVelocity = RadiansPerSecond.of(-fieldSpeeds.omegaRadiansPerSecond);
 
-        turretController.setGoal(azimuthAngle.in(Radians), azimuthVelocity.in(RadiansPerSecond));
+        turretController.setGoal(-azimuthAngle.in(Radians));
+        hoodController.setGoal(calculatedShot.getHoodAngle().in(Degrees));
 
         Voltage turnVoltage = Volts.of(turretController.calculate(turn_turret.getPosition()));
+        Voltage hoodVoltage = Volts.of(hoodController.calculate(hoodMotor.getPosition()));
 
+        hoodMotor.setVoltage(hoodVoltage);
         turn_turret.setVoltage(turnVoltage);
 
         Logger.recordOutput("Turret/Pose 3d", new Pose3d(
