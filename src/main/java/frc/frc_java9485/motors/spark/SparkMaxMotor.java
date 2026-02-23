@@ -10,6 +10,7 @@ import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -40,7 +41,7 @@ public class SparkMaxMotor implements MotorIO{
     this.id = id;
     this.isFollower = isFollower;
     this.name = name;
-    this.motor = new SparkMax(id, SparkMax.MotorType.kBrushless);
+    this.motor = new SparkMax(id, MotorType.kBrushless);
     this.config = new SparkMaxConfig();
 
     cleanStickFaults();

@@ -127,6 +127,16 @@ public class TurretCalculator {
         double angle = MathUtil.inputModulus(
                 new Rotation2d(fieldRelativeAngle).minus(robot.getRotation()).getRotations(), -0.5, 0.5);
         double current = currentAngle.in(Rotations);
+        if (current > 0 && angle + 1 <= MAX_TURN_ANGLE.in(Rotations)) angle -= 1;
+        if (current < 0 && angle - 1 >= MIN_TURN_ANGLE.in(Rotations)) angle += 1;
+        Logger.recordOutput("Turret/DesiredAzimuthRad", angle);
+        return Rotations.of(angle);
+    }
+
+    public static Angle calculateAzimuthAngle(Pose2d robot, Angle fieldRelativeAngle, double currentAngle) {
+        double angle = MathUtil.inputModulus(
+                new Rotation2d(fieldRelativeAngle).minus(robot.getRotation()).getRotations(), -0.5, 0.5);
+        double current = currentAngle;
         if (current > 0 && angle + 1 <= MAX_TURN_ANGLE.in(Rotations)) angle += 1;
         if (current < 0 && angle - 1 >= MIN_TURN_ANGLE.in(Rotations)) angle -= 1;
         Logger.recordOutput("Turret/DesiredAzimuthRad", angle);
@@ -135,6 +145,17 @@ public class TurretCalculator {
 
      // calculates the angle of a turret relative to the robot to hit a target
     public static Angle calculateAzimuthAngle(Pose2d robot, Translation3d target, Angle currentAngle) {
+        Translation2d turretTranslation = new Pose3d(robot)
+                .transformBy(ROBOT_TO_TURRET_TRANSFORM)
+                .toPose2d()
+                .getTranslation();
+
+        Translation2d direction = target.toTranslation2d().minus(turretTranslation);
+        return calculateAzimuthAngle(robot, direction.getAngle().getMeasure(), currentAngle);
+    }
+
+     // calculates the angle of a turret relative to the robot to hit a target
+    public static Angle calculateAzimuthAngle(Pose2d robot, Translation3d target, double currentAngle) {
         Translation2d turretTranslation = new Pose3d(robot)
                 .transformBy(ROBOT_TO_TURRET_TRANSFORM)
                 .toPose2d()

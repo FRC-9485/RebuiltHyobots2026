@@ -35,8 +35,11 @@ public class TurretConsts {
   // .withProfile(100, 80)//testes
   // .withPID(0.4, 0, 0.2);
 
-  public static final Angle MAX_TURN_ANGLE = Rotations.of(270);
-  public static final Angle MIN_TURN_ANGLE = Rotations.of(0);
+  public static final Angle MAX_TURN_ANGLE = Rotations.of(0.25);
+  public static final Angle MIN_TURN_ANGLE = Rotations.of(-0.25);
+
+  // public static final Angle MAX_TURN_ANGLE = Rotations.of(8.5000);
+  // public static final Angle MIN_TURN_ANGLE = Rotations.of(-16.7618);
 
   public static final InterpolatingTreeMap<Double, ShotData> SHOT_MAP = new InterpolatingTreeMap<>(
     InverseInterpolator.forDouble(), ShotData::interpolate);
@@ -81,9 +84,18 @@ public class TurretConsts {
           TOF_MAP.put(1.55, 1.23);
       }
 
+  public static final ControlConstants SHOOTER_CONTROL_CONSTANTS = new ControlConstants()
+  .withPID(0.01, 0, 0)
+  .withProfile(800, 600);
+
+  public static final TunableControlConstants SHOOTER_CONSTANTS = new TunableControlConstants("shooter controller", SHOOTER_CONTROL_CONSTANTS);
+
   public static final ControlConstants TURRET_CONSTANTS = new ControlConstants()
-  .withProfile(1000, 700)//testes
-  .withPID(0.237, 0.0, 0.0);
+  .withProfile(250, 180)//testes
+  .withPID(0.2, 0.0, 0.0)
+  .withContinuous(-180, 180);
+  // .withFeedforward(0.7, 0)
+  // .withPhysical(0.2, 0.0);
 
   public static final int SHOOTER_CURRENT_LIMIT = 40;
   public static final int TURN_TURRET_CURRENT_LIMIT = 20;

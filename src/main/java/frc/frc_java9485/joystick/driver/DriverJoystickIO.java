@@ -30,4 +30,8 @@ public interface DriverJoystickIO {
   Trigger leftBumper();
 
   Trigger getLeftBack();
+
+  double getRightTrigger();
+
+  double getLeftTrigger();
 }

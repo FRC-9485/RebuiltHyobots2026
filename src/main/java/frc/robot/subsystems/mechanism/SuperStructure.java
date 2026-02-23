@@ -1,5 +1,6 @@
 package frc.robot.subsystems.mechanism;
 
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -10,6 +11,7 @@ import static frc.frc_java9485.constants.mechanisms.IntakeConsts.*;
 import org.littletonrobotics.junction.Logger;
 
 import frc.frc_java9485.constants.mechanisms.ConveyorConsts;
+import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.mechanism.conveyor.ConveyorSubsystem;
 import frc.robot.subsystems.mechanism.index.IndexSubsystem;
 import frc.robot.subsystems.mechanism.intake.IntakeSubsystem;
@@ -24,6 +26,7 @@ public class SuperStructure extends SubsystemBase{
   private final ConveyorSubsystem conveyor;
   private final TurretSubsystem turret;
   private final IndexSubsystem index;
+  private final LedSubsystem ledSubsystem;
   // private final TurretSimTeste turretSim;
 
   private Actions currentAction = Actions.SECURITY;
@@ -35,6 +38,7 @@ public class SuperStructure extends SubsystemBase{
     intake = IntakeSubsystem.getInstance();
     conveyor = ConveyorSubsystem.getInstance();
     index = IndexSubsystem.getInstance();
+    ledSubsystem = LedSubsystem.getInstance();
     this.turret = turret;
 
     if (isSimulation()) {
@@ -49,6 +53,22 @@ public class SuperStructure extends SubsystemBase{
   @Override
   public void periodic() {
     executeAction(getAction());
+    setLedActions(getAction());
+  }
+
+  private void setLedActions(Actions action){
+    switch (action) {
+      case SHOOT_FUEL:
+          ledSubsystem.setSolidColor(Color.kRed);
+        break;
+
+      case LOCK_TURRET:
+          ledSubsystem.setSolidColor(Color.kGreen);
+        break;
+
+      default:
+        break;
+    }
   }
 
   public enum Actions {
@@ -69,18 +89,18 @@ public class SuperStructure extends SubsystemBase{
   public void executeAction(Actions actions){
       switch (actions) {
         case SHOOT_FUEL:
-            index.turnOn();
             turret.setGoal(TurretGoal.SCORING);
+            index.turnOn();
             break;
 
         case CATCH_FUEL:
-            intake.enablePivot(SETPOINT_DOWN);
-            // intake.catchFuel(COLLECT_FUEL_SPEED);
+            // intake.enablePivot(SETPOINT_DOWN);
+            intake.catchFuel(COLLECT_FUEL_SPEED);
           break;
 
         case CLOSE_INTAKE:
-            // intake.catchFuel(STOPPED_FUEL_SPEED);
-            intake.enablePivot(SETPOINT_UP);
+            intake.catchFuel(STOPPED_FUEL_SPEED);
+            // intake.enablePivot(SETPOINT_UP);
           break;
 
         case LOCK_CONVEYOR:

@@ -7,7 +7,7 @@ public class ConveyorConsts {
     public static final int HOME_SENSOR_ID = 29;//alterar
     public static final boolean INVERT_HOME = false;
 
-    public static final boolean INVERT_LIMIT = true;
+    public static final boolean INVERT_LIMIT = false;
     public static final int LIMIT_SENSOR_ID = 30;//alterar
 
     public static final int MAX_FUELS = 40;

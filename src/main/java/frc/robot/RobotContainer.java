@@ -72,18 +72,13 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    driverJoystick.a().onTrue(Commands.runOnce(() -> superStructure.setAction(Actions.SHOOT_FUEL), superStructure))
+    mechanismJoystick.rightTrigger().onTrue(Commands.runOnce(() -> superStructure.setAction(Actions.SHOOT_FUEL), superStructure))
     .onFalse(Commands.runOnce(() -> superStructure.setAction(Actions.LOCK_TURRET), superStructure));
-
-    driverJoystick.x().whileTrue(new CatchBall(0.7));
-
-    mechanismJoystick.rightTrigger().onTrue(Commands.runOnce(() -> superStructure.setAction(Actions.SHOOT_FUEL), superStructure));
-    mechanismJoystick.rightTrigger().onFalse(Commands.runOnce(() -> superStructure.setAction(Actions.LOCK_TURRET), superStructure));
 
     mechanismJoystick.x().whileTrue(new CatchBall(0.7));
 
-    mechanismJoystick.a().onTrue(Commands.runOnce(() -> superStructure.setAction(Actions.CATCH_FUEL), superStructure));
-    mechanismJoystick.b().onTrue(Commands.runOnce(() -> superStructure.setAction(Actions.CLOSE_INTAKE), superStructure));
+    mechanismJoystick.a().onTrue(Commands.runOnce(() -> superStructure.setAction(Actions.CATCH_FUEL), superStructure))
+    .onFalse(Commands.runOnce(() -> superStructure.setAction(Actions.CLOSE_INTAKE), superStructure));
   }
 
   private void configureSimBindings() {

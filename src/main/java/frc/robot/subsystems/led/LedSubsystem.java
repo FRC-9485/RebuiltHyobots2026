@@ -2,7 +2,7 @@ package frc.robot.subsystems.led;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-
+import static frc.frc_java9485.constants.mechanisms.LedConsts.*;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -13,18 +13,20 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LedSubsystem extends SubsystemBase implements LedIO {
-  private LEDPattern pattern;
   private static LedSubsystem mInstance = null;
+  private LEDPattern pattern;
 
   private final AddressableLEDBuffer buffer;
   private final AddressableLED addressableLED;
 
   private LedSubsystem() {
-    this.addressableLED = new AddressableLED(9);
-    this.buffer = new AddressableLEDBuffer(60);
-    this.pattern = LEDPattern.solid(Color.kBlack);
+    this.addressableLED = new AddressableLED(LED_ID);
+    this.buffer = new AddressableLEDBuffer(LED_BUFFER);
 
     this.addressableLED.setLength(this.buffer.getLength());
+
+    this.pattern.applyTo(buffer);
+    this.addressableLED.setData(buffer);
     this.addressableLED.start();
   }
 
@@ -41,7 +43,6 @@ public class LedSubsystem extends SubsystemBase implements LedIO {
       pattern.applyTo(buffer);
       addressableLED.setData(buffer);
     }
-
   }
 
   @Override
@@ -86,5 +87,6 @@ public class LedSubsystem extends SubsystemBase implements LedIO {
         rainbowPattern.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), ledSpace);
 
     scrollingRainbowPattern.applyTo(buffer);
+    addressableLED.setData(buffer);
   }
 }

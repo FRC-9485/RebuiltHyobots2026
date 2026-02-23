@@ -12,6 +12,8 @@ public interface MechanismJoystickIO {
 
   public Trigger y();
 
+  public double getLeftX();
+
   public Trigger rightTrigger(); // jogar
 
   public Trigger letTrigger(); // pegar

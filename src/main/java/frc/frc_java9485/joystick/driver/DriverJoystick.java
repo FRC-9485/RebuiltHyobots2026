@@ -32,6 +32,16 @@ public class DriverJoystick implements DriverJoystickIO {
   }
 
   @Override
+  public double getRightTrigger() {
+      return joystick.getRightTriggerAxis();
+  }
+
+  @Override
+  public double getLeftTrigger() {
+    return joystick.getLeftTriggerAxis();
+  }
+
+  @Override
   public double getLeftY() {
     if (isTurboMode()) {
       return MathUtil.applyDeadband(

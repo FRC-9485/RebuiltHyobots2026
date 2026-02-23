@@ -25,6 +25,11 @@ public class MechanismJoystick implements MechanismJoystickIO {
   }
 
   @Override
+  public double getLeftX(){
+    return joystick.getLeftX();
+  }
+
+  @Override
   public Trigger b() {
     return joystick.b();
   }
