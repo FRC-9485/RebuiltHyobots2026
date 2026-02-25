@@ -1,6 +1,5 @@
 package frc.robot.subsystems.mechanism;
 
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -30,7 +29,6 @@ public class SuperStructure extends SubsystemBase{
   // private final TurretSimTeste turretSim;
 
   private Actions currentAction = Actions.SECURITY;
-  private static SuperStructure m_instance;
 
   private IntakeSimulation intakeSimulation;
 
@@ -53,23 +51,23 @@ public class SuperStructure extends SubsystemBase{
   @Override
   public void periodic() {
     executeAction(getAction());
-    setLedActions(getAction());
+    // setLedActions(getAction());
   }
 
-  private void setLedActions(Actions action){
-    switch (action) {
-      case SHOOT_FUEL:
-          ledSubsystem.setSolidColor(Color.kRed);
-        break;
+  // private void setLedActions(Actions action){
+  //   switch (action) {
+  //     case SHOOT_FUEL:
+  //         ledSubsystem.setSolidColor(Color.kRed);
+  //       break;
 
-      case LOCK_TURRET:
-          ledSubsystem.setSolidColor(Color.kGreen);
-        break;
+  //     case LOCK_TURRET:
+  //         ledSubsystem.setSolidColor(Color.kGreen);
+  //       break;
 
-      default:
-        break;
-    }
-  }
+  //     default:
+  //       break;
+  //   }
+  // }
 
   public enum Actions {
     SHOOT_FUEL,
@@ -94,19 +92,20 @@ public class SuperStructure extends SubsystemBase{
             break;
 
         case CATCH_FUEL:
-            // intake.enablePivot(SETPOINT_DOWN);
+            intake.enablePivot(SETPOINT_DOWN);
             intake.catchFuel(COLLECT_FUEL_SPEED);
           break;
 
         case CLOSE_INTAKE:
             intake.catchFuel(STOPPED_FUEL_SPEED);
-            // intake.enablePivot(SETPOINT_UP);
+            intake.enablePivot(SETPOINT_UP);
           break;
 
         case LOCK_CONVEYOR:
           break;
 
         case LOCK_HOOD:
+
           break;
 
         case CLIMBER_L1:
@@ -122,7 +121,7 @@ public class SuperStructure extends SubsystemBase{
       }
   }
 
-  public Actions setAction(Actions actions) {
+  public Actions alternActions(Actions actions) {
       if(currentAction != actions){
         currentAction = actions;
       }
@@ -161,7 +160,7 @@ public class SuperStructure extends SubsystemBase{
       return currentAction;
   }
 
-  public Command setActionSim(Actions action) {
+  public Command alternActionsSim(Actions action) {
     return new Command() {
           public void execute() {
               currentAction = action;

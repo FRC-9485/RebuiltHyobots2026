@@ -21,9 +21,8 @@ public class IntakeConsts {
     public static final ControlConstants PIVOT_CONTROL_CONSTANTS = new ControlConstants()
       .withPID(0.085, 0.03, 0.012)
       .withTolerance(2)
-      .withProfile(500, 300)
-      .withContinuous(-180, 180)
-      .withFeedforward(0.008, 0);
+      .withProfile(250, 170)
+      .withContinuous(-180, 180);
 
     public static final TunableControlConstants PIVOT_CONSTANTS =
         new TunableControlConstants("Throw Intake Consts",  PIVOT_CONTROL_CONSTANTS);

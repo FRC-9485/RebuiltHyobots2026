@@ -8,7 +8,6 @@ import frc.frc_java9485.constants.mechanisms.DriveConsts;
 import frc.frc_java9485.joystick.driver.DriverJoystick;
 import frc.frc_java9485.joystick.mechanism.MechanismJoystick;
 import frc.frc_java9485.utils.RegisterNamedCommands;
-import frc.robot.commands.CatchBall;
 import frc.robot.commands.swerveUtils.ResetSimGyro;
 import frc.robot.subsystems.mechanism.SuperStructure;
 import frc.robot.subsystems.mechanism.SuperStructure.Actions;
@@ -49,9 +48,9 @@ public class RobotContainer {
 
     swerveSubsystem.setDefaultCommand(
         swerveSubsystem.driveCommand(
-            () -> driverJoystick.getLeftY(),
-            () -> driverJoystick.getLeftX(),
-            () -> driverJoystick.getRightX(),
+            () -> mechanismJoystick.getLeftY(),
+            () -> mechanismJoystick.getLeftX(),
+            () -> mechanismJoystick.getRightX(),
             DriveConsts.FIELD_ORIENTED));
 
     if (isSimulation()) {
@@ -72,13 +71,12 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    mechanismJoystick.rightTrigger().onTrue(Commands.runOnce(() -> superStructure.setAction(Actions.SHOOT_FUEL), superStructure))
-    .onFalse(Commands.runOnce(() -> superStructure.setAction(Actions.LOCK_TURRET), superStructure));
+    mechanismJoystick.rightTrigger().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.SHOOT_FUEL), superStructure))
+    .onFalse(Commands.runOnce(() -> superStructure.alternActions(Actions.LOCK_TURRET), superStructure));
 
-    mechanismJoystick.x().whileTrue(new CatchBall(0.7));
-
-    mechanismJoystick.a().onTrue(Commands.runOnce(() -> superStructure.setAction(Actions.CATCH_FUEL), superStructure))
-    .onFalse(Commands.runOnce(() -> superStructure.setAction(Actions.CLOSE_INTAKE), superStructure));
+    mechanismJoystick.leftTrigger().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.CATCH_FUEL), superStructure));
+    // .onFalse(Commands.runOnce(() -> superStructure.alternActions(Actions.CLOSE_INTAKE), superStructure));
+    mechanismJoystick.b().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.CLOSE_INTAKE), superStructure));
   }
 
   private void configureSimBindings() {

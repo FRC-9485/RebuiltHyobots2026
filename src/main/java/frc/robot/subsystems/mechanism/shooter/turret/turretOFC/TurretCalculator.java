@@ -151,7 +151,11 @@ public class TurretCalculator {
                 .getTranslation();
 
         Translation2d direction = target.toTranslation2d().minus(turretTranslation);
-        return calculateAzimuthAngle(robot, direction.getAngle().getMeasure(), currentAngle);
+
+        Translation2d robotRelativeDirection =
+            direction.rotateBy(robot.getRotation().unaryMinus());
+
+        return calculateAzimuthAngle(robot, robotRelativeDirection.getAngle().getMeasure(), currentAngle);
     }
 
      // calculates the angle of a turret relative to the robot to hit a target

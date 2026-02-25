@@ -1,6 +1,7 @@
 package frc.robot.subsystems.swerve;
 
 import static frc.frc_java9485.constants.RobotConsts.CURRENT_ROBOT_MODE;
+import static frc.frc_java9485.constants.RobotConsts.isSimulation;
 import static frc.frc_java9485.constants.mechanisms.DriveConsts.*;
 
 import java.io.File;
@@ -40,6 +41,7 @@ import static frc.frc_java9485.constants.ComponentsConsts.*;
 import static frc.frc_java9485.constants.FieldConsts.ALLIANCE_ZONE;
 import static frc.frc_java9485.constants.FieldConsts.FIELD_LENGTH;
 
+import frc.frc_java9485.constants.FieldConsts;
 import frc.frc_java9485.constants.RobotConsts.RobotModes;
 import frc.frc_java9485.motors.io.SparkOdometryThread;
 import frc.frc_java9485.utils.MathUtils;
@@ -108,7 +110,7 @@ public class SwerveSubsystem extends SubsystemBase implements SwerveIO {
 
         driveSimulator.config.gyroSimulationFactory = COTS.ofPigeon2();
 
-        resetOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
+        resetOdometry(FieldConsts.BLUE_CENTER_START_POSE);
       } else {
         isSimulation = false;
       }
@@ -297,8 +299,6 @@ public class SwerveSubsystem extends SubsystemBase implements SwerveIO {
         });
   }
 
-
-
   private void setupPathPlanner() {
     RobotConfig config;
     try {
@@ -308,7 +308,7 @@ public class SwerveSubsystem extends SubsystemBase implements SwerveIO {
           this::resetOdometry,
           this::getRobotRelativeSpeeds,
           (speeds, feedforwards) -> driveFieldOriented(speeds),
-          CURRENT_ROBOT_MODE == RobotModes.SIM ?
+          isSimulation() ?
             new PPHolonomicDriveController(SIM_TRANSLATION_PID.getPIDConsants(), SIM_ROTATION_PID.getPIDConsants()) :
             new PPHolonomicDriveController(REAL_TRANSLATION_PID.getPIDConsants(), REAL_ROTATION_PID.getPIDConsants()),
           config,

@@ -33,11 +33,11 @@ public class RegisterNamedCommands {
     }
 
     private void configureIntakeSimCommands(SuperStructure superStructure) {
-        NamedCommands.registerCommand("coleta", superStructure.setActionSim(Actions.CATCH_FUEL));
-        NamedCommands.registerCommand("parar coleta", superStructure.setActionSim(Actions.CLOSE_INTAKE));
+        NamedCommands.registerCommand("coleta", superStructure.alternActionsSim(Actions.CATCH_FUEL));
+        NamedCommands.registerCommand("parar coleta", superStructure.alternActionsSim(Actions.CLOSE_INTAKE));
     }
 
     private void configureTurretSimCommands(SuperStructure superStructure) {
-        NamedCommands.registerCommand("shootar", superStructure.setActionSim(Actions.SHOOT_FUEL));
+        NamedCommands.registerCommand("shootar", superStructure.alternActionsSim(Actions.SHOOT_FUEL));
     }
 }

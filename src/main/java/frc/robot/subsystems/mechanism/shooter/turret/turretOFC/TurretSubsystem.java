@@ -17,11 +17,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
+
 import static frc.frc_java9485.constants.FieldConsts.*;
 import static frc.frc_java9485.constants.mechanisms.TurretConsts.*;
 import static frc.frc_java9485.constants.mechanisms.HoodConsts.*;
@@ -78,6 +78,7 @@ public class TurretSubsystem extends SubsystemBase{
         this.fuel_to_turret = new SparkMaxMotor(FUEL_TO_TURRET, "catch fuel to turret");
 
         this.hoodMotor.resetPositionByEncoder(MIN_POSITION);
+        this.turn_turret.resetPositionByEncoder(0);
 
         this.turretController = new TunableProfiledController(TURRET_TUNABLE);
         this.hoodController = new TunableProfiledController(TUNABLE_CONSTANTS);
@@ -111,7 +112,6 @@ public class TurretSubsystem extends SubsystemBase{
     }
 
     private void updateInputs(TurretIOInputs inputs){
-        // inputs.turnPosition = isSimulation() ? turnTurretSim.getPosition() : turn_turret.getPosition();
         inputs.turnPosition = Rotations.of(turn_turret.getPosition());
     }
 
@@ -130,7 +130,7 @@ public class TurretSubsystem extends SubsystemBase{
 
         if (goal == TurretGoal.SCORING || goal == TurretGoal.PASSING) {
             calculateShot(pose.get());
-            fuel_to_turret.setSpeed(-0.9);
+            // fuel_to_turret.setSpeed(-0.6);
         }
 
          if (goal == TurretGoal.PASSING) {
@@ -174,83 +174,23 @@ public class TurretSubsystem extends SubsystemBase{
             }
     }
 
-    // private void calculateShot(Pose2d pose2d){
-    //     ChassisSpeeds fieldSpeeds = chassisSpeed.get();
-
-    //     ShotData calculatedShot = TurretCalculator.iterativeMovingShotFromMap(
-    //             pose2d, fieldSpeeds, currentTarget, LOOKAHEAD_ITERATIONS);
-    //     Angle azimuthAngle =
-    //             TurretCalculator.calculateAzimuthAngle(pose2d,
-    //                                                    calculatedShot.getTarget(),
-    //                                                    turn_turret.getPosition());
-
-    //     AngularVelocity azimuthVelocity = RadiansPerSecond.of(-fieldSpeeds.omegaRadiansPerSecond);
-
-    //     turretController.setGoal(azimuthAngle.in(Rotations));
-    //     hoodController.setGoal(-calculatedShot.getHoodAngle().in(Degrees));
-
-    //     double currentRadians = Rotations.of(turn_turret.getPosition()).in(Rotations);
-
-    //     Voltage turnVoltage = Volts.of(
-    //         turretController.calculate(currentRadians)
-    //     );
-
-    //     Voltage hoodVoltage = Volts.of(hoodController.calculate(hoodMotor.getPosition()));
-
-    //     System.out.println("PID: " + turnVoltage);
-
-    //     hoodMotor.setVoltage(hoodVoltage);
-    //     turn_turret.setVoltage(turnVoltage);
-
-    //     Logger.recordOutput("Turret/Pose 3d", new Pose3d(
-    //         new Translation3d(
-    //             Inches.of(0),
-    //             Inches.of(0),
-    //             Inches.of(32.5)
-    //         ),
-    //         new Rotation3d(
-    //             Degrees.of(0),
-    //             Degrees.of(0),
-    //             Degrees.of(turn_turret.getPosition())
-    //         )
-    //     ));
-
-    //     if (!isSimulation()) {
-    //     } else {
-    //         turnTurretSim.setAppliedOutput(turnVoltage.in(Volts));
-    //         System.out.println("volts: " + turnVoltage.in(Volts));
-
-    //         turnTurretSim.iterate(azimuthVelocity.in(RadiansPerSecond), 12.0, 0.02);
-
-    //         Logger.recordOutput("turretpose",
-    //             new Pose3d(
-    //                 Inches.of(8), //x
-    //             Inches.of(0), //y
-    //             Inches.of(35.2), //z
-    //             new Rotation3d(
-    //                 Degrees.of(0), //yaw
-    //                 Degrees.of(0), //pitch
-    //                 Degrees.of((turnTurretSim.getPosition() * 360.0) - 90.0)
-    //                 )) //roll
-    //             );
-    //     }
-
-    // }
-
-     private void calculateShot(Pose2d robotPose) {
+    private void calculateShot(Pose2d robotPose) {
         ChassisSpeeds fieldSpeeds = chassisSpeed.get();
 
-        ShotData calculatedShot = TurretCalculator.iterativeMovingShotFromMap(
-                robotPose, fieldSpeeds, currentTarget, LOOKAHEAD_ITERATIONS);
+        ShotData calculatedShot = TurretCalculator.iterativeMovingShotFromFunnelClearance(robotPose,
+                                                                                          fieldSpeeds,
+                                                                                          currentTarget,
+                                                                                          LOOKAHEAD_ITERATIONS);
+
         Angle azimuthAngle =
                 TurretCalculator.calculateAzimuthAngle(robotPose, calculatedShot.target(), inputs.turnPosition);
-        AngularVelocity azimuthVelocity = RadiansPerSecond.of(-fieldSpeeds.omegaRadiansPerSecond);
+        AngularVelocity azimuthVelocity = RadiansPerSecond.of(fieldSpeeds.omegaRadiansPerSecond);
 
-        turretController.setGoal(azimuthAngle.in(Degrees), azimuthVelocity.in(RadiansPerSecond));
-        hoodController.setGoal(calculatedShot.getHoodAngle().in(Degrees));
+        turretController.setGoal(azimuthAngle.in(Rotations), azimuthVelocity.in(RadiansPerSecond));
+        hoodController.setGoal(calculatedShot.getHoodAngle().in(Rotations));
         flyWheelController.setGoal(TurretCalculator.linearToAngularVelocity(calculatedShot.getExitVelocity(), FLY_WHEEL_RADIUS).in(RPM));
 
-        Voltage turretVoltage = Volts.of(turretController.calculate(turn_turret.getPosition()));
+        Voltage turretVoltage = Volts.of(turretController.calculate(turn_turret.getPosition() / TURRET_REDUCTION));
         Voltage hoodVoltage = Volts.of(hoodController.calculate(hoodMotor.getPosition()));
         Voltage flyWheelVoltage = Volts.of(flyWheelController.calculate(RPM.of(left_motor.getRate()).in(RPM)));
 
@@ -259,6 +199,9 @@ public class TurretSubsystem extends SubsystemBase{
 
         left_motor.setVoltage(flyWheelVoltage);
         right_motor.setVoltage(flyWheelVoltage.times(-1));
+
+        System.out.println("turret goal: " + turretController.getGoal());
+        System.out.println("\nturret atual: " + turn_turret.getPosition());
 
         Logger.recordOutput("Turret/Shot", calculatedShot);
     }
@@ -276,5 +219,17 @@ public class TurretSubsystem extends SubsystemBase{
         // fuel_to_turret.setVoltage(0);
         left_motor.setVoltage(0);
         right_motor.setVoltage(0);
+
+        // turretController.setGoal(turn_turret.getPosition());
+        // turn_turret.setVoltage(Volts.of(turretController.calculate(turn_turret.getPosition())));
+
+        // hoodController.setGoal(hoodMotor.getPosition());
+        // hoodMotor.setVoltage(Volts.of(hoodController.calculate(hoodMotor.getTemperature())));
+
+        // fuel_to_turret.setSpeed(0);
+
+        // flyWheelController.setGoal(left_motor.getPosition());
+        // left_motor.setVoltage(Volts.of(left_motor.getPosition()));
+        // right_motor.setVoltage(Volts.of(-right_motor.getPosition()));
     }
 }

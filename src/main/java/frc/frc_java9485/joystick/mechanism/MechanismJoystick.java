@@ -30,6 +30,16 @@ public class MechanismJoystick implements MechanismJoystickIO {
   }
 
   @Override
+  public double getLeftY(){
+    return joystick.getLeftY();
+  }
+
+  @Override
+  public double getRightX(){
+    return joystick.getRightX();
+  }
+
+  @Override
   public Trigger b() {
     return joystick.b();
   }
@@ -50,7 +60,7 @@ public class MechanismJoystick implements MechanismJoystickIO {
   }
 
   @Override
-  public Trigger letTrigger() {
+  public Trigger leftTrigger() {
     return joystick.leftTrigger();
   }
 

@@ -44,7 +44,7 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
 
     inputs = new IntakeInputsAutoLogged();
 
-    configureIntakeMotor();
+    // configureIntakeMotor();
   }
 
   private void configureIntakeMotor(){
@@ -56,6 +56,8 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
   public void periodic() {
     updateInputs(inputs);
     Logger.processInputs("Mechanism/Intake", inputs);
+
+    System.out.println("angulo: " + pivotEncoder.get() * 360);
 
     // System.out.println("Angulo: " + pivotEncoder.get() * 360.0);
     // System.out.println("Setpoint: " + pivotSetpoint);

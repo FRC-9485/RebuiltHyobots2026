@@ -31,7 +31,7 @@ public class ConveyorSubsystem extends SubsystemBase implements ConveyorIO{
         homeSensor = new DigitalSensor(HOME_SENSOR_ID, INVERT_HOME);
         limitSensor = new DigitalSensor(LIMIT_SENSOR_ID, INVERT_LIMIT);
 
-        inputs = new ConveyorInputs();
+        inputs = new ConveyorInputsAutoLogged();
         conveyorInputs = new ConveyorInputsAutoLogged();
     }
 
@@ -39,20 +39,36 @@ public class ConveyorSubsystem extends SubsystemBase implements ConveyorIO{
     public void periodic() {
         updateInputs(inputs);
         Logger.processInputs("coveyor inputs", conveyorInputs);
+
+        System.out.println("home: " + homeSensor.isDetected());
+        System.out.println("\nlonge: " + limitSensor.isDetected());
     }
+
+    // @Override
+    // public void runConveyor(double speed) {
+    //     speed = MathUtil.clamp(speed, -MAX_SPEED, MAX_SPEED);
+
+    //     if (speed < 0 && conveyorIsInHome()) {
+    //         stopConveyor();
+    //         return;
+    //     }
+
+    //     if (speed > 0 && conveyorInLimit()) {
+    //         stopConveyor();
+    //         return;
+    //     }
+
+    //     conveyor.set(VictorSPXControlMode.PercentOutput, speed);
+    // }
 
     @Override
     public void runConveyor(double speed) {
-        if(Math.abs(speed) > MAX_SPEED){
-            speed = MAX_SPEED;
-        }
-
-        conveyor.set(VictorSPXControlMode.Velocity, speed);
+        // TODO Auto-generated method stub
     }
 
     @Override
     public void stopConveyor() {
-        conveyor.set(VictorSPXControlMode.Velocity, 0);
+        conveyor.set(VictorSPXControlMode.PercentOutput, 0);
     }
 
     @Override

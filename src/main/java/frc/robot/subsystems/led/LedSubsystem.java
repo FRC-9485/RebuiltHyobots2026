@@ -22,6 +22,7 @@ public class LedSubsystem extends SubsystemBase implements LedIO {
   private LedSubsystem() {
     this.addressableLED = new AddressableLED(LED_ID);
     this.buffer = new AddressableLEDBuffer(LED_BUFFER);
+    this.pattern = LEDPattern.solid(Color.kRed);
 
     this.addressableLED.setLength(this.buffer.getLength());
 

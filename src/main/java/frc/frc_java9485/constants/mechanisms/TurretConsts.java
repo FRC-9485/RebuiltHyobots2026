@@ -29,7 +29,7 @@ public class TurretConsts {
   public static final Distance DISTANCE_ABOVE_FUNNEL = Inches.of(20); // how high to clear the funnel
 
   public static final Transform3d ROBOT_TO_TURRET_TRANSFORM =
-                new Transform3d(new Translation3d(Inches.zero(), Inches.of(8), Inches.of(17.5)), Rotation3d.kZero);
+                new Transform3d(new Translation3d(Inches.zero(), Inches.of(7), Inches.of(17.5)), Rotation3d.kZero);
 
   // public static final ControlConstants TURRET_CONSTANTS = new ControlConstants()
   // .withProfile(100, 80)//testes
@@ -37,6 +37,8 @@ public class TurretConsts {
 
   public static final Angle MAX_TURN_ANGLE = Rotations.of(0.25);
   public static final Angle MIN_TURN_ANGLE = Rotations.of(-0.25);
+
+  public static final double TURRET_REDUCTION = 9.0;
 
   // public static final Angle MAX_TURN_ANGLE = Rotations.of(8.5000);
   // public static final Angle MIN_TURN_ANGLE = Rotations.of(-16.7618);
@@ -85,17 +87,15 @@ public class TurretConsts {
       }
 
   public static final ControlConstants SHOOTER_CONTROL_CONSTANTS = new ControlConstants()
-  .withPID(0.01, 0, 0)
-  .withProfile(800, 600);
+  .withPID(0.0008, 0, 0)
+  .withProfile(1500, 1300);
 
   public static final TunableControlConstants SHOOTER_CONSTANTS = new TunableControlConstants("shooter controller", SHOOTER_CONTROL_CONSTANTS);
 
   public static final ControlConstants TURRET_CONSTANTS = new ControlConstants()
   .withProfile(250, 180)//testes
-  .withPID(0.2, 0.0, 0.0)
-  .withContinuous(-180, 180);
-  // .withFeedforward(0.7, 0)
-  // .withPhysical(0.2, 0.0);
+  .withPID(0.3, 0.0, 0.0)
+  .withFeedforward(0.07, 0);
 
   public static final int SHOOTER_CURRENT_LIMIT = 40;
   public static final int TURN_TURRET_CURRENT_LIMIT = 20;

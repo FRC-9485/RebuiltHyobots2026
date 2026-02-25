@@ -21,13 +21,13 @@ public final class DriveConsts {
   public static final int CANCODER_MODULE3_ID = 12;
   public static final int CANCODER_MODULE4_ID = 13;
 
-  private static final double SIM_ROTATION_kP = 0.01001;
-  private static final double SIM_ROTATION_kI = 0.00001;
-  private static final double SIM_ROTATION_kD = 0.00007948059087543;
+  private static final double SIM_ROTATION_kP = 0.01;
+  private static final double SIM_ROTATION_kI = 0.0000;
+  private static final double SIM_ROTATION_kD = 0.0000;
 
-  private static final double SIM_TRANSLATION_kP = 0.014;
-  private static final double SIM_TRANSLATION_kI = 0.00019;
-  private static final double SIM_TRANSLATION_kD = 0.00075;
+  private static final double SIM_TRANSLATION_kP = 0.09;
+  private static final double SIM_TRANSLATION_kI = 0.000;
+  private static final double SIM_TRANSLATION_kD = 0.000;
 
   private static final double REAL_TRANSLATION_kP = 0.256;
   private static final double REAL_TRANSLATION_kI = 0.000;
