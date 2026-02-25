@@ -126,8 +126,8 @@ public class SparkFlexMotor implements MotorIO {
   }
 
   @Override
-  public void setInvert() {
-    config.inverted(true);
+  public void setInvert(boolean invert) {
+      config.inverted(true);
   }
 
   @Override

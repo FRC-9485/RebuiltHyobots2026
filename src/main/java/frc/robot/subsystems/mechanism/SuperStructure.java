@@ -88,16 +88,16 @@ public class SuperStructure extends SubsystemBase{
       switch (actions) {
         case SHOOT_FUEL:
             turret.setGoal(TurretGoal.SCORING);
-            index.turnOn();
+            // index.turnOn();
             break;
 
         case CATCH_FUEL:
             intake.enablePivot(SETPOINT_DOWN);
-            intake.catchFuel(COLLECT_FUEL_SPEED);
+            // intake.catchFuel(COLLECT_FUEL_SPEED);
           break;
 
         case CLOSE_INTAKE:
-            intake.catchFuel(STOPPED_FUEL_SPEED);
+            // intake.catchFuel(STOPPED_FUEL_SPEED);
             intake.enablePivot(SETPOINT_UP);
           break;
 
@@ -113,7 +113,7 @@ public class SuperStructure extends SubsystemBase{
 
         case LOCK_TURRET:
             turret.setGoal(TurretGoal.OFF);
-            index.stopIndex();
+            // index.stopIndex();
           break;
 
         default:

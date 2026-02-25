@@ -129,7 +129,7 @@ public class SparkMaxBrushed implements MotorIO{
   }
 
   @Override
-  public void setInvert() {
+  public void setInvert(boolean invert) {
       config.inverted(true);
   }
 

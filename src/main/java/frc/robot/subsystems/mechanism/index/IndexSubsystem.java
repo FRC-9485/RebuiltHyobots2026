@@ -68,7 +68,6 @@ public class IndexSubsystem extends SubsystemBase implements IndexIO{
     @Override
     public void stopIndex(){
         index.setSpeed(0);
-        index.setVoltage(0);
         isActive = false;
     }
 }

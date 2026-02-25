@@ -131,7 +131,7 @@ public class SparkMaxMotor implements MotorIO{
   }
 
   @Override
-  public void setInvert() {
+  public void setInvert(boolean invert) {
       config.inverted(true);
   }
 

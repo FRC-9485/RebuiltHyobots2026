@@ -34,8 +34,8 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
   }
 
   private IntakeSubsystem() {
-    pivot = new SparkMaxMotor(PIVOT_ID, "Pivot");
-    catchBall = new SparkMaxMotor(CATCH_BALL_ID, "Catch Fuel");
+    pivot = new SparkMaxMotor(PIVOT_ID, "Pivot motor");
+    catchBall = new SparkMaxMotor(CATCH_BALL_ID, "Catch Fuel motor");
 
     controller = new TunableProfiledController(PIVOT_CONSTANTS);
 
@@ -44,7 +44,7 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
 
     inputs = new IntakeInputsAutoLogged();
 
-    // configureIntakeMotor();
+    configureIntakeMotor();
   }
 
   private void configureIntakeMotor(){

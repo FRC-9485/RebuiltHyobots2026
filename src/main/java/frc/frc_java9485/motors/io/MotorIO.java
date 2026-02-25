@@ -16,7 +16,7 @@ public interface MotorIO {
     public void followMotor(int id);
     public void setVoltage(double voltage);
     public void setVoltage(Voltage voltage);
-    public void setInvert();
+    public void setInvert(boolean invert);
     public void cleanStickFaults();
     public void burnFlash();
     public void setCurrentLimit(int current);

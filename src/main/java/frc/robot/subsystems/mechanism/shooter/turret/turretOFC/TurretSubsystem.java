@@ -41,7 +41,6 @@ public class TurretSubsystem extends SubsystemBase{
     private final Supplier<ChassisSpeeds> chassisSpeed;
     private final Supplier<Pose2d> pose;
 
-    private final SparkFlexMotor left_motor;
     private final SparkFlexMotor right_motor;
 
     private final SparkMaxMotor turn_turret;
@@ -70,7 +69,6 @@ public class TurretSubsystem extends SubsystemBase{
 
         this.setTarget(HUB_BLUE);
 
-        this.left_motor = new SparkFlexMotor(LEFT_SHOOTER, "left shooter");
         this.right_motor = new SparkFlexMotor(RIGHT_SHOOTER, "right shooter");
         this.hoodMotor = new SparkMaxMotor(HOOD_MOTOR_ID, "hood motor");
 
@@ -96,14 +94,9 @@ public class TurretSubsystem extends SubsystemBase{
     }
 
     private void configureShooter(){
-        // right_motor.followMotor(LEFT_SHOOTER);
         right_motor.setCurrentLimit(SHOOTER_CURRENT_LIMIT);
         right_motor.burnFlash();
 
-        left_motor.setCurrentLimit(SHOOTER_CURRENT_LIMIT);
-        left_motor.burnFlash();
-
-        hoodMotor.setInvert();
         hoodMotor.setCurrentLimit(HOOD_CURRENT_LIMIT);
         hoodMotor.burnFlash();
 
@@ -190,14 +183,13 @@ public class TurretSubsystem extends SubsystemBase{
         hoodController.setGoal(calculatedShot.getHoodAngle().in(Rotations));
         flyWheelController.setGoal(TurretCalculator.linearToAngularVelocity(calculatedShot.getExitVelocity(), FLY_WHEEL_RADIUS).in(RPM));
 
-        Voltage turretVoltage = Volts.of(turretController.calculate(turn_turret.getPosition() / TURRET_REDUCTION));
+        Voltage turretVoltage = Volts.of(turretController.calculate(turn_turret.getPosition()));
         Voltage hoodVoltage = Volts.of(hoodController.calculate(hoodMotor.getPosition()));
-        Voltage flyWheelVoltage = Volts.of(flyWheelController.calculate(RPM.of(left_motor.getRate()).in(RPM)));
+        Voltage flyWheelVoltage = Volts.of(flyWheelController.calculate(RPM.of(right_motor.getRate()).in(RPM)));
 
         turn_turret.setVoltage(turretVoltage);
         hoodMotor.setVoltage(hoodVoltage);
 
-        left_motor.setVoltage(flyWheelVoltage);
         right_motor.setVoltage(flyWheelVoltage.times(-1));
 
         System.out.println("turret goal: " + turretController.getGoal());
@@ -217,7 +209,6 @@ public class TurretSubsystem extends SubsystemBase{
         turn_turret.setVoltage(0);
         hoodMotor.setVoltage(0);
         // fuel_to_turret.setVoltage(0);
-        left_motor.setVoltage(0);
         right_motor.setVoltage(0);
 
         // turretController.setGoal(turn_turret.getPosition());

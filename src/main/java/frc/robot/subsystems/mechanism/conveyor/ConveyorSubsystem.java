@@ -1,13 +1,20 @@
 package frc.robot.subsystems.mechanism.conveyor;
 
-import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.*;
+import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.CONVEYOR_MOTOR_ID;
+import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.HOME_SENSOR_ID;
+import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.INVERT_HOME;
+import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.INVERT_LIMIT;
+import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.LIMIT_SENSOR_ID;
+import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.MAX_SPEED;
+import frc.frc_java9485.sensor.DigitalSensor;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
-import frc.frc_java9485.sensor.DigitalSensor;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ConveyorSubsystem extends SubsystemBase implements ConveyorIO{
     private static ConveyorSubsystem m_instance;
@@ -44,26 +51,21 @@ public class ConveyorSubsystem extends SubsystemBase implements ConveyorIO{
         System.out.println("\nlonge: " + limitSensor.isDetected());
     }
 
-    // @Override
-    // public void runConveyor(double speed) {
-    //     speed = MathUtil.clamp(speed, -MAX_SPEED, MAX_SPEED);
-
-    //     if (speed < 0 && conveyorIsInHome()) {
-    //         stopConveyor();
-    //         return;
-    //     }
-
-    //     if (speed > 0 && conveyorInLimit()) {
-    //         stopConveyor();
-    //         return;
-    //     }
-
-    //     conveyor.set(VictorSPXControlMode.PercentOutput, speed);
-    // }
-
     @Override
     public void runConveyor(double speed) {
-        // TODO Auto-generated method stub
+        speed = MathUtil.clamp(speed, -MAX_SPEED, MAX_SPEED);
+
+        if (speed < 0 && conveyorIsInHome()) {
+            stopConveyor();
+            return;
+        }
+
+        if (speed > 0 && conveyorInLimit()) {
+            stopConveyor();
+            return;
+        }
+
+        conveyor.set(VictorSPXControlMode.PercentOutput, speed);
     }
 
     @Override
@@ -80,6 +82,11 @@ public class ConveyorSubsystem extends SubsystemBase implements ConveyorIO{
     public boolean conveyorInLimit() {
         return limitSensor.isDetected();
     }
+
+    // @Override
+    // public void manualConveyor(MechanismJoystick mechanismJoystick) {
+    //     runConveyor(mechanismJoystick.getLeftX());
+    // }
 
     @Override
     public void updateInputs(ConveyorInputs inputs) {
