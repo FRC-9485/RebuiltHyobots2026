@@ -16,6 +16,10 @@ public interface MechanismJoystickIO {
 
   public double getLeftY();
 
+  public double getRightY();
+
+  public boolean getRightBumper();
+
   public double getRightX();
 
   public Trigger rightTrigger(); // jogar

@@ -1,10 +1,14 @@
 package frc.robot.subsystems.mechanism.shooter.turret.turretOFC;
 
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import com.pathplanner.lib.util.FlippingUtil;
 import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -15,6 +19,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static edu.wpi.first.units.Units.RPM;
@@ -53,9 +58,11 @@ public class TurretSubsystem extends SubsystemBase{
     private final TurretIOInputsAutoLogged inputs;
 
     @AutoLogOutput
-    private TurretGoal goal = TurretGoal.OFF;
+    private TurretGoal goal = TurretGoal.MANUAL;
 
     private SparkMaxSim turnTurretSim;
+    private double hoodSetpoint = 0;
+    private double turretSetpoint = 0;
 
     @AutoLogOutput
     private Translation3d currentTarget = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
@@ -98,6 +105,7 @@ public class TurretSubsystem extends SubsystemBase{
         right_motor.burnFlash();
 
         hoodMotor.setCurrentLimit(HOOD_CURRENT_LIMIT);
+        hoodMotor.setIdleMode(IdleMode.kBrake);
         hoodMotor.burnFlash();
 
         fuel_to_turret.setCurrentLimit(FUEL_TO_TURRET_CURRENT_LIMIT);
@@ -118,11 +126,11 @@ public class TurretSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        Logger.processInputs("turret inputs", inputs);
         updateInputs(inputs);
+        Logger.processInputs("turret inputs", inputs);
 
         if (goal == TurretGoal.SCORING || goal == TurretGoal.PASSING) {
-            calculateShot(pose.get());
+            // calculateShot(pose.get());
             // fuel_to_turret.setSpeed(-0.6);
         }
 
@@ -161,47 +169,127 @@ public class TurretSubsystem extends SubsystemBase{
                     setTarget(getPassingTarget(pose.get()));
                 break;
 
+                case MANUAL:
+
+                break;
+
                 case SECURITY:
 
                 break;
             }
     }
 
-    private void calculateShot(Pose2d robotPose) {
+    public Command normalTurretCommand(DoubleSupplier turret, DoubleSupplier hood, DoubleSupplier shooter, BooleanSupplier acel,
+                                       BooleanSupplier spellFuels){
+        return run(() ->{
+            if(goal == TurretGoal.MANUAL){
+                double hoodInput = hood.getAsDouble() * 0.1;
+                double turretInput = turret.getAsDouble();
+                double shooterInput = shooter.getAsDouble();
+
+                // faz o setpoint - hood
+                if(hoodInput < 0){
+                    hoodSetpoint = (hoodSetpoint + 0.205694851156169075657563) + hoodInput;
+                } else if(hoodInput > 0){
+                    hoodSetpoint = (hoodSetpoint - 0.205694851156169075657563) + hoodInput;
+                }
+
+                //limita o setpoint - hood
+                if (hoodSetpoint >= MAX_POSITION) {
+                    hoodSetpoint = MAX_POSITION;
+                } else if (hoodSetpoint <= MIN_POSITION) {
+                    hoodSetpoint = MIN_POSITION;
+                }
+
+                hoodController.setGoal(hoodSetpoint);
+                double hoodPID = hoodController.calculate(hoodMotor.getPosition());
+
+                System.out.println("Turret input: " + turretInput);
+                System.out.println("Setpoint: " + turretSetpoint);
+                System.out.println("Angulo Atual: " + turn_turret.getPosition());
+                System.out.println();
+
+                if (turn_turret.getPosition() >= MAX_TURN_POSITION && turretInput > 0) {
+                    turretInput = 0;
+                } else if (turn_turret.getPosition() <= MIN_TURN_POSITION && turretInput < 0) {
+                    turretInput = 0;
+                } else {
+                    turn_turret.setSpeed(turretInput * 0.24);
+                }
+
+                hoodMotor.setSpeed(hoodPID);
+                fuel_to_turret.setSpeed(-0.4 * shooterInput);
+                right_motor.setSpeed(-shooterInput * 5);
+
+                turn_turret.setSpeed(turretInput * 0.24);
+
+
+                if(acel.getAsBoolean()){
+                    if(shooterInput < 0.4){
+                        right_motor.setSpeed(-0.4);
+                    } else {
+                        right_motor.setSpeed(-shooterInput * 5);
+                    }
+                } else {
+                    right_motor.setSpeed(-shooterInput * 5);
+                }
+
+                if(spellFuels.getAsBoolean()){
+                    fuel_to_turret.setSpeed(0.4);
+                } else {
+                    fuel_to_turret.setSpeed(-0.4 * shooterInput);
+                }
+
+            } else {
+                turn_turret.setSpeed(0);
+                hoodMotor.setSpeed(0);
+                right_motor.setSpeed(0);
+                fuel_to_turret.setSpeed(0);
+            }
+
+        });
+    }
+
+    public Command calculateShot(Pose2d robotPose, DoubleSupplier turret) {
+        return run(() ->{
+
         ChassisSpeeds fieldSpeeds = chassisSpeed.get();
+        double input = turret.getAsDouble();
 
         ShotData calculatedShot = TurretCalculator.iterativeMovingShotFromFunnelClearance(robotPose,
-                                                                                          fieldSpeeds,
-                                                                                          currentTarget,
-                                                                                          LOOKAHEAD_ITERATIONS);
+        fieldSpeeds,
+        currentTarget,
+        LOOKAHEAD_ITERATIONS);
 
         Angle azimuthAngle =
-                TurretCalculator.calculateAzimuthAngle(robotPose, calculatedShot.target(), inputs.turnPosition);
+        TurretCalculator.calculateAzimuthAngle(robotPose, calculatedShot.target(), inputs.turnPosition);
         AngularVelocity azimuthVelocity = RadiansPerSecond.of(fieldSpeeds.omegaRadiansPerSecond);
 
-        turretController.setGoal(azimuthAngle.in(Rotations), azimuthVelocity.in(RadiansPerSecond));
+        // turretController.setGoal(azimuthAngle.in(Rotations), azimuthVelocity.in(RadiansPerSecond));
         hoodController.setGoal(calculatedShot.getHoodAngle().in(Rotations));
         flyWheelController.setGoal(TurretCalculator.linearToAngularVelocity(calculatedShot.getExitVelocity(), FLY_WHEEL_RADIUS).in(RPM));
 
-        Voltage turretVoltage = Volts.of(turretController.calculate(turn_turret.getPosition()));
+        // Voltage turretVoltage = Volts.of(turretController.calculate(turn_turret.getPosition()));
         Voltage hoodVoltage = Volts.of(hoodController.calculate(hoodMotor.getPosition()));
         Voltage flyWheelVoltage = Volts.of(flyWheelController.calculate(RPM.of(right_motor.getRate()).in(RPM)));
 
-        turn_turret.setVoltage(turretVoltage);
+        turn_turret.setVoltage(input * 0.24);
         hoodMotor.setVoltage(hoodVoltage);
 
-        right_motor.setVoltage(flyWheelVoltage.times(-1));
+        // right_motor.setVoltage(flyWheelVoltage.times(-1));
 
         System.out.println("turret goal: " + turretController.getGoal());
         System.out.println("\nturret atual: " + turn_turret.getPosition());
 
         Logger.recordOutput("Turret/Shot", calculatedShot);
+    });
     }
 
     public enum TurretGoal{
         SCORING,
         SECURITY,
         PASSING,
+        MANUAL,
         OFF
     }
 

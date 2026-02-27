@@ -46,6 +46,8 @@ public class SuperStructure extends SubsystemBase{
                                                            IntakeSide.BACK,
                                                            ConveyorConsts.MAX_FUELS);
     }
+
+    turret.setGoal(TurretGoal.MANUAL);
   }
 
   @Override
@@ -71,11 +73,15 @@ public class SuperStructure extends SubsystemBase{
 
   public enum Actions {
     SHOOT_FUEL,
+    OPEN_INTAKE,
     CATCH_FUEL,
     CLOSE_INTAKE,
+    STOP_CATCH,
     LOCK_CONVEYOR,
     AUTOMATIC_HOOD,
     MANUAL_HOOD,
+    OPEN_CONVEYOR,
+    CLOSE_CONVEYOR,
     LOCK_HOOD,
     CLIMBER_L1,
     AUTOMATIC_TURRET,
@@ -87,21 +93,35 @@ public class SuperStructure extends SubsystemBase{
   public void executeAction(Actions actions){
       switch (actions) {
         case SHOOT_FUEL:
-            turret.setGoal(TurretGoal.SCORING);
-            // index.turnOn();
+            index.turnOn();
             break;
 
-        case CATCH_FUEL:
+        case OPEN_INTAKE:
             intake.enablePivot(SETPOINT_DOWN);
-            // intake.catchFuel(COLLECT_FUEL_SPEED);
           break;
 
         case CLOSE_INTAKE:
-            // intake.catchFuel(STOPPED_FUEL_SPEED);
             intake.enablePivot(SETPOINT_UP);
           break;
 
+        case STOP_CATCH:
+          intake.catchFuel(STOPPED_FUEL_SPEED);
+          break;
+
+        case CATCH_FUEL:
+            intake.catchFuel(COLLECT_FUEL_SPEED);
+         break;
+
         case LOCK_CONVEYOR:
+          conveyor.runConveyor(0);
+          break;
+
+        case OPEN_CONVEYOR:
+            conveyor.runConveyor(0.8);
+          break;
+
+        case CLOSE_CONVEYOR:
+            conveyor.runConveyor(-0.8);
           break;
 
         case LOCK_HOOD:
@@ -112,8 +132,6 @@ public class SuperStructure extends SubsystemBase{
           break;
 
         case LOCK_TURRET:
-            turret.setGoal(TurretGoal.OFF);
-            // index.stopIndex();
           break;
 
         default:
@@ -130,12 +148,28 @@ public class SuperStructure extends SubsystemBase{
             currentAction = Actions.SHOOT_FUEL;
           break;
 
+        case STOP_CATCH:
+            currentAction = Actions.STOP_CATCH;
+          break;
+
+        case OPEN_INTAKE:
+        if(!conveyor.conveyorInLimit()){
+            currentAction = Actions.OPEN_CONVEYOR;
+          } else {
+            currentAction = Actions.OPEN_INTAKE;
+          }
+          break;
+
         case CATCH_FUEL:
-            currentAction = Actions.CATCH_FUEL;
+          currentAction = Actions.CATCH_FUEL;
           break;
 
         case CLOSE_INTAKE:
+        if(!conveyor.conveyorInLimit()){
+          currentAction = Actions.OPEN_INTAKE;
+          } else {
             currentAction = Actions.CLOSE_INTAKE;
+          }
           break;
 
         case LOCK_CONVEYOR:
@@ -178,7 +212,7 @@ public class SuperStructure extends SubsystemBase{
 
           break;
 
-          case CATCH_FUEL:
+          case OPEN_INTAKE:
             intakeSimulation.startIntake();
             break;
 

@@ -8,6 +8,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.frc_java9485.constants.mechanisms.IntakeConsts.*;
+
 import frc.frc_java9485.motors.spark.SparkMaxMotor;
 import frc.frc_java9485.utils.TunableControls.TunableProfiledController;
 
@@ -57,9 +58,7 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
     updateInputs(inputs);
     Logger.processInputs("Mechanism/Intake", inputs);
 
-    System.out.println("angulo: " + pivotEncoder.get() * 360);
-
-    // System.out.println("Angulo: " + pivotEncoder.get() * 360.0);
+    System.out.println("Angulo: " + pivotEncoder.get() * 360.0);
     // System.out.println("Setpoint: " + pivotSetpoint);
     // System.out.println("Voltagem: " + pivot.getVoltage() + "\n");
   }
@@ -77,7 +76,7 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
 
     double output = controller.calculate(angle);
 
-    pivot.setVoltage(output);
+    pivot.setVoltage(-output);
   }
 
   @Override
@@ -87,7 +86,8 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
 
   @Override
   public boolean isColecting() {
-      return isCollecting; //mudar lógica
+    isCollecting = catchBall.getRate() != 0;
+    return isCollecting;
   }
 
   @Override

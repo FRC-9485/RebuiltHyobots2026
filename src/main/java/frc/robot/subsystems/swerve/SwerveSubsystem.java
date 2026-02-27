@@ -97,8 +97,12 @@ public class SwerveSubsystem extends SubsystemBase implements SwerveIO {
   private SwerveSubsystem(File directory) {
     try {
       SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+
       swerveDrive = new SwerveParser(directory).createSwerveDrive(MAX_SPEED);
       swerveDrive.setMotorIdleMode(false);
+      swerveDrive.setHeadingCorrection(false
+      );
+      swerveDrive.setCosineCompensator(false);
 
       if (CURRENT_ROBOT_MODE == RobotModes.SIM) {
         isSimulation = true;
@@ -119,8 +123,8 @@ public class SwerveSubsystem extends SubsystemBase implements SwerveIO {
           new CANcoder[] {
             new CANcoder(CANCODER_MODULE1_ID), // FL
             new CANcoder(CANCODER_MODULE2_ID), // FR
-            new CANcoder(CANCODER_MODULE3_ID), // BR
-            new CANcoder(CANCODER_MODULE4_ID)  // BL
+            new CANcoder(CANCODER_MODULE3_ID), // BL
+            new CANcoder(CANCODER_MODULE4_ID)  // BR
           };
 
       pigeon = new Pigeon2(PIGEON2);
@@ -139,7 +143,7 @@ public class SwerveSubsystem extends SubsystemBase implements SwerveIO {
 
       limelight = VisionInstances.getLimelightInstance();
       raspberry = VisionInstances.getRaspberryInstance();
-        } catch (Exception e) {
+    } catch (Exception e) {
       throw new RuntimeException("Erro criando Swerve!!!!\n", e);
     }
   }
@@ -281,12 +285,13 @@ public class SwerveSubsystem extends SubsystemBase implements SwerveIO {
                       Ycontroller * swerveDrive.getMaximumChassisVelocity(),
                       rotation * swerveDrive.getMaximumChassisAngularVelocity(),
                       isSimulation ?
-                        getGyroSimulation().getGyroReading() :
-                        pigeon.getRotation2d())
-                  : new ChassisSpeeds(
+                      getGyroSimulation().getGyroReading() :
+                      getHeading2d())
+                    : new ChassisSpeeds(
                       Xcontroller * swerveDrive.getMaximumChassisVelocity(),
                       Ycontroller * swerveDrive.getMaximumChassisVelocity(),
-                      rotation * swerveDrive.getMaximumChassisAngularVelocity());
+                      rotation * swerveDrive.getMaximumChassisAngularVelocity()
+                      );
 
           ChassisSpeeds discretize = ChassisSpeeds.discretize(speeds, td);
           states = swerveDrive.kinematics.toSwerveModuleStates(discretize);

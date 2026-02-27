@@ -2,12 +2,12 @@ package frc.frc_java9485.constants.mechanisms;
 
 public class ConveyorConsts {
     public static final int CONVEYOR_MOTOR_ID = 17;//lembrar de configurar victor
-    public static final double MAX_SPEED = 0.5;
+    public static final double MAX_SPEED = 1.0;
 
     public static final int HOME_SENSOR_ID = 7;//alterar
     public static final boolean INVERT_HOME = true;
 
-    public static final boolean INVERT_LIMIT = true;
+    public static final boolean INVERT_LIMIT = false;
     public static final int LIMIT_SENSOR_ID = 6;//alterar
 
     public static final int MAX_FUELS = 40;

@@ -39,6 +39,23 @@ public class MechanismJoystick implements MechanismJoystickIO {
     return joystick.getRightX();
   }
 
+  public double getRightY(){
+    return joystick.getRightY();
+  }
+
+  @Override
+  public boolean getRightBumper(){
+    return joystick.rightBumper().getAsBoolean();
+  }
+
+  public Trigger leftBumper(){
+    return joystick.leftBumper();
+  }
+
+  public double getRightTrigger(){
+    return joystick.getRightTriggerAxis();
+  }
+
   @Override
   public Trigger b() {
     return joystick.b();

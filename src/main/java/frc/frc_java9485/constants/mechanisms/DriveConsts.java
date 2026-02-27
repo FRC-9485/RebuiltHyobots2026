@@ -52,7 +52,7 @@ public final class DriveConsts {
 
   public static final int ODOMETRY_FREQUENCY = 100; //HZ
 
-  public static final double MAX_SPEED = 2.0;
+  public static final double MAX_SPEED = 3.0;
   public static final boolean FIELD_ORIENTED = true;
 
   public static final Translation2d[] MODULES_TRANSLATIONS =

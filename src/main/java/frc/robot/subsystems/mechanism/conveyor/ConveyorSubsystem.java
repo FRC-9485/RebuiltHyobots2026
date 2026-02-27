@@ -47,19 +47,21 @@ public class ConveyorSubsystem extends SubsystemBase implements ConveyorIO{
         updateInputs(inputs);
         Logger.processInputs("coveyor inputs", conveyorInputs);
 
-        System.out.println("home: " + homeSensor.isDetected());
-        System.out.println("\nlonge: " + limitSensor.isDetected());
+        // System.out.println("home: " + homeSensor.isDetected());
+        // System.out.println("\nlimit: " + limitSensor.isDetected());
     }
 
     @Override
     public void runConveyor(double speed) {
         speed = MathUtil.clamp(speed, -MAX_SPEED, MAX_SPEED);
 
+        // Bloqueia movimento para trás se já está no home
         if (speed < 0 && conveyorIsInHome()) {
             stopConveyor();
             return;
         }
 
+        // Bloqueia movimento para frente se já está no limit
         if (speed > 0 && conveyorInLimit()) {
             stopConveyor();
             return;
@@ -82,11 +84,6 @@ public class ConveyorSubsystem extends SubsystemBase implements ConveyorIO{
     public boolean conveyorInLimit() {
         return limitSensor.isDetected();
     }
-
-    // @Override
-    // public void manualConveyor(MechanismJoystick mechanismJoystick) {
-    //     runConveyor(mechanismJoystick.getLeftX());
-    // }
 
     @Override
     public void updateInputs(ConveyorInputs inputs) {

@@ -8,9 +8,11 @@ import frc.frc_java9485.constants.mechanisms.DriveConsts;
 import frc.frc_java9485.joystick.driver.DriverJoystick;
 import frc.frc_java9485.joystick.mechanism.MechanismJoystick;
 import frc.frc_java9485.utils.RegisterNamedCommands;
+import frc.robot.commands.swerveUtils.ResetPigeon;
 import frc.robot.commands.swerveUtils.ResetSimGyro;
 import frc.robot.subsystems.mechanism.SuperStructure;
 import frc.robot.subsystems.mechanism.SuperStructure.Actions;
+import frc.robot.subsystems.mechanism.index.IndexSubsystem;
 import frc.robot.subsystems.mechanism.intake.IntakeSubsystem;
 import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretSubsystem;
 import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretIO;
@@ -19,9 +21,10 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 import static frc.frc_java9485.constants.RobotConsts.*;
 
 public class RobotContainer {
+  private final IndexSubsystem index;
   private final IntakeSubsystem intake;
-  private final SwerveSubsystem swerveSubsystem;
   private final TurretSubsystem turret;
+  private final SwerveSubsystem swerveSubsystem;
 
   private SuperStructure superStructure;
   // private SuperStructureSim superStructureSim;
@@ -38,6 +41,7 @@ public class RobotContainer {
     swerveSubsystem = SwerveSubsystem.getInstance();
     intake = IntakeSubsystem.getInstance();
     turret = new TurretSubsystem(new TurretIO() {}, swerveSubsystem::getRobotRelativeSpeeds, swerveSubsystem::getPose2d);
+    index = IndexSubsystem.getInstance();
     superStructure = new SuperStructure(turret);
 
     driverJoystick = DriverJoystick.getInstance();
@@ -48,10 +52,22 @@ public class RobotContainer {
 
     swerveSubsystem.setDefaultCommand(
         swerveSubsystem.driveCommand(
-            () -> mechanismJoystick.getLeftY(),
-            () -> mechanismJoystick.getLeftX(),
-            () -> mechanismJoystick.getRightX(),
+            () -> driverJoystick.getLeftY(),
+            () -> driverJoystick.getLeftX(),
+            () -> driverJoystick.getRightX(),
             DriveConsts.FIELD_ORIENTED));
+
+    turret.setDefaultCommand(turret.normalTurretCommand(
+      () -> mechanismJoystick.getLeftX(),
+      () -> mechanismJoystick.getRightY(),
+      () -> mechanismJoystick.getRightTrigger(),
+      () -> mechanismJoystick.getRightBumper(),
+      () -> mechanismJoystick.y().getAsBoolean()));
+
+      index.setDefaultCommand(index.turnOnCommand(
+      () -> mechanismJoystick.getRightTrigger(),
+      () -> mechanismJoystick.y().getAsBoolean()
+    ));
 
     if (isSimulation()) {
       // superStructureSim = new SuperStructureSim();
@@ -71,12 +87,22 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    mechanismJoystick.rightTrigger().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.SHOOT_FUEL), superStructure))
-    .onFalse(Commands.runOnce(() -> superStructure.alternActions(Actions.LOCK_TURRET), superStructure));
+    //drive
+    driverJoystick.getLeftBack().onTrue(new ResetPigeon());
 
-    mechanismJoystick.leftTrigger().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.CATCH_FUEL), superStructure));
-    // .onFalse(Commands.runOnce(() -> superStructure.alternActions(Actions.CLOSE_INTAKE), superStructure));
-    mechanismJoystick.b().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.CLOSE_INTAKE), superStructure));
+    //mecanismos
+    mechanismJoystick.leftBumper().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.OPEN_INTAKE), superStructure));
+
+    mechanismJoystick.leftTrigger().onTrue(Commands.run(() -> superStructure.alternActions(Actions.CATCH_FUEL), superStructure))
+    .onFalse(Commands.runOnce(() -> superStructure.alternActions(Actions.STOP_CATCH), superStructure));
+
+    mechanismJoystick.x().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.CLOSE_INTAKE), superStructure));
+
+    mechanismJoystick.a().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.OPEN_CONVEYOR), superStructure))
+    .onFalse(Commands.runOnce(() -> superStructure.alternActions(Actions.LOCK_CONVEYOR), superStructure));
+
+    mechanismJoystick.b().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.CLOSE_CONVEYOR), superStructure))
+    .onFalse(Commands.runOnce(() -> superStructure.alternActions(Actions.LOCK_CONVEYOR), superStructure));
   }
 
   private void configureSimBindings() {

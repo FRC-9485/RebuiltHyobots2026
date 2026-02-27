@@ -25,7 +25,7 @@ public class DriverJoystick implements DriverJoystickIO {
   @Override
   public double getPerfomanceByAlliance(double speed) {
     var alliance = DriverStation.getAlliance().get();
-    if (DriverStation.getAlliance().isPresent() && alliance == Alliance.Red) {
+    if (DriverStation.getAlliance().isPresent() && alliance == Alliance.Blue) {
       return speed;
     }
     return -speed;
