@@ -27,4 +27,6 @@ public interface IntakeIO {
   public boolean isColecting();
 
   public double getPivotVoltage();
+
+  public boolean atSetpoint();
 }

@@ -6,7 +6,7 @@ import frc.frc_java9485.utils.TunableControls.TunableControlConstants;
 public class HoodConsts {
     public static final int HOOD_MOTOR_ID = 15; // ALTERAR
 
-    public static final double MAX_POSITION = 3.7; // ALTERAR
+    public static final double MAX_POSITION = 3.5; // ALTERAR
     public static final double MIN_POSITION = 0.0; // ALTERAR
 
     public static final int HOOD_CURRENT_LIMIT = 30;

@@ -39,6 +39,7 @@ public class MechanismJoystick implements MechanismJoystickIO {
     return joystick.getRightX();
   }
 
+  @Override
   public double getRightY(){
     return joystick.getRightY();
   }
@@ -48,10 +49,12 @@ public class MechanismJoystick implements MechanismJoystickIO {
     return joystick.rightBumper().getAsBoolean();
   }
 
+  @Override
   public Trigger leftBumper(){
     return joystick.leftBumper();
   }
 
+  @Override
   public double getRightTrigger(){
     return joystick.getRightTriggerAxis();
   }
@@ -89,5 +92,20 @@ public class MechanismJoystick implements MechanismJoystickIO {
   @Override
   public Trigger backLeft() {
     return joystick.button(7);
+  }
+
+  @Override
+  public Trigger getUpPOV() {
+    return joystick.povUp();
+  }
+
+  @Override
+  public Trigger getRightPOV() {
+    return joystick.povRight();
+  }
+
+  @Override
+  public Trigger getLeftPOV() {
+      return joystick.povLeft();
   }
 }

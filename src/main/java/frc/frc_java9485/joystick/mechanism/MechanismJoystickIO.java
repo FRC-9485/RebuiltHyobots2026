@@ -18,6 +18,16 @@ public interface MechanismJoystickIO {
 
   public double getRightY();
 
+  public Trigger getUpPOV();
+
+  public Trigger leftBumper();
+
+  public double getRightTrigger();
+
+  public Trigger getRightPOV();
+
+  public Trigger getLeftPOV();
+
   public boolean getRightBumper();
 
   public double getRightX();

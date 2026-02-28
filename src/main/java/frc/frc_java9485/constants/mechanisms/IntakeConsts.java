@@ -10,14 +10,14 @@ public class IntakeConsts {
     public static final boolean ENCODER_INVERTED = true;
     public static final int ENCODER_CHANNEL = 9;
 
-    public static final double SETPOINT_UP = 254.00;
-    public static final double SETPOINT_DOWN = 7.25;
+    public static final double SETPOINT_UP = 250.00;
+    public static final double SETPOINT_DOWN = 16;
 
     public static final double STOPPED_FUEL_SPEED = 0;
     public static final double COLLECT_FUEL_SPEED = 0.7;
 
     public static final ControlConstants PIVOT_CONTROL_CONSTANTS = new ControlConstants()
-      .withPID(0.04, 0.007, 0.0)
+      .withPID(0.035, 0.007, 0.0)
       .withTolerance(4)
       .withProfile(1000, 700)
       .withContinuous(-180, 180)

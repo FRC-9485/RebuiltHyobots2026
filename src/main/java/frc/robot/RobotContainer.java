@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.frc_java9485.autonomous.AutoChooser;
 import frc.frc_java9485.constants.mechanisms.DriveConsts;
+import frc.frc_java9485.constants.mechanisms.TurretConsts;
 import frc.frc_java9485.joystick.driver.DriverJoystick;
 import frc.frc_java9485.joystick.mechanism.MechanismJoystick;
 import frc.frc_java9485.utils.RegisterNamedCommands;
@@ -12,6 +13,7 @@ import frc.robot.commands.swerveUtils.ResetPigeon;
 import frc.robot.commands.swerveUtils.ResetSimGyro;
 import frc.robot.subsystems.mechanism.SuperStructure;
 import frc.robot.subsystems.mechanism.SuperStructure.Actions;
+import frc.robot.subsystems.mechanism.conveyor.ConveyorSubsystem;
 import frc.robot.subsystems.mechanism.index.IndexSubsystem;
 import frc.robot.subsystems.mechanism.intake.IntakeSubsystem;
 import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretSubsystem;
@@ -19,12 +21,14 @@ import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretIO;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 import static frc.frc_java9485.constants.RobotConsts.*;
+import static frc.frc_java9485.constants.mechanisms.HoodConsts.MAX_POSITION;
 
 public class RobotContainer {
   private final IndexSubsystem index;
   private final IntakeSubsystem intake;
   private final TurretSubsystem turret;
   private final SwerveSubsystem swerveSubsystem;
+  private final ConveyorSubsystem conveyor;
 
   private SuperStructure superStructure;
   // private SuperStructureSim superStructureSim;
@@ -42,6 +46,7 @@ public class RobotContainer {
     intake = IntakeSubsystem.getInstance();
     turret = new TurretSubsystem(new TurretIO() {}, swerveSubsystem::getRobotRelativeSpeeds, swerveSubsystem::getPose2d);
     index = IndexSubsystem.getInstance();
+    conveyor = ConveyorSubsystem.getInstance();
     superStructure = new SuperStructure(turret);
 
     driverJoystick = DriverJoystick.getInstance();
@@ -82,7 +87,7 @@ public class RobotContainer {
     if (isSimulation()) {
       namedCommands.configureSimCommands(intake, superStructure);
     } else {
-      namedCommands.configureRealCommands(intake, superStructure);
+      namedCommands.configureRealCommands(intake, superStructure, conveyor);
     }
   }
 
@@ -92,6 +97,24 @@ public class RobotContainer {
 
     //mecanismos
     mechanismJoystick.leftBumper().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.OPEN_INTAKE), superStructure));
+
+    // mechanismJoystick.getUpPOV().onTrue(Commands.run(() -> turret.turnToMapSetpoint(0), turret)
+    // .until(() -> turret.turretOnSetpoint()));
+
+    mechanismJoystick.getUpPOV().whileTrue(
+      Commands.run(() -> turret.turnToMapSetpoint(0), turret)
+      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(MAX_POSITION)))
+    );
+
+    mechanismJoystick.getRightPOV().whileTrue(
+      Commands.run(() -> turret.turnToMapSetpoint(TurretConsts.MIN_TURN_POSITION), turret)
+      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(MAX_POSITION)))
+    );
+
+    mechanismJoystick.getLeftPOV().whileTrue(
+      Commands.run(() -> turret.turnToMapSetpoint(TurretConsts.MAX_TURN_POSITION), turret)
+      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(MAX_POSITION)))
+    );
 
     mechanismJoystick.leftTrigger().onTrue(Commands.run(() -> superStructure.alternActions(Actions.CATCH_FUEL), superStructure))
     .onFalse(Commands.runOnce(() -> superStructure.alternActions(Actions.STOP_CATCH), superStructure));

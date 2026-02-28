@@ -41,7 +41,6 @@ import static frc.frc_java9485.constants.ComponentsConsts.*;
 import static frc.frc_java9485.constants.FieldConsts.ALLIANCE_ZONE;
 import static frc.frc_java9485.constants.FieldConsts.FIELD_LENGTH;
 
-import frc.frc_java9485.constants.FieldConsts;
 import frc.frc_java9485.constants.RobotConsts.RobotModes;
 import frc.frc_java9485.motors.io.SparkOdometryThread;
 import frc.frc_java9485.utils.MathUtils;
@@ -114,7 +113,7 @@ public class SwerveSubsystem extends SubsystemBase implements SwerveIO {
 
         driveSimulator.config.gyroSimulationFactory = COTS.ofPigeon2();
 
-        resetOdometry(FieldConsts.BLUE_CENTER_START_POSE);
+        // resetOdometry(FieldConsts.BLUE_LEFT_START_POSE);
       } else {
         isSimulation = false;
       }

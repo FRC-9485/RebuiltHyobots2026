@@ -93,11 +93,8 @@ public class TurretConsts {
   public static final TunableControlConstants SHOOTER_CONSTANTS = new TunableControlConstants("shooter controller", SHOOTER_CONTROL_CONSTANTS);
 
   public static final ControlConstants TURRET_CONSTANTS = new ControlConstants()
-  .withPID(0.09, 0.0, 0.0)
-  .withProfile(3500, 2800);//testes
-  // .withFeedforward(0.08, 0);
-  // .withContinuous(Rotations.of(0.25).times(-1).in(Rotations), Rotations.of(0.5).in(Rotations))
-  // .withPhysical(0.3, 0);
+  .withPID(0.06, 0.0, 0.0)
+  .withProfile(1700, 1400);
 
   public static final int SHOOTER_CURRENT_LIMIT = 40;
   public static final int TURN_TURRET_CURRENT_LIMIT = 20;

@@ -58,7 +58,7 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
     updateInputs(inputs);
     Logger.processInputs("Mechanism/Intake", inputs);
 
-    System.out.println("Angulo: " + pivotEncoder.get() * 360.0);
+    System.out.println("Angulo: " + pivotEncoder.get() * 347.0);
     // System.out.println("Setpoint: " + pivotSetpoint);
     // System.out.println("Voltagem: " + pivot.getVoltage() + "\n");
   }
@@ -71,8 +71,9 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
 
   @Override
   public void enablePivot(double setpoint) {
-    controller.setGoal(setpoint);
+    this.pivotSetpoint = setpoint;
     double angle = pivotEncoder.get() * 360.0;
+    controller.setGoal(setpoint);
 
     double output = controller.calculate(angle);
 
@@ -93,6 +94,11 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
   @Override
   public double getPivotVoltage() {
       return pivotVolts.in(Volts);
+  }
+
+  @Override
+  public boolean atSetpoint() {
+      return controller.atGoal();
   }
 
   @Override
