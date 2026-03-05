@@ -24,6 +24,8 @@ public class TurretConsts {
   public static final int TURN_TURRET = 13;
   public static final int FUEL_TO_TURRET = 14;
 
+  public static final double LIMELIGHT_OFFSET = 2.0;
+
   public static final int LOOKAHEAD_ITERATIONS = 3;
   public static final Distance FLY_WHEEL_RADIUS = Inches.of(2);
   public static final Distance DISTANCE_ABOVE_FUNNEL = Inches.of(20); // how high to clear the funnel
@@ -92,9 +94,17 @@ public class TurretConsts {
 
   public static final TunableControlConstants SHOOTER_CONSTANTS = new TunableControlConstants("shooter controller", SHOOTER_CONTROL_CONSTANTS);
 
-  public static final ControlConstants TURRET_CONSTANTS = new ControlConstants()
+  public static final ControlConstants TURRET_MANUAL_CONSTANTS = new ControlConstants()
   .withPID(0.06, 0.0, 0.0)
-  .withProfile(1700, 1400);
+  .withProfile(250, 170);
+
+  public static final ControlConstants AUTOMATIC_TURRET = new ControlConstants()
+  .withPID(0.14, 0.0, 0.0)
+  .withProfile(3, 8)//testes
+  .withFeedforward(0.08, 0)
+  .withPhysical(2.0, 0);
+
+  public static final TunableControlConstants AUTOMATIC_TURRET_CONTROL = new TunableControlConstants("automatic turret", AUTOMATIC_TURRET);
 
   public static final int SHOOTER_CURRENT_LIMIT = 40;
   public static final int TURN_TURRET_CURRENT_LIMIT = 20;
@@ -103,5 +113,5 @@ public class TurretConsts {
   public static final double MAX_TURN_POSITION = 15;
   public static final double MIN_TURN_POSITION = -19.69;
 
-  public static final TunableControlConstants TURRET_TUNABLE = new TunableControlConstants("shooter tunableConstants", TURRET_CONSTANTS);
+  public static final TunableControlConstants TURRET_TUNABLE = new TunableControlConstants("shooter tunableConstants", TURRET_MANUAL_CONSTANTS);
 }

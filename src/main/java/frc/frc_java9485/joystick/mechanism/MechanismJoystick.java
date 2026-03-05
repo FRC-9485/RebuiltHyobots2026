@@ -100,6 +100,11 @@ public class MechanismJoystick implements MechanismJoystickIO {
   }
 
   @Override
+  public Trigger getDownPOV(){
+    return joystick.povDown();
+  }
+
+  @Override
   public Trigger getRightPOV() {
     return joystick.povRight();
   }

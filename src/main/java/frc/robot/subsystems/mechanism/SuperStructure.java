@@ -10,7 +10,7 @@ import static frc.frc_java9485.constants.mechanisms.IntakeConsts.*;
 import org.littletonrobotics.junction.Logger;
 
 import frc.frc_java9485.constants.mechanisms.ConveyorConsts;
-import frc.robot.subsystems.led.LedSubsystem;
+// import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.mechanism.conveyor.ConveyorSubsystem;
 import frc.robot.subsystems.mechanism.index.IndexSubsystem;
 import frc.robot.subsystems.mechanism.intake.IntakeSubsystem;
@@ -25,7 +25,7 @@ public class SuperStructure extends SubsystemBase{
   private final ConveyorSubsystem conveyor;
   private final TurretSubsystem turret;
   private final IndexSubsystem index;
-  private final LedSubsystem ledSubsystem;
+  // // private final LedSubsystem ledSubsystem;
   // private final TurretSimTeste turretSim;
 
   private Actions currentAction = Actions.SECURITY;
@@ -36,7 +36,7 @@ public class SuperStructure extends SubsystemBase{
     intake = IntakeSubsystem.getInstance();
     conveyor = ConveyorSubsystem.getInstance();
     index = IndexSubsystem.getInstance();
-    ledSubsystem = LedSubsystem.getInstance();
+    // // ledSubsystem = LedSubsystem.getInstance();
     this.turret = turret;
 
     if (isSimulation()) {
@@ -59,11 +59,11 @@ public class SuperStructure extends SubsystemBase{
   // private void setLedActions(Actions action){
   //   switch (action) {
   //     case SHOOT_FUEL:
-  //         ledSubsystem.setSolidColor(Color.kRed);
+          // ledSubsystem.setSolidColor(Color.kRed);
   //       break;
 
   //     case LOCK_TURRET:
-  //         ledSubsystem.setSolidColor(Color.kGreen);
+          // ledSubsystem.setSolidColor(Color.kGreen);
   //       break;
 
   //     default:

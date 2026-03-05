@@ -5,6 +5,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+
 import com.pathplanner.lib.util.FlippingUtil;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -35,9 +36,9 @@ import static frc.frc_java9485.constants.mechanisms.HoodConsts.*;
 import frc.frc_java9485.motors.spark.SparkFlexMotor;
 import frc.frc_java9485.motors.spark.SparkMaxMotor;
 import frc.frc_java9485.utils.TunableControls.TunableProfiledController;
-
 import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretCalculator.ShotData;
 import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretIO.TurretIOInputs;
+import frc.robot.subsystems.vision.LimelightHelpers;
 
 import static frc.frc_java9485.constants.RobotConsts.*;
 
@@ -53,10 +54,15 @@ public class TurretSubsystem extends SubsystemBase{
     private final SparkMaxMotor fuel_to_turret;
     private final SparkMaxMotor hoodMotor;
 
-    public final TunableProfiledController turretController;
+    public final TunableProfiledController manual_turret_controller;
+    public final TunableProfiledController automatic_turret_controller;
     private final TunableProfiledController hoodController;
     private final TunableProfiledController flyWheelController;
     private final TurretIOInputsAutoLogged inputs;
+
+    private final int targetTag = DriverStation.getAlliance().get() == Alliance.Blue ?
+    26
+    : 10;
 
     @AutoLogOutput
     private TurretGoal goal = TurretGoal.MANUAL;
@@ -81,7 +87,6 @@ public class TurretSubsystem extends SubsystemBase{
         this.io = io;
 
         this.setTarget(HUB_BLUE);
-
         this.right_motor = new SparkFlexMotor(RIGHT_SHOOTER, "right shooter");
         this.hoodMotor = new SparkMaxMotor(HOOD_MOTOR_ID, "hood motor");
 
@@ -91,9 +96,10 @@ public class TurretSubsystem extends SubsystemBase{
         this.hoodMotor.resetPositionByEncoder(MIN_POSITION);
         this.turn_turret.resetPositionByEncoder(0);
 
-        this.turretController = new TunableProfiledController(TURRET_TUNABLE);
+        this.manual_turret_controller = new TunableProfiledController(TURRET_TUNABLE);
         this.hoodController = new TunableProfiledController(TUNABLE_CONSTANTS);
         this.flyWheelController = new TunableProfiledController(SHOOTER_CONSTANTS);
+        this.automatic_turret_controller = new TunableProfiledController(AUTOMATIC_TURRET_CONTROL);
 
         this.map = new InterpolatingDoubleTreeMap();
         this.putValues();
@@ -152,8 +158,7 @@ public class TurretSubsystem extends SubsystemBase{
     }
 
     public void turnToMapSetpoint(double setpoint){
-        automatic = true;
-
+        if(!automatic){
             if(setpoint > MAX_TURN_POSITION){
                 setpoint = MAX_TURN_POSITION;
             } else if(setpoint < MIN_TURN_POSITION){
@@ -162,17 +167,19 @@ public class TurretSubsystem extends SubsystemBase{
 
             this.turretSetpoint = setpoint;
 
-            turretController.setGoal(setpoint, 0.1);
+            manual_turret_controller.setGoal(setpoint, 0.1);
 
-            double output = turretController.calculate(turn_turret.getPosition());
+            double output = manual_turret_controller.calculate(turn_turret.getPosition());
 
             turn_turret.setSpeed(output);
 
-        if(turretController.atGoal()) return;
+            if(manual_turret_controller.atGoal()) return;
+        }
     }
 
     public void turnHoodFromSetpoint(double setpoint){
-          if(setpoint > MAX_POSITION){
+        if(!automatic){
+            if(setpoint > MAX_POSITION){
                 setpoint = MAX_POSITION;
             } else if(setpoint < MIN_POSITION){
                 setpoint = MIN_POSITION;
@@ -186,15 +193,28 @@ public class TurretSubsystem extends SubsystemBase{
 
             hoodMotor.setSpeed(output);
 
-        if(hoodController.atGoal()) return;
+            if(hoodController.atGoal()) return;
+        }
+    }
+
+    public void shootWithForce(double speed){
+        right_motor.setSpeed(-0.8);
     }
 
     public boolean turretOnSetpoint(){
-        return turretController.atGoal();
+        return manual_turret_controller.atGoal();
     }
 
     public void setSetpoint(double setpoint){
-        turretController.setGoal(setpoint);
+        manual_turret_controller.setGoal(setpoint);
+    }
+
+    public void automatic(){
+        automatic = !automatic;
+        if(!automatic) {
+            hoodSetpoint = hoodMotor.getPosition();
+            turretSetpoint = turn_turret.getPosition();
+        }
     }
 
     @Override
@@ -202,8 +222,7 @@ public class TurretSubsystem extends SubsystemBase{
         updateInputs(inputs);
         Logger.processInputs("turret inputs", inputs);
 
-        System.out.println("setpoint: " + turretSetpoint);
-        System.out.println("Pose: " + pose.get().getY());
+        System.out.println("TA: " + LimelightHelpers.getTA(""));
 
         if (goal == TurretGoal.SCORING || goal == TurretGoal.PASSING) {
 
@@ -254,10 +273,28 @@ public class TurretSubsystem extends SubsystemBase{
             }
     }
 
+    public double regulateTa(){
+        double valorA = LimelightHelpers.getTA("");
+
+        if(valorA > 1){
+            return 0.45;
+        } else if(valorA < 1.0 && valorA > 0.8){
+            return 0.46;
+        } else if(valorA < 0.8 && valorA > 0.6){
+            return 0.47;
+        } else if(valorA < 0.6 && valorA > 0.4){
+            return 0.48;
+        } else if(valorA < 0.4 && valorA > 0.2){
+            return 0.49;
+        } else {
+            return 0.5;
+        }
+    }
+
     public Command normalTurretCommand(DoubleSupplier turret, DoubleSupplier hood, DoubleSupplier shooter, BooleanSupplier acel,
                                        BooleanSupplier spellFuels){
         return run(() ->{
-            if(goal == TurretGoal.MANUAL){
+            if(goal == TurretGoal.MANUAL && automatic == false){
                 double hoodInput = hood.getAsDouble() * 0.1;
                 double turretInput = turret.getAsDouble();
                 double shooterInput = shooter.getAsDouble();
@@ -279,35 +316,35 @@ public class TurretSubsystem extends SubsystemBase{
                 hoodController.setGoal(hoodSetpoint);
                 double hoodPID = hoodController.calculate(hoodMotor.getPosition());
 
-                    if(turretInput > 0){
-                        turretSetpoint = (turretSetpoint + 0.0190) + turretInput * 0.6;
-                    } else if(turretInput < 0){
-                        turretSetpoint = (turretSetpoint - 0.0190) + turretInput * 0.6;
-                    }
+                if(turretInput > 0){
+                    turretSetpoint = (turretSetpoint + 0.0190) + turretInput * 0.6;
+                } else if(turretInput < 0){
+                    turretSetpoint = (turretSetpoint - 0.0190) + turretInput * 0.6;
+                }
 
-                    if (turretSetpoint >= MAX_TURN_POSITION && turretInput > 0) {
-                        turretSetpoint = MAX_TURN_POSITION;
-                    } else if (turretSetpoint <= MIN_TURN_POSITION && turretInput < 0) {
-                        turretSetpoint = MIN_TURN_POSITION;
-                    }
+                if (turretSetpoint >= MAX_TURN_POSITION && turretInput > 0) {
+                    turretSetpoint = MAX_TURN_POSITION;
+                } else if (turretSetpoint <= MIN_TURN_POSITION && turretInput < 0) {
+                    turretSetpoint = MIN_TURN_POSITION;
+                }
 
-                    turretController.setGoal(turretSetpoint);
-                    double turretOutput = turretController.calculate(turn_turret.getPosition());
+                manual_turret_controller.setGoal(turretSetpoint);
+                double turretOutput = manual_turret_controller.calculate(turn_turret.getPosition());
 
-                    turn_turret.setSpeed(turretOutput);
+                turn_turret.setSpeed(turretOutput);
 
                 hoodMotor.setSpeed(hoodPID);
                 fuel_to_turret.setSpeed(-0.4 * shooterInput);
-                right_motor.setSpeed(-shooterInput * 0.6);
+                right_motor.setSpeed(-shooterInput * 0.8);
 
                 if(acel.getAsBoolean()){
-                    if(shooterInput < 0.4){
-                        right_motor.setSpeed(-0.4);
+                    if(shooterInput < 0.6){
+                        right_motor.setSpeed(-0.6);
                     } else {
-                        right_motor.setSpeed(-shooterInput * 0.6);
+                        right_motor.setSpeed(-shooterInput * 0.8);
                     }
                 } else {
-                    right_motor.setSpeed(-shooterInput * 0.6);
+                    right_motor.setSpeed(-shooterInput * 0.8);
                 }
 
                 if(spellFuels.getAsBoolean()){
@@ -316,15 +353,75 @@ public class TurretSubsystem extends SubsystemBase{
                     fuel_to_turret.setSpeed(-0.4 * shooterInput);
                 }
 
-            } else {
-                turn_turret.setSpeed(0);
-                hoodMotor.setSpeed(0);
-                right_motor.setSpeed(0);
-                fuel_to_turret.setSpeed(0);
-            }
+            } else if(automatic){
+                // if(targetTag ==(int) LimelightHelpers.getFiducialID(""))
+                // turretSetpoint = -LIMELIGHT_OFFSET;
+                turretSetpoint = 0.0;
+                automatic_turret_controller.setGoal(turretSetpoint);
 
+                double outptut = automatic_turret_controller.calculate(LimelightHelpers.getTX(""));
+                Voltage volts = Volts.of(-outptut);
+
+                if(turn_turret.getPosition() >= MAX_TURN_POSITION && outptut < 0 || turn_turret.getPosition() <= MIN_TURN_POSITION && outptut > 0){
+                    turn_turret.setVoltage(0);
+                } else {
+                    turn_turret.setVoltage(volts);
+                }
+
+                hoodController.setGoal(0.5);
+                double hoodOutput = hoodController.calculate(LimelightHelpers.getTY(""));
+                Voltage voltageHood = Volts.of(hoodOutput);
+
+                if(hoodMotor.getPosition() > MAX_POSITION && hoodOutput > 0 || hoodMotor.getPosition() < MIN_POSITION && outptut < 0){
+                    hoodMotor.setVoltage(0);
+                } else {
+                    hoodMotor.setVoltage(voltageHood);
+                }
+
+                double shoot = shooter.getAsDouble();
+                right_motor.setSpeed((-shoot) * regulateTa());
+
+                if(acel.getAsBoolean()){
+                    if(shoot < 0.6){
+                        right_motor.setSpeed(-0.6);
+                    } else {
+                        right_motor.setSpeed((-shoot) * regulateTa());
+                    }
+                } else {
+                    right_motor.setSpeed((-shoot) * regulateTa());
+                }
+
+                fuel_to_turret.setSpeed(-0.4 * shoot);
+
+                if(spellFuels.getAsBoolean()){
+                    fuel_to_turret.setSpeed(0.4);
+                } else {
+                    fuel_to_turret.setSpeed(-0.4 * shoot);
+                }
+
+            } else {
+                turn_turret.setVoltage(0);
+                fuel_to_turret.setVoltage(0);
+                right_motor.setVoltage(0);
+            }
         });
     }
+
+    //  public Command turnToSetpoint(int tag, double setpoint){
+    //     return run(() ->{
+    //         if(automatic){
+    //             turretController.setGoal(setpoint);
+    //             double outptut = turretController.calculate(LimelightHelpers.getTX("limelight-hyobots"));
+    //             Voltage volts = Volts.of(-outptut);
+
+    //             if(turn_turret.getPosition() >= MAX_TURN_POSITION && outptut < 0 || turn_turret.getPosition() <= MIN_TURN_POSITION && outptut > 0){
+    //                 turn_turret.setVoltage(0);
+    //             } else {
+    //                 turn_turret.setVoltage(volts);
+    //             }
+    //         }
+    //     });
+    // }
 
     public Command calculateShot(Pose2d robotPose, DoubleSupplier turret) {
         return run(() ->{
@@ -354,8 +451,6 @@ public class TurretSubsystem extends SubsystemBase{
 
         // right_motor.setVoltage(flyWheelVoltage.times(-1));
 
-        System.out.println("turret goal: " + turretController.getGoal());
-        System.out.println("\nturret atual: " + turn_turret.getPosition());
 
         Logger.recordOutput("Turret/Shot", calculatedShot);
     });

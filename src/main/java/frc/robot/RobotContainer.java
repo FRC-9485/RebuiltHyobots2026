@@ -98,17 +98,18 @@ public class RobotContainer {
     //mecanismos
     mechanismJoystick.leftBumper().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.OPEN_INTAKE), superStructure));
 
-    // mechanismJoystick.getUpPOV().onTrue(Commands.run(() -> turret.turnToMapSetpoint(0), turret)
-    // .until(() -> turret.turretOnSetpoint()));
-
     mechanismJoystick.getUpPOV().whileTrue(
       Commands.run(() -> turret.turnToMapSetpoint(0), turret)
-      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(MAX_POSITION)))
+      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(2)))
     );
 
     mechanismJoystick.getRightPOV().whileTrue(
-      Commands.run(() -> turret.turnToMapSetpoint(TurretConsts.MIN_TURN_POSITION), turret)
+      Commands.run(() -> turret.turnToMapSetpoint(-16.0), turret)
       .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(MAX_POSITION)))
+    );
+
+    mechanismJoystick.getDownPOV().whileTrue(
+      Commands.runOnce(() -> turret.automatic(), turret)
     );
 
     mechanismJoystick.getLeftPOV().whileTrue(

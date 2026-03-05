@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.frc_java9485.constants.FieldConsts;
@@ -15,6 +16,7 @@ import frc.frc_java9485.utils.HubTracker;
 import frc.frc_java9485.utils.Elastic.Notification;
 import frc.frc_java9485.utils.Elastic.Notification.NotificationLevel;
 import frc.frc_java9485.utils.Simulation;
+import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -34,6 +36,9 @@ public class Robot extends LoggedRobot {
   private Simulation simulator;
   private final SwerveSubsystem swerve;
   private final RobotContainer m_robotContainer;
+
+  // AddressableLED m_led;
+  // AddressableLEDBuffer m_ledBuffer;
 
   public Robot() {
     switch (RobotConsts.CURRENT_ROBOT_MODE) {
@@ -59,6 +64,17 @@ public class Robot extends LoggedRobot {
 
     currentMatchTime = 0.00;
     runnedAutonomous = false;
+
+    // m_led = new AddressableLED(1);
+    // m_ledBuffer = new AddressableLEDBuffer(30);
+    // // m_led.setLength(m_ledBuffer.getLength());
+
+    // // m_led.setData(m_ledBuffer);
+    // m_led.start();
+
+    // LEDPattern red = LEDPattern.solid(Color.kGreen);
+    // red.applyTo(m_ledBuffer);
+    // // m_led.setData(m_ledBuffer);
   }
 
   @Override
@@ -69,6 +85,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    LedSubsystem.getInstance().setSolidColor(Color.kGreen);
 
     if (powerDistribution.getVoltage() <= 11.4
         && timer.advanceIfElapsed(10)
@@ -98,8 +115,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopInit() {
     Elastic.sendNotification(new Notification(NotificationLevel.INFO, "Inicio do teleop!!", ""));
-
-    // if (isSimulation()) {
       if (!runnedAutonomous) {
         var alliancePosition = DriverStation.getRawAllianceStation();
         switch (alliancePosition) {
@@ -129,7 +144,6 @@ public class Robot extends LoggedRobot {
             break;
         }
       }
-    // }
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();

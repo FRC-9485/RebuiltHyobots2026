@@ -12,9 +12,9 @@ public class HoodConsts {
     public static final int HOOD_CURRENT_LIMIT = 30;
 
     private static final ControlConstants CONTROL_CONSTANTS = new ControlConstants()
-    .withPID(0.05, 0, 0)
+    .withPID(0.15, 0, 0)
     .withProfile(300, 200)
-    .withTolerance(1.5);
+    .withTolerance(0.2);
     // .withFeedforward(0.01, 0);
 
     public static final TunableControlConstants TUNABLE_CONSTANTS =
