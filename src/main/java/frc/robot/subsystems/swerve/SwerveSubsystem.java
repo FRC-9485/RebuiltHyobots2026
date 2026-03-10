@@ -48,8 +48,6 @@ import frc.robot.subsystems.swerve.IO.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.swerve.IO.PigeonIO;
 import frc.robot.subsystems.swerve.IO.SwerveIO;
 import frc.robot.subsystems.swerve.IO.SwerveInputsAutoLogged;
-import frc.robot.subsystems.vision.VisionSubsystem;
-import frc.robot.subsystems.vision.VisionInstances;
 import swervelib.SwerveDrive;
 import swervelib.SwerveModule;
 import swervelib.parser.SwerveParser;
@@ -76,8 +74,8 @@ public class SwerveSubsystem extends SubsystemBase implements SwerveIO {
 
   private SwerveDriveSimulation driveSimulator;
 
-  private VisionSubsystem limelight;
-  private VisionSubsystem raspberry;
+  // private VisionSubsystem limelight;
+  // private VisionSubsystem raspberry;
 
   private SwerveModule[] modules;
   private SwerveModuleState states[];
@@ -112,8 +110,6 @@ public class SwerveSubsystem extends SubsystemBase implements SwerveIO {
         driveSimulator.setEnabled(true);
 
         driveSimulator.config.gyroSimulationFactory = COTS.ofPigeon2();
-
-        // resetOdometry(FieldConsts.BLUE_LEFT_START_POSE);
       } else {
         isSimulation = false;
       }
@@ -127,6 +123,7 @@ public class SwerveSubsystem extends SubsystemBase implements SwerveIO {
           };
 
       pigeon = new Pigeon2(PIGEON2);
+      pigeon.reset();
       pigeonIO = new PigeonIO();
 
       swerveInputs = new SwerveInputsAutoLogged();
@@ -140,8 +137,8 @@ public class SwerveSubsystem extends SubsystemBase implements SwerveIO {
           new SwerveDrivePoseEstimator3d(kinematics, getHeading3d(), swerveDrive.getModulePositions(),
                                         new Pose3d(), STATE_STD_DEVS, VISION_STD_DEVS);
 
-      limelight = VisionInstances.getLimelightInstance();
-      raspberry = VisionInstances.getRaspberryInstance();
+      // limelight = VisionInstances.getLimelightInstance();
+      // raspberry = VisionInstances.getRaspberryInstance();
     } catch (Exception e) {
       throw new RuntimeException("Erro criando Swerve!!!!\n", e);
     }
@@ -151,10 +148,9 @@ public class SwerveSubsystem extends SubsystemBase implements SwerveIO {
   public void periodic() {
     if (poseEstimator != null) {
       // raspberry.estimatePose(this::addVisionMeasurement);
-      limelight.estimatePose(this::addVisionMeasurement);
+      // limelight.estimatePose(this::addVisionMeasurement);
       poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getHeading3d(), swerveDrive.getModulePositions());
 
-      System.out.println("yaw: " + pigeon.getYaw().getValueAsDouble());
       if (isSimulation) {
         poseEstimator.addVisionMeasurement(new Pose3d(driveSimulator.getSimulatedDriveTrainPose()), Timer.getFPGATimestamp());
       } else if (!isSimulation) {

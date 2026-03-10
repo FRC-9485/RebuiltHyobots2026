@@ -58,7 +58,7 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
     updateInputs(inputs);
     Logger.processInputs("Mechanism/Intake", inputs);
 
-    System.out.println("Angulo: " + pivotEncoder.get() * 347.0);
+    System.out.println("Angulo: " + pivotEncoder.get() * 360.0);
     // System.out.println("Setpoint: " + pivotSetpoint);
     // System.out.println("Voltagem: " + pivot.getVoltage() + "\n");
   }

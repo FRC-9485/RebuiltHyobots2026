@@ -2,7 +2,6 @@ package frc.robot.subsystems.mechanism.index;
 
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.AutoLog;
@@ -23,7 +22,7 @@ public interface IndexIO {
     public void updateInputs(IndexInputs indexInputs);
     public void turnOn();
     public void stopIndex();
-    public Command turnOnCommand(DoubleSupplier speed, BooleanSupplier invert);
+    public Command turnOnCommand(DoubleSupplier speed);
 
     public boolean isCollecting();
 }

@@ -100,7 +100,7 @@ public class TurretConsts {
 
   public static final ControlConstants AUTOMATIC_TURRET = new ControlConstants()
   .withPID(0.14, 0.0, 0.0)
-  .withProfile(3, 8)//testes
+  .withProfile(3, 8)
   .withFeedforward(0.08, 0)
   .withPhysical(2.0, 0);
 

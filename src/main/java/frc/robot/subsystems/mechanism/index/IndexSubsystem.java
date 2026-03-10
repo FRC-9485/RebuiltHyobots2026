@@ -3,7 +3,6 @@ package frc.robot.subsystems.mechanism.index;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.frc_java9485.constants.mechanisms.IndexConsts.*;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -65,13 +64,9 @@ public class IndexSubsystem extends SubsystemBase implements IndexIO{
     }
 
     @Override
-    public Command turnOnCommand(DoubleSupplier speed, BooleanSupplier invert){
+    public Command turnOnCommand(DoubleSupplier speed){
         return run(() -> {
-            if(invert.getAsBoolean()){
-                index.setSpeed(speed.getAsDouble() * 0.6);
-            } else {
-                index.setSpeed(-speed.getAsDouble() * 0.6);
-            }
+            index.setSpeed(-speed.getAsDouble() * 0.6);
         });
     }
 

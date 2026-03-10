@@ -70,9 +70,8 @@ public class RobotContainer {
       () -> mechanismJoystick.getRightBumper(),
       () -> mechanismJoystick.y().getAsBoolean()));
 
-      index.setDefaultCommand(index.turnOnCommand(
-      () -> mechanismJoystick.getRightTrigger(),
-      () -> mechanismJoystick.y().getAsBoolean()
+    index.setDefaultCommand(index.turnOnCommand(
+      () -> mechanismJoystick.getRightTrigger()
     ));
 
     if (isSimulation()) {
@@ -103,7 +102,7 @@ public class RobotContainer {
 
     mechanismJoystick.getUpPOV().whileTrue(
       Commands.run(() -> turret.turnToMapSetpoint(0), turret) // angulo torreta
-      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(MIN_POSITION, 2420, () -> mechanismJoystick.getRightTrigger() > 0))) // angulo capuz
+      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(MIN_POSITION, 2420, () -> mechanismJoystick.getRightTrigger() > 0)))
     );
 
     mechanismJoystick.getRightPOV().whileTrue(
