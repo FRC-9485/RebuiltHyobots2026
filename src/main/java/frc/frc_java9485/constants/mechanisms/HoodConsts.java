@@ -14,9 +14,9 @@ public class HoodConsts {
     private static final ControlConstants CONTROL_CONSTANTS = new ControlConstants()
     .withPID(0.15, 0, 0)
     .withProfile(300, 200)
-    .withTolerance(0.2);
+    .withTolerance(0.02);
     // .withFeedforward(0.01, 0);
 
     public static final TunableControlConstants TUNABLE_CONSTANTS =
-        new TunableControlConstants("Estêvão Barros Reis (electric boss) loves jhonny from lipetral, Linhares, ES, Brazil", CONTROL_CONSTANTS);
+        new TunableControlConstants("hood constants", CONTROL_CONSTANTS);
 }

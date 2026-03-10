@@ -11,6 +11,8 @@ public class DriverJoystick implements DriverJoystickIO {
   CommandXboxController joystick;
   private static DriverJoystick mInstance = null;
 
+  private int invert = 1;
+
   private DriverJoystick() {
     this.joystick = new CommandXboxController(JoystickConsts.DRIVER_PORT);
   }
@@ -26,9 +28,9 @@ public class DriverJoystick implements DriverJoystickIO {
   public double getPerfomanceByAlliance(double speed) {
     var alliance = DriverStation.getAlliance().get();
     if (DriverStation.getAlliance().isPresent() && alliance == Alliance.Blue) {
-      return -speed;
+      return speed;
     }
-    return speed;
+    return -speed;
   }
 
   @Override
@@ -90,6 +92,16 @@ public class DriverJoystick implements DriverJoystickIO {
               getPerfomanceByAlliance(joystick.getRightX()), JoystickConsts.DRIVER_DEADBAND)
           * 0.7;
     }
+  }
+
+  @Override
+  public Trigger emergencyInvert() {
+    return joystick.y();
+  }
+
+  @Override
+  public void invertManual(){
+    invert *= -1;
   }
 
   @Override

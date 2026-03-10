@@ -68,9 +68,9 @@ public class IndexSubsystem extends SubsystemBase implements IndexIO{
     public Command turnOnCommand(DoubleSupplier speed, BooleanSupplier invert){
         return run(() -> {
             if(invert.getAsBoolean()){
-                index.setSpeed(speed.getAsDouble() * 0.4);
+                index.setSpeed(speed.getAsDouble() * 0.6);
             } else {
-                index.setSpeed(-speed.getAsDouble() * 0.4);
+                index.setSpeed(-speed.getAsDouble() * 0.6);
             }
         });
     }

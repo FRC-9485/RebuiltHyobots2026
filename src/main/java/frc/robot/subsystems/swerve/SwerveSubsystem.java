@@ -154,6 +154,7 @@ public class SwerveSubsystem extends SubsystemBase implements SwerveIO {
       limelight.estimatePose(this::addVisionMeasurement);
       poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getHeading3d(), swerveDrive.getModulePositions());
 
+      System.out.println("yaw: " + pigeon.getYaw().getValueAsDouble());
       if (isSimulation) {
         poseEstimator.addVisionMeasurement(new Pose3d(driveSimulator.getSimulatedDriveTrainPose()), Timer.getFPGATimestamp());
       } else if (!isSimulation) {

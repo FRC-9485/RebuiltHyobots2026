@@ -71,9 +71,13 @@ public class SparkFlexMotor implements MotorIO {
 
   @Override
   public void setSetpoint(double setpoint) {
-    if (setpoint != getPosition()) {
-      motor.getClosedLoopController().setSetpoint(setpoint, ControlType.kPosition);
+    if (setpoint != getRate()) {
+      motor.getClosedLoopController().setSetpoint(setpoint, ControlType.kVelocity);
     }
+  }
+
+  public void setRPM(double RPM){
+    motor.set(RPM/6000);
   }
 
   @Override

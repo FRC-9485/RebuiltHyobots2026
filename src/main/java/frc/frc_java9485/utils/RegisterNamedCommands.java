@@ -4,10 +4,15 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.CatchBall;
+import frc.robot.commands.mechanism.ShotFuel;
+import frc.robot.commands.mechanism.TurnToShotCenter;
+import frc.robot.commands.mechanism.TurnToShotRight;
 import frc.robot.subsystems.mechanism.SuperStructure;
 import frc.robot.subsystems.mechanism.SuperStructure.Actions;
 import frc.robot.subsystems.mechanism.conveyor.ConveyorSubsystem;
+import frc.robot.subsystems.mechanism.index.IndexSubsystem;
 import frc.robot.subsystems.mechanism.intake.IntakeSubsystem;
+import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretSubsystem;
 
 public class RegisterNamedCommands {
     public static RegisterNamedCommands mInstance = null;
@@ -21,9 +26,11 @@ public class RegisterNamedCommands {
 
     private RegisterNamedCommands(){}
 
-    public void configureRealCommands(IntakeSubsystem intake, SuperStructure superStructure, ConveyorSubsystem conveyorSubsystem){
+    public void configureRealCommands(IntakeSubsystem intake, SuperStructure superStructure, ConveyorSubsystem conveyorSubsystem,
+     TurretSubsystem turretSubsystem, IndexSubsystem indexSubsystem){
         configureIntakeCommands(intake, superStructure, conveyorSubsystem);
         configureConveyorCommands(superStructure, conveyorSubsystem);
+        configureTurretCommands(turretSubsystem, indexSubsystem);
     }
 
     public void configureSimCommands(IntakeSubsystem intke, SuperStructure superStructure) {
@@ -41,6 +48,14 @@ public class RegisterNamedCommands {
     private void configureConveyorCommands(SuperStructure superStructure, ConveyorSubsystem conveyorSubsystem){
         NamedCommands.registerCommand("open conveyor", Commands.run(() -> superStructure.alternActions(Actions.OPEN_CONVEYOR), superStructure)
         .until(() -> conveyorSubsystem.conveyorInLimit()));
+    }
+
+    private void configureTurretCommands(TurretSubsystem turretSubsystem, IndexSubsystem indexSubsystem){
+        NamedCommands.registerCommand("turn to right", new TurnToShotRight(turretSubsystem));
+        NamedCommands.registerCommand("shot fuel right", new ShotFuel(indexSubsystem, turretSubsystem, 2820));
+
+        NamedCommands.registerCommand("turn to center", new TurnToShotCenter(turretSubsystem));
+        NamedCommands.registerCommand("shot fuel center", new ShotFuel(indexSubsystem, turretSubsystem, 3000));
     }
 
     private void configureIntakeSimCommands(SuperStructure superStructure) {

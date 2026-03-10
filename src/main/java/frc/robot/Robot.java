@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.frc_java9485.constants.FieldConsts;
@@ -16,7 +15,6 @@ import frc.frc_java9485.utils.HubTracker;
 import frc.frc_java9485.utils.Elastic.Notification;
 import frc.frc_java9485.utils.Elastic.Notification.NotificationLevel;
 import frc.frc_java9485.utils.Simulation;
-import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -85,7 +83,8 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    LedSubsystem.getInstance().setSolidColor(Color.kGreen);
+    SmartDashboard.putBoolean("hub is active", HubTracker.isActive());
+    SmartDashboard.putNumber("batery voltage", powerDistribution.getVoltage());
 
     if (powerDistribution.getVoltage() <= 11.4
         && timer.advanceIfElapsed(10)

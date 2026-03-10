@@ -89,8 +89,8 @@ public class TurretConsts {
       }
 
   public static final ControlConstants SHOOTER_CONTROL_CONSTANTS = new ControlConstants()
-  .withPID(0.0008, 0, 0)
-  .withProfile(1500, 1300);
+  .withPID(2.4, 1, 0.0)
+  .withTolerance(21);
 
   public static final TunableControlConstants SHOOTER_CONSTANTS = new TunableControlConstants("shooter controller", SHOOTER_CONTROL_CONSTANTS);
 

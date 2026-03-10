@@ -22,6 +22,7 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 import static frc.frc_java9485.constants.RobotConsts.*;
 import static frc.frc_java9485.constants.mechanisms.HoodConsts.MAX_POSITION;
+import static frc.frc_java9485.constants.mechanisms.HoodConsts.MIN_POSITION;
 
 public class RobotContainer {
   private final IndexSubsystem index;
@@ -52,7 +53,7 @@ public class RobotContainer {
     driverJoystick = DriverJoystick.getInstance();
     mechanismJoystick = MechanismJoystick.getInstance();
 
-    autoChooser = new AutoChooser("Autonomous Chooser", "path");
+    autoChooser = new AutoChooser("Autonomous Chooser", "Con e intake");
     namedCommands = RegisterNamedCommands.getInstance();
 
     swerveSubsystem.setDefaultCommand(
@@ -87,25 +88,27 @@ public class RobotContainer {
     if (isSimulation()) {
       namedCommands.configureSimCommands(intake, superStructure);
     } else {
-      namedCommands.configureRealCommands(intake, superStructure, conveyor);
+      namedCommands.configureRealCommands(intake, superStructure, conveyor, turret, index);
     }
   }
 
   private void configureBindings() {
     //drive
     driverJoystick.getLeftBack().onTrue(new ResetPigeon());
+    driverJoystick.emergencyInvert().onTrue(Commands.run(() -> driverJoystick.invertManual()));
+
 
     //mecanismos
     mechanismJoystick.leftBumper().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.OPEN_INTAKE), superStructure));
 
     mechanismJoystick.getUpPOV().whileTrue(
-      Commands.run(() -> turret.turnToMapSetpoint(0), turret)
-      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(2)))
+      Commands.run(() -> turret.turnToMapSetpoint(0), turret) // angulo torreta
+      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(MIN_POSITION, 2420, () -> mechanismJoystick.getRightTrigger() > 0))) // angulo capuz
     );
 
     mechanismJoystick.getRightPOV().whileTrue(
-      Commands.run(() -> turret.turnToMapSetpoint(-16.0), turret)
-      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(MAX_POSITION)))
+      Commands.run(() -> turret.turnToMapSetpoint(-16), turret)
+      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(0.5, 2820, () -> mechanismJoystick.getRightTrigger() > 0)))
     );
 
     mechanismJoystick.getDownPOV().whileTrue(
@@ -114,7 +117,7 @@ public class RobotContainer {
 
     mechanismJoystick.getLeftPOV().whileTrue(
       Commands.run(() -> turret.turnToMapSetpoint(TurretConsts.MAX_TURN_POSITION), turret)
-      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(MAX_POSITION)))
+      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(MAX_POSITION, 3000, () -> mechanismJoystick.getRightTrigger() > 0)))
     );
 
     mechanismJoystick.leftTrigger().onTrue(Commands.run(() -> superStructure.alternActions(Actions.CATCH_FUEL), superStructure))
