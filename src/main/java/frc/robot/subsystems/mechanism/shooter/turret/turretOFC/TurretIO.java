@@ -1,66 +1,44 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.mechanism.shooter.turret.turretOFC;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
-/** Add your docs here. */
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj2.command.Command;
+
 public interface TurretIO {
+
     @AutoLog
-    public static class TurretIOInputs {
-        public boolean turnMotorConnected = false;
-        public Voltage turnAppliedVolts = Volts.zero();
-        public Current turnCurrent = Amps.zero();
-        public Angle turnPosition = Radians.of(0.0);
-        public AngularVelocity turnVelocity = RadiansPerSecond.zero();
-
-        public boolean hoodMotorConnected = false;
-        public Voltage hoodAppliedVolts = Volts.zero();
-        public Current hoodCurrent = Amps.zero();
-        public Angle hoodPosition = Radians.zero();
-        public AngularVelocity hoodVelocity = RadiansPerSecond.zero();
-
-        public boolean flywheelMotorConnected = false;
-        public Voltage flywheelAppliedVolts = Volts.zero();
-        public Current flywheelCurrent = Amps.zero();
-        public AngularVelocity flywheelSpeed = RadiansPerSecond.zero();
-        public AngularAcceleration flywheelAccel = RadiansPerSecondPerSecond.zero();
-        public AngularVelocity flywheelSetpointSpeed = RadiansPerSecond.zero();
-        public AngularAcceleration flywheelSetpointAccel = RadiansPerSecondPerSecond.zero();
+    public static class TurretIOinputs{
+        public boolean inbuxing = false;
+        public boolean turretAtSetpoint = false;
+        public boolean automatic = false;
+        public double turretSetpoint = 0;
+        public double hoodSetpoint = 0;
     }
 
-    public default void updateInputs(TurretIOInputs inputs) {}
+    public double getDegreesPerRotationTurret();
+    public double getMapValue(Pose2d pose2d);
+    public double regulateTa();
 
-    public default void setTurnSetpoint(Angle position, AngularVelocity velocity) {}
+    public void shotWithRPM(double RPM);
+    public void turnOnFuelToTurret(double speed);
+    public void turnHoodFromSetpoint(double setpoint, double motor);
+    public void turnToMapSetpoint(double setpoint);
+    public void turnHoodFromSetpoint(double setpoint, double motor, BooleanSupplier tag);
+    public void turnHoodFromSetpoint(double setpoint);
+    public void setSetpoint(double setpoint);
+    public void automatic();
+    public void turnOfAllComponents();
+    public void shootWithForce(double speed);
+    public void updateInputs(TurretIOinputsAutoLogged turretIOinputsAutoLogged);
 
-    public default void setHoodAngle(Angle angle) {}
+    public boolean inbuxing();
+    public boolean turretOnSetpoint();
+    public boolean isAutomatic();
 
-    public default void setFlywheelSpeed(AngularVelocity speed) {}
-
-    public default void stopTurn() {}
-
-    public default void stopHood() {}
-
-    public default void stopFlywheel() {}
-
-    public default void resetTurnEncoder() {}
-
-    public default void setTurnPID(double kP, double kD, double kV, double kS) {}
-
-    public default void setHoodPID(double kP, double kD, double kS) {}
-
-    public default void setFlywheelPID(double kP, double kD) {}
+    public Command normalTurretCommand(DoubleSupplier turret, DoubleSupplier hood, DoubleSupplier shooter, BooleanSupplier acel,
+                                       BooleanSupplier spellFuels);
 }

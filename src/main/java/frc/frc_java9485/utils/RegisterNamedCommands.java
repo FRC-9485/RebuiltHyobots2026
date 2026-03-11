@@ -3,7 +3,7 @@ package frc.frc_java9485.utils;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.CatchBall;
+import frc.robot.commands.mechanism.CatchBall;
 import frc.robot.commands.mechanism.ShotFuel;
 import frc.robot.commands.mechanism.TurnToShotCenter;
 import frc.robot.commands.mechanism.TurnToShotRight;

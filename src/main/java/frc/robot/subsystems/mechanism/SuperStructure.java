@@ -15,7 +15,6 @@ import frc.robot.subsystems.mechanism.conveyor.ConveyorSubsystem;
 import frc.robot.subsystems.mechanism.index.IndexSubsystem;
 import frc.robot.subsystems.mechanism.intake.IntakeSubsystem;
 import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretSubsystem;
-import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretSubsystem.TurretGoal;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import swervelib.simulation.ironmaple.simulation.IntakeSimulation;
 import swervelib.simulation.ironmaple.simulation.IntakeSimulation.IntakeSide;
@@ -46,8 +45,6 @@ public class SuperStructure extends SubsystemBase{
                                                            IntakeSide.BACK,
                                                            ConveyorConsts.MAX_FUELS);
     }
-
-    turret.setGoal(TurretGoal.MANUAL);
   }
 
   @Override

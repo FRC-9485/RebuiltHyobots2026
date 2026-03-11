@@ -3,12 +3,12 @@ package frc.robot.subsystems.mechanism.intake;
 import static edu.wpi.first.units.Units.Volts;
 import org.littletonrobotics.junction.Logger;
 
-
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.frc_java9485.constants.mechanisms.IntakeConsts.*;
 
+import frc.frc_java9485.motors.io.SparkInputsAutoLogged;
 import frc.frc_java9485.motors.spark.SparkMaxMotor;
 import frc.frc_java9485.utils.TunableControls.TunableProfiledController;
 
@@ -23,11 +23,14 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
   private final TunableProfiledController controller;
 
   private double catchFuelSpeed = 0;
+
   private double pivotSetpoint = 0;
   private boolean isCollecting = false;
   private Voltage pivotVolts = Volts.of(0);
 
   private final IntakeInputsAutoLogged inputs;
+  private final SparkInputsAutoLogged pivotInputs;
+  private final SparkInputsAutoLogged catchBallInputs;
 
   public static IntakeSubsystem getInstance() {
     if (m_instance == null) m_instance = new IntakeSubsystem();
@@ -44,6 +47,8 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
     pivotEncoder.setInverted(ENCODER_INVERTED);
 
     inputs = new IntakeInputsAutoLogged();
+    pivotInputs = new SparkInputsAutoLogged();
+    catchBallInputs = new SparkInputsAutoLogged();
 
     configureIntakeMotor();
   }
@@ -56,9 +61,12 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
   @Override
   public void periodic() {
     updateInputs(inputs);
-    Logger.processInputs("Mechanism/Intake", inputs);
+    Logger.processInputs("Mechanism/Intake inputs", inputs);
 
-    System.out.println("Angulo: " + pivotEncoder.get() * 360.0);
+    pivot.updateInputs(pivotInputs);
+    catchBall.updateInputs(catchBallInputs);
+
+    // System.out.println("Angulo: " + pivotEncoder.get() * 360.0);
     // System.out.println("Setpoint: " + pivotSetpoint);
     // System.out.println("Voltagem: " + pivot.getVoltage() + "\n");
   }

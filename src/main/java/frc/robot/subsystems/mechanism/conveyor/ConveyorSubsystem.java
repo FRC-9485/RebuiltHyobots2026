@@ -6,6 +6,7 @@ import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.INVERT_HOME;
 import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.INVERT_LIMIT;
 import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.LIMIT_SENSOR_ID;
 import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.MAX_SPEED;
+
 import frc.frc_java9485.sensor.DigitalSensor;
 
 import org.littletonrobotics.junction.Logger;
@@ -25,7 +26,6 @@ public class ConveyorSubsystem extends SubsystemBase implements ConveyorIO{
     private final DigitalSensor limitSensor;
 
     private final ConveyorInputsAutoLogged conveyorInputs;
-    private final ConveyorInputs inputs;
 
     public static ConveyorSubsystem getInstance() {
         if (m_instance == null) m_instance = new ConveyorSubsystem();
@@ -38,17 +38,13 @@ public class ConveyorSubsystem extends SubsystemBase implements ConveyorIO{
         homeSensor = new DigitalSensor(HOME_SENSOR_ID, INVERT_HOME);
         limitSensor = new DigitalSensor(LIMIT_SENSOR_ID, INVERT_LIMIT);
 
-        inputs = new ConveyorInputsAutoLogged();
         conveyorInputs = new ConveyorInputsAutoLogged();
     }
 
     @Override
     public void periodic() {
-        updateInputs(inputs);
-        Logger.processInputs("coveyor inputs", conveyorInputs);
-
-        // System.out.println("home: " + homeSensor.isDetected());
-        // System.out.println("\nlimit: " + limitSensor.isDetected());
+        updateInputs(conveyorInputs);
+        Logger.processInputs("Mechanism/coveyor inputs", conveyorInputs);
     }
 
     @Override

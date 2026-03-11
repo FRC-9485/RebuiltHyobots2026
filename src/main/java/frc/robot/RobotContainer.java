@@ -17,7 +17,6 @@ import frc.robot.subsystems.mechanism.conveyor.ConveyorSubsystem;
 import frc.robot.subsystems.mechanism.index.IndexSubsystem;
 import frc.robot.subsystems.mechanism.intake.IntakeSubsystem;
 import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretSubsystem;
-import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretIO;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 import static frc.frc_java9485.constants.RobotConsts.*;
@@ -45,7 +44,7 @@ public class RobotContainer {
 
     swerveSubsystem = SwerveSubsystem.getInstance();
     intake = IntakeSubsystem.getInstance();
-    turret = new TurretSubsystem(new TurretIO() {}, swerveSubsystem::getRobotRelativeSpeeds, swerveSubsystem::getPose2d);
+    turret = new TurretSubsystem();
     index = IndexSubsystem.getInstance();
     conveyor = ConveyorSubsystem.getInstance();
     superStructure = new SuperStructure(turret);
@@ -95,7 +94,6 @@ public class RobotContainer {
     //drive
     driverJoystick.getLeftBack().onTrue(new ResetPigeon());
     driverJoystick.emergencyInvert().onTrue(Commands.run(() -> driverJoystick.invertManual()));
-
 
     //mecanismos
     mechanismJoystick.leftBumper().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.OPEN_INTAKE), superStructure));

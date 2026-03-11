@@ -1,50 +1,70 @@
 package frc.frc_java9485.motors.spark;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import frc.frc_java9485.motors.io.MotorIO;
+import frc.frc_java9485.motors.io.SparkIO;
+import frc.frc_java9485.motors.io.SparkInputsAutoLogged;
+import frc.frc_java9485.utils.TunableControls.ControlConstants;
 
-public class SparkMaxMotor implements MotorIO{
-
-  private SparkMax motor;
-  private SparkMaxConfig config;
-  private int id;
-  private boolean isFollower;
-  private String name;
+public class SparkMaxMotor implements SparkIO{
+  private final SparkMax motor;
+  private final SparkMaxConfig config;
 
   private double speed = 0;
   private double porcentage = 0;
-  private double position = 0;
   private IdleMode currentIdleMode;
 
-  public SparkMaxMotor(int id, String name) {
-    this(id, name, false);
-  }
+  private final String name;
+  private final String key;
 
-  public SparkMaxMotor(int id, String name, boolean isFollower) {
-    this.id = id;
-    this.isFollower = isFollower;
-    this.name = name;
+  public SparkMaxMotor(int id, String name) {
     this.motor = new SparkMax(id, MotorType.kBrushless);
     this.config = new SparkMaxConfig();
 
+    this.name = name;
+    this.key = "Motors/Spark Max/Brushless/";
+
     cleanStickFaults();
+    motor.getDeviceId();
+  }
+
+  @Override
+  public void updateInputs(SparkInputsAutoLogged inputs) {
+    inputs.id = motor.getDeviceId();
+    inputs.currentRPM = RPM.of(getRate());
+    inputs.currentAmps = Amps.of(getCurrent());
+    inputs.currentVoltage = Volts.of(getVoltage());
+    inputs.currentPosition = Rotations.of(getPosition());
+    inputs.currentTemperature = Celsius.of(getTemperature());
+
+    Logger.processInputs(key + name, inputs);
   }
 
   @Override
@@ -163,6 +183,97 @@ public class SparkMaxMotor implements MotorIO{
   @Override
   public void cleanStickFaults() {
       configureSparkMax(motor::clearFaults);
+  }
+
+  @Override
+  public void setForwardSoftLimit(double limit) {
+    config.softLimit.forwardSoftLimit(limit);
+  }
+
+  @Override
+  public void setReverseSoftLimit(double limit) {
+    config.softLimit.reverseSoftLimit(limit);
+  }
+
+  @Override
+  public void enableForwardSoftLimit(boolean enable) {
+    config.softLimit.forwardSoftLimitEnabled(enable);
+  }
+
+  @Override
+  public void enableReverseSoftLimit(boolean enable) {
+    config.softLimit.reverseSoftLimitEnabled(enable);
+  }
+
+  @Override
+  public void setPositionConversionFactor(double factor) {
+    config.encoder.positionConversionFactor(factor);
+  }
+
+  @Override
+  public void setVelocityConversionFactor(double factor) {
+    config.encoder.velocityConversionFactor(factor);
+  }
+
+  @Override
+  public void setClosedLoopPID(double kP, double kI, double kD) {
+    config.closedLoop.pid(kP, kI, kD);
+  }
+
+  @Override
+  public void setClosedLoopFeedbackSensor(FeedbackSensor feedbackSensor) {
+    config.closedLoop.feedbackSensor(feedbackSensor);
+  }
+
+  @Override
+  public void setClosedLoopFeedForward(double kA, double kV) {
+    config.closedLoop.feedForward.kA(kA);
+    config.closedLoop.feedForward.kV(kV);
+  }
+
+  @Override
+  public void setClosedLoopPhysical(double kS, double kG) {
+    config.closedLoop.feedForward.kS(kS);
+    config.closedLoop.feedForward.kG(kG);
+  }
+
+  @Override
+  public void setClosedLoopControlConstants(ControlConstants constants) {
+    PIDController pid = constants.getPIDController();
+    ElevatorFeedforward ff = constants.getElevatorFeedforward();
+
+    config.closedLoop.pid(pid.getP(), pid.getI(), pid.getD());
+    config.closedLoop.feedForward.kA(ff.getKa());
+    config.closedLoop.feedForward.kV(ff.getKv());
+    config.closedLoop.feedForward.kS(ff.getKs());
+    config.closedLoop.feedForward.kG(ff.getKg());
+  }
+
+  @Override
+  public void setClosedLoopPID(PIDController pid) {
+      config.closedLoop.pid(pid.getP(), pid.getI(), pid.getD());
+  }
+
+  @Override
+  public void resetConfigToDefault(Motor motor) {
+    switch (motor) {
+      case NEO_1:
+        config.apply(SparkMaxConfig.Presets.REV_NEO);
+        break;
+      case NEO_2:
+        config.apply(SparkMaxConfig.Presets.REV_NEO_2);
+        break;
+      case NEO_550:
+        config.apply(SparkMaxConfig.Presets.REV_NEO_550);
+        break;
+      case NEO_VORTEX:
+        throw new RuntimeException("Cannot configure a Spark Max to NEO Vortex default config");
+    }
+  }
+
+  @Override
+  public SparkClosedLoopController getClosedLoopController() {
+      return motor.getClosedLoopController();
   }
 
   @Override
