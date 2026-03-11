@@ -22,11 +22,7 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
 
   private final TunableProfiledController controller;
 
-  private double catchFuelSpeed = 0;
-
   private double pivotSetpoint = 0;
-  private boolean isCollecting = false;
-  private Voltage pivotVolts = Volts.of(0);
 
   private final IntakeInputsAutoLogged inputs;
   private final SparkInputsAutoLogged pivotInputs;
@@ -65,15 +61,10 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
 
     pivot.updateInputs(pivotInputs);
     catchBall.updateInputs(catchBallInputs);
-
-    // System.out.println("Angulo: " + pivotEncoder.get() * 360.0);
-    // System.out.println("Setpoint: " + pivotSetpoint);
-    // System.out.println("Voltagem: " + pivot.getVoltage() + "\n");
   }
 
   @Override
   public void catchFuel(double speed) {
-    this.catchFuelSpeed = speed;
     catchBall.setSpeed(speed);
   }
 
@@ -90,18 +81,17 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
 
   @Override
   public double getCatchFuelSpeed() {
-    return catchFuelSpeed;
+    return catchBall.getRate();
   }
 
   @Override
   public boolean isColecting() {
-    isCollecting = catchBall.getRate() != 0;
-    return isCollecting;
+    return getCatchFuelSpeed() > 0.1;
   }
 
   @Override
   public double getPivotVoltage() {
-      return pivotVolts.in(Volts);
+      return pivot.getVoltage();
   }
 
   @Override
@@ -113,7 +103,7 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
   public void updateInputs(IntakeInputs inputs) {
     inputs.isColecting = isColecting();
     inputs.catchFuelSpeed = getCatchFuelSpeed();
-    inputs.pivotVolts = pivotVolts;
+    inputs.pivotVolts = Volts.of(getPivotVoltage());
     inputs.pivotAngle = pivotEncoder.get()*360.0;
     inputs.pivotSetpoint = pivotSetpoint;
   }

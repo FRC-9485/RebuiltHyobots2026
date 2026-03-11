@@ -28,6 +28,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import static frc.frc_java9485.constants.LoggerConstants.*;
 import frc.frc_java9485.motors.io.SparkIO;
 import frc.frc_java9485.motors.io.SparkInputsAutoLogged;
 import frc.frc_java9485.utils.TunableControls.ControlConstants;
@@ -41,14 +42,12 @@ public class SparkMaxBrushed implements SparkIO{
   private IdleMode currentIdleMode;
 
   private final String name;
-  private final String key;
 
   public SparkMaxBrushed(int id, String name) {
     this.motor = new SparkMax(id, SparkMax.MotorType.kBrushed);
     this.config = new SparkMaxConfig();
 
     this.name = name;
-    key = "Motors/Spark Max/Brushed/";
 
     cleanStickFaults();
   }
@@ -62,7 +61,7 @@ public class SparkMaxBrushed implements SparkIO{
     inputs.currentPosition = Rotations.of(getPosition());
     inputs.currentTemperature = Celsius.of(getTemperature());
 
-    Logger.processInputs(key + name, inputs);
+    Logger.processInputs(SPARK_MAX_BRUSHED_KEY + name, inputs);
   }
 
   @Override

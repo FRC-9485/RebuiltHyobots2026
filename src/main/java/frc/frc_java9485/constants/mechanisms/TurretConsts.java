@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotations;
 
+
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -86,15 +87,17 @@ public class TurretConsts {
       }
 
   public static final ControlConstants SHOOTER_CONTROL_CONSTANTS = new ControlConstants()
-  // .withPID(2.4, 1, 0.0)
-  // .withTolerance(21);
-  .withPID(2.4, 0.7, 0.6)
+  .withPID(2.3, 1, 0.1)
   .withTolerance(21);
+  // .withPID(2.4, 0.7, 0.6)
+  // .withTolerance(21);
+  // .withPID(3., 0.0, 0.1)
+  // .withTolerance(21);
 
   public static final TunableControlConstants SHOOTER_CONSTANTS = new TunableControlConstants("shooter controller", SHOOTER_CONTROL_CONSTANTS);
 
   public static final ControlConstants TURRET_MANUAL_CONSTANTS = new ControlConstants()
-  .withPID(0.06, 0.0, 0.0)
+  .withPID(0.075, 0.05, 0.0)
   .withProfile(250, 170);
 
   public static final ControlConstants AUTOMATIC_TURRET = new ControlConstants()

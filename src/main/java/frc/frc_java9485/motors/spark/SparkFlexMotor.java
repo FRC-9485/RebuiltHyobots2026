@@ -29,6 +29,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import static frc.frc_java9485.constants.LoggerConstants.*;
 import frc.frc_java9485.motors.io.SparkIO;
 import frc.frc_java9485.motors.io.SparkInputsAutoLogged;
 import frc.frc_java9485.utils.TunableControls.ControlConstants;
@@ -43,14 +44,12 @@ public class SparkFlexMotor implements SparkIO {
   private IdleMode currentIdleMode;
 
   private final String name;
-  private final String key;
 
   public SparkFlexMotor(int id, String name) {
     this.config = new SparkFlexConfig();
     this.motor = new SparkFlex(id, MotorType.kBrushless);
 
     this.name = name;
-    this.key = "Motors/Spark Flex/";
 
     cleanStickFaults();
   }
@@ -64,7 +63,7 @@ public class SparkFlexMotor implements SparkIO {
     inputs.currentPosition = Rotations.of(getPosition());
     inputs.currentTemperature = Celsius.of(getTemperature());
 
-    Logger.processInputs(key + name, inputs);
+    Logger.processInputs(SPARK_FLEX_KEY + name, inputs);
   }
 
   @Override

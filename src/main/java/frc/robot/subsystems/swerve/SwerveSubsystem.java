@@ -147,7 +147,6 @@ public class SwerveSubsystem extends SubsystemBase implements SwerveIO {
   @Override
   public void periodic() {
     if (poseEstimator != null) {
-      // raspberry.estimatePose(this::addVisionMeasurement);
       // limelight.estimatePose(this::addVisionMeasurement);
       poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getHeading3d(), swerveDrive.getModulePositions());
 

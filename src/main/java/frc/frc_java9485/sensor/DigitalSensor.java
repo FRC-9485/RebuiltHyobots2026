@@ -1,15 +1,35 @@
 package frc.frc_java9485.sensor;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj.DigitalInput;
+import static frc.frc_java9485.constants.LoggerConstants.*;
 
 public class DigitalSensor implements SensorIO{
 
     private final DigitalInput sensor;
     private final boolean inverted;
+    private final String identification;
 
-    public DigitalSensor(int input, boolean inverted){
+    private final SensorInputsAutoLogged sensorInputsAutoLogged;
+
+    public DigitalSensor(int input, boolean inverted, String identification){
         sensor = new DigitalInput(input);
         this.inverted = inverted;
+        this.identification = identification;
+        this.sensorInputsAutoLogged = new SensorInputsAutoLogged();
+    }
+
+    public DigitalSensor(int input, String identification){
+        this(input, false, identification);
+    }
+
+    @Override
+    public void processInput(SensorInputsAutoLogged sensorInputs) {
+        sensorInputsAutoLogged.detected = isDetected();
+        sensorInputsAutoLogged.inverted = inverted;     
+        
+        Logger.processInputs(DIGITAL_SENSOR_KEY + identification, sensorInputs);
     }
 
     @Override
