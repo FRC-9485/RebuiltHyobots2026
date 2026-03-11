@@ -203,7 +203,6 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
             }
 
             this.hoodSetpoint = setpoint;
-
             hoodController.setGoal(setpoint, 0.1);
 
             double output = hoodController.calculate(hoodMotor.getPosition());
@@ -228,7 +227,6 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
             this.hoodSetpoint = setpoint;
 
             hoodController.setGoal(setpoint, 0.1);
-
             double output = hoodController.calculate(hoodMotor.getPosition());
 
             hoodMotor.setSpeed(output);
@@ -250,11 +248,9 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
             }
 
             this.hoodSetpoint = setpoint;
-
             hoodController.setGoal(setpoint, 0.1);
 
             double output = hoodController.calculate(hoodMotor.getPosition());
-
             hoodMotor.setSpeed(output);
         }
     }
@@ -293,7 +289,6 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
 
         left_motor.updateInputs(leftMotorInputs);
         right_motor.updateInputs(rightMotorInputs);
-
         flyWheelController.setSetpoint(shooterSetpoint);
     }
 
@@ -301,7 +296,6 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
     public void periodic() {
         proccesInput();
         double shooterOutput = flyWheelController.calculate(-right_motor.getRate());
-
         if (shooterSetpoint == 0) {
             left_motor.setRPM(0);
             right_motor.setRPM(0);
@@ -309,6 +303,8 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
             left_motor.setRPM(shooterOutput);
             right_motor.setRPM(-shooterOutput);
         }
+
+        System.out.println("RPM: " + left_motor.getRate());
     }
 
     @Override
