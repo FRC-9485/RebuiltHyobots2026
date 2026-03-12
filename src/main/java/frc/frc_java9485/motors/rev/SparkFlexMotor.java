@@ -1,4 +1,4 @@
-package frc.frc_java9485.motors.spark;
+package frc.frc_java9485.motors.rev;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
@@ -30,8 +30,9 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import static frc.frc_java9485.constants.LoggerConstants.*;
-import frc.frc_java9485.motors.io.SparkIO;
-import frc.frc_java9485.motors.io.SparkInputsAutoLogged;
+
+import frc.frc_java9485.motors.rev.io.SparkIO;
+import frc.frc_java9485.motors.rev.io.SparkInputsAutoLogged;
 import frc.frc_java9485.utils.TunableControls.ControlConstants;
 
 public class SparkFlexMotor implements SparkIO {
@@ -40,6 +41,7 @@ public class SparkFlexMotor implements SparkIO {
 
   private double speed = 0;
   private double porcentage = 0;
+  private boolean inverted = false;
 
   private IdleMode currentIdleMode;
 
@@ -57,11 +59,15 @@ public class SparkFlexMotor implements SparkIO {
   @Override
   public void updateInputs(SparkInputsAutoLogged inputs) {
     inputs.id = motor.getDeviceId();
-    inputs.currentRPM = RPM.of(getRate());
+    inputs.speed = this.speed;
+    inputs.inverted = this.inverted;
+    inputs.currentRPM = RPM.of(getRPM());
     inputs.currentAmps = Amps.of(getCurrent());
     inputs.currentVoltage = Volts.of(getVoltage());
     inputs.currentPosition = Rotations.of(getPosition());
     inputs.currentTemperature = Celsius.of(getTemperature());
+    inputs.positionSetpoint = Rotations.of(getClosedLoopController().getMAXMotionSetpointPosition());
+    inputs.speedSetpoint = RPM.of(getClosedLoopController().getMAXMotionSetpointVelocity());
 
     Logger.processInputs(SPARK_FLEX_KEY + name, inputs);
   }
@@ -84,18 +90,18 @@ public class SparkFlexMotor implements SparkIO {
 
   @Override
   public double getPosition() {
-    return motor.getEncoder().getPosition();
+    return getEncoder().getPosition();
   }
 
   @Override
-  public double getRate() {
-    return motor.getEncoder().getVelocity();
+  public double getRPM() {
+    return getEncoder().getVelocity();
   }
 
   @Override
-  public void setSetpoint(double setpoint) {
-    if (setpoint != getRate()) {
-      motor.getClosedLoopController().setSetpoint(setpoint, ControlType.kVelocity);
+  public void setSetpoint(double setpoint, ControlType ctrl) {
+    if (setpoint != getRPM()) {
+      getClosedLoopController().setSetpoint(setpoint, ctrl);
     }
   }
 
@@ -153,8 +159,9 @@ public class SparkFlexMotor implements SparkIO {
   }
 
   @Override
-  public void setInvert(boolean invert) {
+  public void setInverted(boolean invert) {
       config.inverted(true);
+      this.inverted = invert;
   }
 
   @Override
@@ -214,13 +221,13 @@ public class SparkFlexMotor implements SparkIO {
   }
 
   @Override
-  public void setClosedLoopPID(double kP, double kI, double kD) {
-    config.closedLoop.pid(kP, kI, kD);
+  public void setClosedLoopFeedbackSensor(FeedbackSensor feedbackSensor) {
+    config.closedLoop.feedbackSensor(feedbackSensor);
   }
 
   @Override
-  public void setClosedLoopFeedbackSensor(FeedbackSensor feedbackSensor) {
-    config.closedLoop.feedbackSensor(feedbackSensor);
+  public void setClosedLoopPID(double kP, double kI, double kD) {
+    config.closedLoop.pid(kP, kI, kD);
   }
 
   @Override
@@ -240,16 +247,14 @@ public class SparkFlexMotor implements SparkIO {
       PIDController pid = constants.getPIDController();
       ElevatorFeedforward ff = constants.getElevatorFeedforward();
 
-      config.closedLoop.pid(pid.getP(), pid.getI(), pid.getD());
-      config.closedLoop.feedForward.kS(ff.getKs());
-      config.closedLoop.feedForward.kV(ff.getKv());
-      config.closedLoop.feedForward.kA(ff.getKa());
-      config.closedLoop.feedForward.kG(ff.getKg());
+      setClosedLoopPID(pid);
+      setClosedLoopFeedForward(ff.getKa(), ff.getKv());
+      setClosedLoopPhysical(ff.getKs(), ff.getKg());
   }
 
   @Override
   public void setClosedLoopPID(PIDController pid) {
-      config.closedLoop.pid(pid.getP(), pid.getI(), pid.getD());
+    setClosedLoopPID(pid.getP(), pid.getI(), pid.getD());
   }
 
   @Override
@@ -284,6 +289,6 @@ public class SparkFlexMotor implements SparkIO {
 
   @Override
   public void resetPositionByEncoder(double posisition) {
-      motor.getEncoder().setPosition(posisition);
+      getEncoder().setPosition(posisition);
   }
 }

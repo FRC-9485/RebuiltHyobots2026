@@ -7,12 +7,13 @@ import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.INVERT_LIMIT;
 import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.LIMIT_SENSOR_ID;
 import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.MAX_SPEED;
 
+import frc.frc_java9485.motors.ctre.VictorSPXMotor;
+import frc.frc_java9485.motors.ctre.io.CtreMotorInputsAutoLogged;
 import frc.frc_java9485.sensor.DigitalSensor;
 import frc.frc_java9485.sensor.SensorInputsAutoLogged;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.math.MathUtil;
@@ -22,6 +23,7 @@ public class ConveyorSubsystem extends SubsystemBase implements ConveyorIO{
     private static ConveyorSubsystem m_instance;
 
     private final VictorSPX conveyor;
+    private final VictorSPXMotor conveyor2;
 
     private final DigitalSensor homeSensor;
     private final DigitalSensor limitSensor;
@@ -30,6 +32,7 @@ public class ConveyorSubsystem extends SubsystemBase implements ConveyorIO{
     private final SensorInputsAutoLogged limitAutoLogged;
 
     private final ConveyorInputsAutoLogged conveyorInputs;
+    private final CtreMotorInputsAutoLogged motorInputs;
 
     public static ConveyorSubsystem getInstance() {
         if (m_instance == null) m_instance = new ConveyorSubsystem();
@@ -38,6 +41,7 @@ public class ConveyorSubsystem extends SubsystemBase implements ConveyorIO{
 
     private ConveyorSubsystem() {
         conveyor = new VictorSPX(CONVEYOR_MOTOR_ID);
+        conveyor2 = new VictorSPXMotor(CONVEYOR_MOTOR_ID, "conveyor");
 
         homeSensor = new DigitalSensor(HOME_SENSOR_ID, INVERT_HOME, "home sensor");
         limitSensor = new DigitalSensor(LIMIT_SENSOR_ID, INVERT_LIMIT, "limit sensor");
@@ -45,12 +49,14 @@ public class ConveyorSubsystem extends SubsystemBase implements ConveyorIO{
         homeAutoLogged = new SensorInputsAutoLogged();
         limitAutoLogged = new SensorInputsAutoLogged();
 
+        motorInputs = new CtreMotorInputsAutoLogged();
         conveyorInputs = new ConveyorInputsAutoLogged();
     }
 
     @Override
     public void periodic() {
         updateInputs(conveyorInputs);
+        conveyor2.updateInputs(motorInputs);
         Logger.processInputs("Mechanism/coveyor inputs", conveyorInputs);
 
         homeSensor.processInput(homeAutoLogged);
@@ -73,12 +79,14 @@ public class ConveyorSubsystem extends SubsystemBase implements ConveyorIO{
             return;
         }
 
-        conveyor.set(VictorSPXControlMode.PercentOutput, speed);
+        // conveyor.set(VictorSPXControlMode.PercentOutput, speed);
+        conveyor2.setSpeed(speed);
     }
 
     @Override
     public void stopConveyor() {
-        conveyor.set(VictorSPXControlMode.PercentOutput, 0);
+        // conveyor.set(VictorSPXControlMode.PercentOutput, 0);
+        conveyor2.stopMotor();
     }
 
     @Override

@@ -95,16 +95,6 @@ public class DriverJoystick implements DriverJoystickIO {
   }
 
   @Override
-  public Trigger emergencyInvert() {
-    return joystick.y();
-  }
-
-  @Override
-  public void invertManual(){
-    invert *= -1;
-  }
-
-  @Override
   public double getRightY() {
     if (isTurboMode()) {
       return MathUtil.applyDeadband(

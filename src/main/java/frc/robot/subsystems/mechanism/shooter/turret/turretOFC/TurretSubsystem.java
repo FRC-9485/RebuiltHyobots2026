@@ -16,6 +16,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -25,9 +26,9 @@ import static frc.frc_java9485.constants.FieldConsts.*;
 import static frc.frc_java9485.constants.mechanisms.TurretConsts.*;
 import static frc.frc_java9485.constants.mechanisms.HoodConsts.*;
 
-import frc.frc_java9485.motors.io.SparkInputsAutoLogged;
-import frc.frc_java9485.motors.spark.SparkFlexMotor;
-import frc.frc_java9485.motors.spark.SparkMaxMotor;
+import frc.frc_java9485.motors.rev.SparkFlexMotor;
+import frc.frc_java9485.motors.rev.SparkMaxMotor;
+import frc.frc_java9485.motors.rev.io.SparkInputsAutoLogged;
 import frc.frc_java9485.utils.TunableControls.TunablePIDController;
 import frc.frc_java9485.utils.TunableControls.TunableProfiledController;
 import frc.robot.subsystems.vision.LimelightHelpers;
@@ -40,7 +41,7 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
     private final SparkFlexMotor left_motor;
 
     private final SparkMaxMotor turn_turret;
-    private final SparkMaxMotor fuel_to_turret;
+    private final SparkMaxMotor indexer;
     private final SparkMaxMotor hoodMotor;
 
     private final TunableProfiledController manual_turret_controller;
@@ -70,9 +71,6 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
 
     private final TurretIOinputsAutoLogged turretInputs;
 
-    // private final SparkClosedLoopController rightController;
-    // private final SparkClosedLoopController leftController;
-
     @AutoLogOutput
     private Translation3d currentTarget = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                 ? HUB_BLUE
@@ -84,7 +82,7 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
         this.hoodMotor = new SparkMaxMotor(HOOD_MOTOR_ID, "hood motor");
 
         this.turn_turret = new SparkMaxMotor(TURN_TURRET, "turn turret");
-        this.fuel_to_turret = new SparkMaxMotor(FUEL_TO_TURRET, "catch fuel to turret");
+        this.indexer = new SparkMaxMotor(FUEL_TO_TURRET, "catch fuel to turret");
 
         this.hoodMotor.resetPositionByEncoder(MIN_POSITION);
         this.turn_turret.resetPositionByEncoder(0);
@@ -106,15 +104,14 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
 
         this.turretInputs = new TurretIOinputsAutoLogged();
 
-        // this.rightController = right_motor.getClosedLoopController();
-        // this.leftController = left_motor.getClosedLoopController();
-
         if (isSimulation()) {
             this.turnTurretSim = new SparkMaxSim(turn_turret.getSpark(), DCMotor.getNeo550(1));
 
             turnTurretSim.enable();
         }
         configureShooter();
+
+        SmartDashboard.putBoolean("isAutomatic", automatic);
     }
 
     @Override
@@ -125,7 +122,7 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
     @Override
     public void updateInputs(TurretIOinputsAutoLogged turretIOinputsAutoLogged) {
         turretIOinputsAutoLogged.automatic = automatic;
-        turretIOinputsAutoLogged.hoodSetpoint = hoodController.getGoal();
+        turretIOinputsAutoLogged.hoodSetpoint = hoodSetpoint;
         turretIOinputsAutoLogged.inbuxing = inbuxing();
         turretIOinputsAutoLogged.turretAtSetpoint = manual_turret_controller.atGoal();
         turretIOinputsAutoLogged.turretSetpoint = manual_turret_controller.getSetpoint().position;
@@ -138,36 +135,32 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
 
     @Override
     public boolean inbuxing(){
-        return fuel_to_turret.getCurrent() > 30;
+        return indexer.getCurrent() > 30;
     }
 
     @Override
     public void turnOnFuelToTurret(double speed) {
-        fuel_to_turret.setSpeed(speed);
+        indexer.setSpeed(speed);
     }
 
     private void configureShooter(){
         right_motor.setCurrentLimit(SHOOTER_CURRENT_LIMIT);
-        // right_motor.setClosedLoopFeedbackSensor(FeedbackSensor.kPrimaryEncoder);
-        // right_motor.setClosedLoopControlConstants(SHOOTER_CONTROL_CONSTANTS);
         right_motor.setIdleMode(IdleMode.kBrake);
-        right_motor.setInvert(false);
+        right_motor.setInverted(false);
         right_motor.burnFlash();
 
         left_motor.setCurrentLimit(SHOOTER_CURRENT_LIMIT);
         left_motor.setIdleMode(IdleMode.kBrake);
-        left_motor.setInvert(false);
-        // left_motor.setClosedLoopControlConstants(SHOOTER_CONTROL_CONSTANTS);
-        // left_motor.setClosedLoopFeedbackSensor(FeedbackSensor.kPrimaryEncoder);
+        left_motor.setInverted(false);
         left_motor.burnFlash();
 
         hoodMotor.setCurrentLimit(HOOD_CURRENT_LIMIT);
         hoodMotor.setIdleMode(IdleMode.kBrake);
         hoodMotor.burnFlash();
 
-        fuel_to_turret.setCurrentLimit(FUEL_TO_TURRET_CURRENT_LIMIT);
-        fuel_to_turret.setIdleMode(IdleMode.kCoast);
-        fuel_to_turret.burnFlash();
+        indexer.setCurrentLimit(FUEL_TO_TURRET_CURRENT_LIMIT);
+        indexer.setIdleMode(IdleMode.kCoast);
+        indexer.burnFlash();
     }
 
     private void putValues(){
@@ -217,7 +210,7 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
             double output = hoodController.calculate(hoodMotor.getPosition());
 
             if(tag.getAsBoolean()){
-                fuel_to_turret.setSpeed(-0.5);
+                indexer.setSpeed(-0.5);
             }
             hoodMotor.setSpeed(output);
             shooterSetpoint = -motor;
@@ -242,7 +235,7 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
             shooterSetpoint = -motor;
 
             if(flyWheelController.atSetpoint() && motor > 0){
-                fuel_to_turret.setSpeed(-0.4);
+                indexer.setSpeed(-0.4);
             }
         }
     }
@@ -281,10 +274,11 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
 
     @Override
     public void automatic(){
-        automatic = !automatic;
-        if(!automatic) {
-            hoodSetpoint = hoodMotor.getPosition();
-            turretSetpoint = turn_turret.getPosition();
+        hoodSetpoint = hoodMotor.getPosition();
+        turretSetpoint = turn_turret.getPosition();
+
+        if(hoodSetpoint == hoodMotor.getPosition() && turretSetpoint == turn_turret.getPosition()){
+            automatic = !automatic;
         }
     }
 
@@ -294,7 +288,7 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
 
         hoodMotor.updateInputs(hoodInputs);
         turn_turret.updateInputs(turnTurretInputs);
-        fuel_to_turret.updateInputs(fuelToTurretInputs);
+        indexer.updateInputs(fuelToTurretInputs);
 
         left_motor.updateInputs(leftMotorInputs);
         right_motor.updateInputs(rightMotorInputs);
@@ -305,9 +299,10 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
     public void periodic() {
         proccesInput();
         flyWheelController.setSetpoint(shooterSetpoint);
-        double shooterOutput = flyWheelController.calculate(-right_motor.getRate());
+        double shooterOutput = flyWheelController.calculate(-right_motor.getRPM());
 
-        System.out.println("RPM: " + left_motor.getRate());
+        System.out.println("RPM: " + left_motor.getRPM());
+        System.out.println("position: " + turn_turret.getPosition());
 
         if (shooterSetpoint == 0) {
             left_motor.setRPM(0);
@@ -333,20 +328,19 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
     public double regulateTa(){
         double valorA = LimelightHelpers.getTA("");
 
-        // if(valorA > 1){
-        //     return 0.5;
-        // } else if(valorA < 1.0 && valorA > 0.8){
-        //     return 0.52;
-        // } else if(valorA < 0.8 && valorA > 0.6){
-        //     return 0.54;
-        // } else if(valorA < 0.6 && valorA > 0.4){
-        //     return 0.56;
-        // } else if(valorA < 0.4 && valorA > 0.2){
-        //     return 0.58;
-        // } else {
-        //     return 0.61;
-        // }
-        return 2;
+        if(valorA > 1){
+            return 0.5;
+        } else if(valorA < 1.0 && valorA > 0.8){
+            return 0.52;
+        } else if(valorA < 0.8 && valorA > 0.6){
+            return 0.54;
+        } else if(valorA < 0.6 && valorA > 0.4){
+            return 0.56;
+        } else if(valorA < 0.4 && valorA > 0.2){
+            return 0.58;
+        } else {
+            return 0.61;
+        }
     }
 
     @Override
@@ -397,9 +391,9 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
                 turn_turret.setSpeed(turretOutput);
 
                 hoodMotor.setSpeed(hoodPID);
-                fuel_to_turret.setSpeed(-0.4 * shooterInput);
+                indexer.setSpeed(-0.4 * shooterInput);
 
-                shooterSetpoint = 6000 * -shooterInput * 0.8;
+                shooterSetpoint = 6000 * -shooterInput * 0.4;
 
                 if(acel.getAsBoolean()){
                     if(shooterInput < 0.6){
@@ -412,10 +406,11 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
                 }
 
                 if(spellFuels.getAsBoolean()){
-                    fuel_to_turret.setSpeed(0.6);
+                    indexer.setSpeed(0.6);
                 } else {
-                    fuel_to_turret.setSpeed(-0.6 * shooterInput);
+                    indexer.setSpeed(-0.6 * shooterInput);
                 }
+
             } else if(automatic){
                 turretSetpoint = 0.0;
                 automatic_turret_controller.setGoal(turretSetpoint);
@@ -423,7 +418,8 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
                 double outptut = automatic_turret_controller.calculate(LimelightHelpers.getTX(""));
                 Voltage volts = Volts.of(-outptut);
 
-                if(turn_turret.getPosition() >= MAX_TURN_POSITION && outptut > 0 || turn_turret.getPosition() <= MIN_TURN_POSITION && outptut < 0){
+                if(turn_turret.getPosition() >= MAX_TURN_POSITION && outptut < 0 ||
+                   turn_turret.getPosition() <= MIN_TURN_POSITION && outptut > 0){
                     turn_turret.setVoltage(0);
                 } else {
                     turn_turret.setVoltage(volts);
@@ -460,14 +456,11 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
                         shooterSetpoint = 6000 * ((-shoot * 0.4) * regulateTa());
                     }
                 } else {
-                    shooterSetpoint = 6000 * ((-shoot * 0.8));
+                    shooterSetpoint = 6000 * ((-shoot * 0.4));
                 }
 
                 flyWheelController.setSetpoint(shooterSetpoint);
-                double shooterOutput = flyWheelController.calculate(-right_motor.getRate());
-
-                System.out.println("RPM: " + left_motor.getRate());
-                System.out.println("setpoint: " + flyWheelController.getSetpoint());
+                double shooterOutput = flyWheelController.calculate(-right_motor.getRPM());
 
                 if (shooterSetpoint == 0) {
                     left_motor.setRPM(0);
@@ -478,16 +471,16 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
                 }
 
 
-                fuel_to_turret.setSpeed(-0.4 * shoot);
+                indexer.setSpeed(-0.4 * shoot);
 
                 if(spellFuels.getAsBoolean() || inbuxing()){
-                    fuel_to_turret.setSpeed(0.4);
+                    indexer.setSpeed(0.4);
                 } else {
-                    fuel_to_turret.setSpeed(-0.4 * shoot);
+                    indexer.setSpeed(-0.4 * shoot);
                 }
             } else {
                 turn_turret.setVoltage(0);
-                fuel_to_turret.setVoltage(0);
+                indexer.setVoltage(0);
                 left_motor.setVoltage(0);
                 right_motor.setVoltage(0);
             }
@@ -503,7 +496,6 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
     public void turnOfAllComponents(){
         turn_turret.setVoltage(0);
         hoodMotor.setVoltage(0);
-        // right_motor.setVoltage(0);
         right_motor.setRPM(0);
     }
 }

@@ -14,7 +14,6 @@ import frc.frc_java9485.constants.mechanisms.ConveyorConsts;
 import frc.robot.subsystems.mechanism.conveyor.ConveyorSubsystem;
 import frc.robot.subsystems.mechanism.index.IndexSubsystem;
 import frc.robot.subsystems.mechanism.intake.IntakeSubsystem;
-import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import swervelib.simulation.ironmaple.simulation.IntakeSimulation;
 import swervelib.simulation.ironmaple.simulation.IntakeSimulation.IntakeSide;
@@ -22,21 +21,16 @@ import swervelib.simulation.ironmaple.simulation.IntakeSimulation.IntakeSide;
 public class SuperStructure extends SubsystemBase{
   private final IntakeSubsystem intake;
   private final ConveyorSubsystem conveyor;
-  private final TurretSubsystem turret;
   private final IndexSubsystem index;
-  // // private final LedSubsystem ledSubsystem;
-  // private final TurretSimTeste turretSim;
 
   private Actions currentAction = Actions.SECURITY;
 
   private IntakeSimulation intakeSimulation;
 
-  public SuperStructure(TurretSubsystem turret) {
+  public SuperStructure() {
     intake = IntakeSubsystem.getInstance();
     conveyor = ConveyorSubsystem.getInstance();
     index = IndexSubsystem.getInstance();
-    // // ledSubsystem = LedSubsystem.getInstance();
-    this.turret = turret;
 
     if (isSimulation()) {
       intakeSimulation = IntakeSimulation.InTheFrameIntake("Fuel",
@@ -50,27 +44,12 @@ public class SuperStructure extends SubsystemBase{
   @Override
   public void periodic() {
     executeAction(getAction());
-    // setLedActions(getAction());
   }
-
-  // private void setLedActions(Actions action){
-  //   switch (action) {
-  //     case SHOOT_FUEL:
-          // ledSubsystem.setSolidColor(Color.kRed);
-  //       break;
-
-  //     case LOCK_TURRET:
-          // ledSubsystem.setSolidColor(Color.kGreen);
-  //       break;
-
-  //     default:
-  //       break;
-  //   }
-  // }
 
   public enum Actions {
     SHOOT_FUEL,
     OPEN_INTAKE,
+    SEMI_INTAKE,
     CATCH_FUEL,
     CLOSE_INTAKE,
     STOP_CATCH,
@@ -91,6 +70,11 @@ public class SuperStructure extends SubsystemBase{
       switch (actions) {
         case SHOOT_FUEL:
             index.turnOn();
+            break;
+
+        case SEMI_INTAKE:
+            intake.enablePivot(SETPOINT_MIDDLE);
+            intake.catchFuel(0.5);
             break;
 
         case OPEN_INTAKE:
@@ -147,6 +131,10 @@ public class SuperStructure extends SubsystemBase{
 
         case STOP_CATCH:
             currentAction = Actions.STOP_CATCH;
+          break;
+
+        case SEMI_INTAKE:
+            currentAction = Actions.SEMI_INTAKE;
           break;
 
         case OPEN_INTAKE:

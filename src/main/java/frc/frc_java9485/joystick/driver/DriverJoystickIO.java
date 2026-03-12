@@ -15,10 +15,6 @@ public interface DriverJoystickIO {
 
   boolean isLowMode();
 
-  void invertManual();
-
-  Trigger emergencyInvert();
-
   double getPerfomanceByAlliance(double speed);
 
   Trigger a();

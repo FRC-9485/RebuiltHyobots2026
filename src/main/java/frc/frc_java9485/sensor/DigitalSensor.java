@@ -27,8 +27,8 @@ public class DigitalSensor implements SensorIO{
     @Override
     public void processInput(SensorInputsAutoLogged sensorInputs) {
         sensorInputsAutoLogged.detected = isDetected();
-        sensorInputsAutoLogged.inverted = inverted;     
-        
+        sensorInputsAutoLogged.inverted = inverted;
+
         Logger.processInputs(DIGITAL_SENSOR_KEY + identification, sensorInputs);
     }
 

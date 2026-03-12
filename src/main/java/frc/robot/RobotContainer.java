@@ -30,8 +30,7 @@ public class RobotContainer {
   private final SwerveSubsystem swerveSubsystem;
   private final ConveyorSubsystem conveyor;
 
-  private SuperStructure superStructure;
-  // private SuperStructureSim superStructureSim;
+  private final SuperStructure superStructure;
 
   private final DriverJoystick driverJoystick;
   private final MechanismJoystick mechanismJoystick;
@@ -47,7 +46,7 @@ public class RobotContainer {
     turret = new TurretSubsystem();
     index = IndexSubsystem.getInstance();
     conveyor = ConveyorSubsystem.getInstance();
-    superStructure = new SuperStructure(turret);
+    superStructure = new SuperStructure();
 
     driverJoystick = DriverJoystick.getInstance();
     mechanismJoystick = MechanismJoystick.getInstance();
@@ -67,17 +66,18 @@ public class RobotContainer {
       () -> mechanismJoystick.getRightY(),
       () -> mechanismJoystick.getRightTrigger(),
       () -> mechanismJoystick.getRightBumper(),
-      () -> mechanismJoystick.y().getAsBoolean()));
+      () -> mechanismJoystick.y().getAsBoolean()
+    ));
 
     index.setDefaultCommand(index.turnOnCommand(
       () -> mechanismJoystick.getRightTrigger()
     ));
 
     if (isSimulation()) {
-      // superStructureSim = new SuperStructureSim();
       configureSimBindings();
     } else {
-      configureBindings();
+      configureMechanismBindings();
+      configureDriveBindings();
     }
     configureAutonomousCommands();
   }
@@ -90,16 +90,17 @@ public class RobotContainer {
     }
   }
 
-  private void configureBindings() {
+  private void configureDriveBindings(){
     //drive
     driverJoystick.getLeftBack().onTrue(new ResetPigeon());
-    driverJoystick.emergencyInvert().onTrue(Commands.run(() -> driverJoystick.invertManual()));
+  }
 
+  private void configureMechanismBindings() {
     //mecanismos
     mechanismJoystick.leftBumper().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.OPEN_INTAKE), superStructure));
 
     mechanismJoystick.getUpPOV().whileTrue(
-      Commands.run(() -> turret.turnToMapSetpoint(0), turret) // angulo torreta
+      Commands.run(() -> turret.turnToMapSetpoint(0), turret)
       .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(MIN_POSITION, 2420, () -> mechanismJoystick.getRightTrigger() > 0)))
     );
 
@@ -127,13 +128,14 @@ public class RobotContainer {
 
     mechanismJoystick.b().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.CLOSE_CONVEYOR), superStructure))
     .onFalse(Commands.runOnce(() -> superStructure.alternActions(Actions.LOCK_CONVEYOR), superStructure));
+
+    //remapear controle
+    mechanismJoystick.backRight().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.SEMI_INTAKE), superStructure));
   }
 
   private void configureSimBindings() {
+    //drive
     driverJoystick.getLeftBack().onTrue(new ResetSimGyro());
-
-    // driverJoystick.a().whileTrue(superStructureSim.setSimAction(SimAction.CATCH_FUEL));
-    // driverJoystick.a().whileTrue(superStructureSim.setSimAction(SimAction.CLOSE_INTAKE));
   }
 
   public Command getAutonomousCommand() {

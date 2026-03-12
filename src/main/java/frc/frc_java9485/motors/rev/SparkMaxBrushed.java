@@ -1,4 +1,4 @@
-package frc.frc_java9485.motors.spark;
+package frc.frc_java9485.motors.rev;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
@@ -16,10 +16,9 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -30,40 +29,45 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import static frc.frc_java9485.constants.LoggerConstants.*;
-import frc.frc_java9485.motors.io.SparkIO;
-import frc.frc_java9485.motors.io.SparkInputsAutoLogged;
+
+import frc.frc_java9485.motors.rev.io.SparkIO;
+import frc.frc_java9485.motors.rev.io.SparkInputsAutoLogged;
 import frc.frc_java9485.utils.TunableControls.ControlConstants;
 
-public class SparkMaxMotor implements SparkIO{
+public class SparkMaxBrushed implements SparkIO{
   private final SparkMax motor;
   private final SparkMaxConfig config;
 
   private double speed = 0;
   private double porcentage = 0;
+  private boolean inverted = false;
   private IdleMode currentIdleMode;
 
   private final String name;
 
-  public SparkMaxMotor(int id, String name) {
-    this.motor = new SparkMax(id, MotorType.kBrushless);
+  public SparkMaxBrushed(int id, String name) {
+    this.motor = new SparkMax(id, SparkMax.MotorType.kBrushed);
     this.config = new SparkMaxConfig();
 
     this.name = name;
 
     cleanStickFaults();
-    motor.getDeviceId();
   }
 
   @Override
   public void updateInputs(SparkInputsAutoLogged inputs) {
     inputs.id = motor.getDeviceId();
-    inputs.currentRPM = RPM.of(getRate());
+    inputs.speed = this.speed;
+    inputs.inverted = this.inverted;
+    inputs.currentRPM = RPM.of(getRPM());
     inputs.currentAmps = Amps.of(getCurrent());
     inputs.currentVoltage = Volts.of(getVoltage());
     inputs.currentPosition = Rotations.of(getPosition());
     inputs.currentTemperature = Celsius.of(getTemperature());
+    inputs.positionSetpoint = Rotations.of(getClosedLoopController().getMAXMotionSetpointPosition());
+    inputs.speedSetpoint = RPM.of(getClosedLoopController().getMAXMotionSetpointVelocity());
 
-    Logger.processInputs(SPARK_MAX_BRUSHLESS_KEY + name, inputs);
+    Logger.processInputs(SPARK_MAX_BRUSHED_KEY + name, inputs);
   }
 
   @Override
@@ -84,18 +88,18 @@ public class SparkMaxMotor implements SparkIO{
 
   @Override
   public double getPosition() {
-    return motor.getEncoder().getPosition();
+    return getEncoder().getPosition();
   }
 
   @Override
-  public double getRate() {
-    return motor.getEncoder().getVelocity();
+  public double getRPM() {
+    return getEncoder().getVelocity();
   }
 
   @Override
-  public void setSetpoint(double setpoint) {
+  public void setSetpoint(double setpoint, ControlType ctrl) {
     if (setpoint != getPosition()) {
-      motor.getClosedLoopController().setSetpoint(setpoint, ControlType.kPosition);
+      motor.getClosedLoopController().setSetpoint(setpoint, ctrl);
     }
   }
 
@@ -145,23 +149,19 @@ public class SparkMaxMotor implements SparkIO{
   }
 
   @Override
-  public double getCurrent(){
-    return motor.getOutputCurrent();
+  public double getCurrent() {
+      return motor.getOutputCurrent();
   }
 
   @Override
-  public void setInvert(boolean invert) {
+  public void setInverted(boolean invert) {
       config.inverted(true);
+      this.inverted = invert;
   }
 
-  @Override
+   @Override
   public IdleMode getIdleMode() {
       return currentIdleMode;
-  }
-
-  @Override
-  public void resetPositionByEncoder(double posisition) {
-      motor.getEncoder().setPosition(posisition);
   }
 
   private void configureSparkMax(Supplier<REVLibError> config) {
@@ -175,14 +175,15 @@ public class SparkMaxMotor implements SparkIO{
   }
 
   @Override
+  public void cleanStickFaults() {
+      configureSparkMax(motor::clearFaults);
+  }
+
+  @Override
   public void setCurrentLimit(int current) {
       config.smartCurrentLimit(current);
   }
 
-  @Override
-  public void cleanStickFaults() {
-      configureSparkMax(motor::clearFaults);
-  }
 
   @Override
   public void setForwardSoftLimit(double limit) {
@@ -215,19 +216,13 @@ public class SparkMaxMotor implements SparkIO{
   }
 
   @Override
-  public void setClosedLoopPID(double kP, double kI, double kD) {
-    config.closedLoop.pid(kP, kI, kD);
-  }
-
-  @Override
   public void setClosedLoopFeedbackSensor(FeedbackSensor feedbackSensor) {
     config.closedLoop.feedbackSensor(feedbackSensor);
   }
 
   @Override
-  public void setClosedLoopFeedForward(double kA, double kV) {
-    config.closedLoop.feedForward.kA(kA);
-    config.closedLoop.feedForward.kV(kV);
+  public void setClosedLoopPID(double kP, double kI, double kD) {
+    config.closedLoop.pid(kP, kI, kD);
   }
 
   @Override
@@ -237,15 +232,21 @@ public class SparkMaxMotor implements SparkIO{
   }
 
   @Override
-  public void setClosedLoopControlConstants(ControlConstants constants) {
-    PIDController pid = constants.getPIDController();
-    ElevatorFeedforward ff = constants.getElevatorFeedforward();
+  public void setClosedLoopFeedForward(double kA, double kV) {
+    config.closedLoop.feedForward.kA(kA);
+    config.closedLoop.feedForward.kV(kV);
+  }
 
-    config.closedLoop.pid(pid.getP(), pid.getI(), pid.getD());
-    config.closedLoop.feedForward.kA(ff.getKa());
-    config.closedLoop.feedForward.kV(ff.getKv());
-    config.closedLoop.feedForward.kS(ff.getKs());
-    config.closedLoop.feedForward.kG(ff.getKg());
+  @Override
+  public void setClosedLoopControlConstants(ControlConstants constants) {
+      PIDController pid = constants.getPIDController();
+      ElevatorFeedforward ff = constants.getElevatorFeedforward();
+
+      config.closedLoop.pid(pid.getP(), pid.getI(), pid.getD());
+      config.closedLoop.feedForward.kS(ff.getKs());
+      config.closedLoop.feedForward.kV(ff.getKv());
+      config.closedLoop.feedForward.kA(ff.getKa());
+      config.closedLoop.feedForward.kG(ff.getKg());
   }
 
   @Override
@@ -283,5 +284,10 @@ public class SparkMaxMotor implements SparkIO{
     configureSparkMax(() -> {
       return motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     });
+  }
+
+  @Override
+  public void resetPositionByEncoder(double posisition) {
+      getEncoder().setPosition(posisition);
   }
 }

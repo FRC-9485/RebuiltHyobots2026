@@ -1,4 +1,4 @@
-package frc.frc_java9485.motors.io;
+package frc.frc_java9485.motors.rev.io;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
@@ -11,6 +11,7 @@ import org.littletonrobotics.junction.AutoLog;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -22,42 +23,48 @@ import edu.wpi.first.units.measure.Voltage;
 import frc.frc_java9485.utils.TunableControls.ControlConstants;
 
 public interface SparkIO {
-
     @AutoLog
     public static class SparkInputs{
         public int id = 0;
+        public boolean inverted = false;
+        public double speed = 0.0;
         public Voltage currentVoltage = Volts.of(0);
         public Angle currentPosition = Rotations.of(0);
         public Current currentAmps = Amps.of(0);
         public AngularVelocity currentRPM = RPM.of(0);
         public Temperature currentTemperature = Celsius.of(0);
+        public Angle positionSetpoint = Rotations.of(0);
+        public AngularVelocity speedSetpoint = RPM.of(0);
     }
 
     final int maximumRetries = 5;
 
     public void setSpeed(double speeds);
+    public void setSetpoint(double setpoint, ControlType ctrl);
     public void setPorcentage(double porcentage);
-    public void setSetpoint(double setpoint);
-    public void setRampRate(double ramp);
-    public void setIdleMode(IdleMode idleMode);
+
     public void followMotor(int id);
     public void setVoltage(double voltage);
     public void setVoltage(Voltage voltage);
-    public void setInvert(boolean invert);
     public void cleanStickFaults();
-    public void setCurrentLimit(int current);
     public void resetPositionByEncoder(double posisition);
 
-    public double getPosition();
-    public double getRate();
+    public double getRPM();
     public double getVoltage();
-    public double getTemperature();
     public double getCurrent();
+    public double getPosition();
+    public double getTemperature();
 
     public IdleMode getIdleMode();
     public RelativeEncoder getEncoder();
 
     public void updateInputs(SparkInputsAutoLogged inputs);
+
+    public void setInverted(boolean invert);
+    public void setIdleMode(IdleMode idleMode);
+
+    public void setRampRate(double ramp);
+    public void setCurrentLimit(int current);
 
     public void setForwardSoftLimit(double limit);
     public void setReverseSoftLimit(double limit);

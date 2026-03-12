@@ -3,13 +3,12 @@ package frc.robot.subsystems.mechanism.intake;
 import static edu.wpi.first.units.Units.Volts;
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.frc_java9485.constants.mechanisms.IntakeConsts.*;
 
-import frc.frc_java9485.motors.io.SparkInputsAutoLogged;
-import frc.frc_java9485.motors.spark.SparkMaxMotor;
+import frc.frc_java9485.motors.rev.SparkMaxMotor;
+import frc.frc_java9485.motors.rev.io.SparkInputsAutoLogged;
 import frc.frc_java9485.utils.TunableControls.TunableProfiledController;
 
 public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
@@ -81,7 +80,7 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeIO {
 
   @Override
   public double getCatchFuelSpeed() {
-    return catchBall.getRate();
+    return catchBall.getRPM();
   }
 
   @Override

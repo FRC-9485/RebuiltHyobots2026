@@ -113,7 +113,7 @@ public class TurretConsts {
   public static final int TURN_TURRET_CURRENT_LIMIT = 20;
   public static final int FUEL_TO_TURRET_CURRENT_LIMIT = 30;
 
-  public static final double MAX_TURN_POSITION = 15;
+  public static final double MAX_TURN_POSITION = 17.78;
   public static final double MIN_TURN_POSITION = -19.69;
 
   public static final TunableControlConstants TURRET_TUNABLE = new TunableControlConstants("shooter tunableConstants", TURRET_MANUAL_CONSTANTS);

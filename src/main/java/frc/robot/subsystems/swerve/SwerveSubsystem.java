@@ -42,7 +42,7 @@ import static frc.frc_java9485.constants.FieldConsts.ALLIANCE_ZONE;
 import static frc.frc_java9485.constants.FieldConsts.FIELD_LENGTH;
 
 import frc.frc_java9485.constants.RobotConsts.RobotModes;
-import frc.frc_java9485.motors.io.SparkOdometryThread;
+import frc.frc_java9485.motors.rev.io.SparkOdometryThread;
 import frc.frc_java9485.utils.MathUtils;
 import frc.robot.subsystems.swerve.IO.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.swerve.IO.PigeonIO;

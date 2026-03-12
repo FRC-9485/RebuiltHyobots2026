@@ -19,11 +19,11 @@ public class AutoChooser {
 
   public AutoChooser(String chooserName, String defaultOption) {
     if (chooserName == null) {
-      throw new IllegalArgumentException("O nome nao pode ser nulo");
+      throw new IllegalArgumentException("The name cannot be null");
     }
 
     if (defaultOption == null) {
-      throw new IllegalArgumentException("A opcao padrao nao pode ser nula");
+      throw new IllegalArgumentException("The default option cannot be null");
     }
 
     deployDirectory = Paths.get(Filesystem.getDeployDirectory().getPath());

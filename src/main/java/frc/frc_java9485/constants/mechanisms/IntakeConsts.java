@@ -11,6 +11,7 @@ public class IntakeConsts {
     public static final int ENCODER_CHANNEL = 9;
 
     public static final double SETPOINT_UP = 250.00;
+    public static final double SETPOINT_MIDDLE = 200;
     public static final double SETPOINT_DOWN = 16;
 
     public static final double STOPPED_FUEL_SPEED = 0;

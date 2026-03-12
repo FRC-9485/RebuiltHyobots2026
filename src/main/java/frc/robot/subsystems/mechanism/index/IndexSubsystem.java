@@ -9,8 +9,8 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.frc_java9485.motors.io.SparkInputsAutoLogged;
-import frc.frc_java9485.motors.spark.SparkMaxMotor;
+import frc.frc_java9485.motors.rev.SparkMaxMotor;
+import frc.frc_java9485.motors.rev.io.SparkInputsAutoLogged;
 
 public class IndexSubsystem extends SubsystemBase implements IndexIO{
 
@@ -42,7 +42,7 @@ public class IndexSubsystem extends SubsystemBase implements IndexIO{
     @Override
     public void updateInputs(IndexInputs indexInputs) {
         indexInputs.current = index.getCurrent();
-        indexInputs.indexSpeed = index.getRate();
+        indexInputs.indexSpeed = index.getRPM();
         indexInputs.isCollecting = isCollecting();
         indexInputs.voltage = Volts.of(index.getVoltage());
     }
@@ -78,7 +78,7 @@ public class IndexSubsystem extends SubsystemBase implements IndexIO{
 
     @Override
     public boolean isCollecting(){
-        return Math.abs(index.getRate()) > 0.01;
+        return Math.abs(index.getRPM()) > 0.01;
     }
 
     @Override
