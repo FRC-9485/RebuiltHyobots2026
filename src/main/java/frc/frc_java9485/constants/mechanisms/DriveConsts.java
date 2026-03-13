@@ -1,7 +1,5 @@
 package frc.frc_java9485.constants.mechanisms;
 
-
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -48,7 +46,6 @@ public final class DriveConsts {
 
   public static LoggedPathPlannerPIDConstants SIM_ROTATION_PID =
     new LoggedPathPlannerPIDConstants("PathPlanner/Tuning/SIM Rotation", SIM_ROTATION_kP, SIM_ROTATION_kI, SIM_ROTATION_kD);
-
 
   public static final int ODOMETRY_FREQUENCY = 100; //HZ
 

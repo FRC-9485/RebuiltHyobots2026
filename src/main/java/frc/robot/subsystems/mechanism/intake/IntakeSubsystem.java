@@ -5,7 +5,9 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.frc_java9485.constants.mechanisms.IntakeConsts.*;
+import static frc.frc_java9485.constants.mechanisms.IntakeConsts.Motors.*;
+import static frc.frc_java9485.constants.mechanisms.IntakeConsts.Encoder.*;
+import static frc.frc_java9485.constants.mechanisms.IntakeConsts.PID.*;
 
 import frc.frc_java9485.motors.rev.SparkMaxMotor;
 import frc.frc_java9485.motors.rev.io.SparkInputsAutoLogged;

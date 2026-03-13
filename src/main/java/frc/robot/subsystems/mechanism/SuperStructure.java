@@ -5,12 +5,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static edu.wpi.first.units.Units.Meters;
 import static frc.frc_java9485.constants.RobotConsts.*;
-import static frc.frc_java9485.constants.mechanisms.IntakeConsts.*;
+import static frc.frc_java9485.constants.mechanisms.IntakeConsts.Setpoint.*;
 
 import org.littletonrobotics.junction.Logger;
 
 import frc.frc_java9485.constants.mechanisms.ConveyorConsts;
-// import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.mechanism.conveyor.ConveyorSubsystem;
 import frc.robot.subsystems.mechanism.index.IndexSubsystem;
 import frc.robot.subsystems.mechanism.intake.IntakeSubsystem;

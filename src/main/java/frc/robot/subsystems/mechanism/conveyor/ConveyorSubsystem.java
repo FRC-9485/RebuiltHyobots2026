@@ -1,16 +1,12 @@
 package frc.robot.subsystems.mechanism.conveyor;
 
-import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.CONVEYOR_MOTOR_ID;
-import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.HOME_SENSOR_ID;
-import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.INVERT_HOME;
-import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.INVERT_LIMIT;
-import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.LIMIT_SENSOR_ID;
-import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.MAX_SPEED;
-
 import frc.frc_java9485.motors.ctre.VictorSPXMotor;
 import frc.frc_java9485.motors.ctre.io.CtreMotorInputsAutoLogged;
 import frc.frc_java9485.sensor.DigitalSensor;
 import frc.frc_java9485.sensor.SensorInputsAutoLogged;
+
+import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.Motor.*;
+import static frc.frc_java9485.constants.mechanisms.ConveyorConsts.Sensors.*;
 
 import org.littletonrobotics.junction.Logger;
 

@@ -38,8 +38,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.frc_java9485.constants.ComponentsConsts.*;
-import static frc.frc_java9485.constants.FieldConsts.ALLIANCE_ZONE;
-import static frc.frc_java9485.constants.FieldConsts.FIELD_LENGTH;
+import static frc.frc_java9485.constants.FieldConsts.FieldMeansureds.*;
 
 import frc.frc_java9485.constants.RobotConsts.RobotModes;
 import frc.frc_java9485.motors.rev.io.SparkOdometryThread;

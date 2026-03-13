@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.frc_java9485.autonomous.AutoChooser;
 import frc.frc_java9485.constants.mechanisms.DriveConsts;
-import frc.frc_java9485.constants.mechanisms.TurretConsts;
 import frc.frc_java9485.joystick.driver.DriverJoystick;
 import frc.frc_java9485.joystick.mechanism.MechanismJoystick;
 import frc.frc_java9485.utils.RegisterNamedCommands;
@@ -20,8 +19,8 @@ import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 import static frc.frc_java9485.constants.RobotConsts.*;
-import static frc.frc_java9485.constants.mechanisms.HoodConsts.MAX_POSITION;
-import static frc.frc_java9485.constants.mechanisms.HoodConsts.MIN_POSITION;
+import static frc.frc_java9485.constants.mechanisms.HoodConsts.Setpoint.*;
+import static frc.frc_java9485.constants.mechanisms.TurretConsts.Setpoint.*;
 
 public class RobotContainer {
   private final IndexSubsystem index;
@@ -114,7 +113,7 @@ public class RobotContainer {
     );
 
     mechanismJoystick.getLeftPOV().whileTrue(
-      Commands.run(() -> turret.turnToMapSetpoint(TurretConsts.MAX_TURN_POSITION), turret)
+      Commands.run(() -> turret.turnToMapSetpoint(MAX_TURN_POSITION), turret)
       .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(MAX_POSITION, 3000, () -> mechanismJoystick.getRightTrigger() > 0)))
     );
 

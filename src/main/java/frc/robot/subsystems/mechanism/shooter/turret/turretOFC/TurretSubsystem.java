@@ -22,9 +22,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static edu.wpi.first.units.Units.Volts;
 
-import static frc.frc_java9485.constants.FieldConsts.*;
-import static frc.frc_java9485.constants.mechanisms.TurretConsts.*;
-import static frc.frc_java9485.constants.mechanisms.HoodConsts.*;
+import static frc.frc_java9485.constants.FieldConsts.HubMeansured.*;
+import static frc.frc_java9485.constants.mechanisms.TurretConsts.Motors.*;
+import static frc.frc_java9485.constants.mechanisms.TurretConsts.PID.*;
+import static frc.frc_java9485.constants.mechanisms.TurretConsts.Setpoint.*;
+import static frc.frc_java9485.constants.mechanisms.HoodConsts.Motor.*;
+import static frc.frc_java9485.constants.mechanisms.HoodConsts.Setpoint.*;
+import static frc.frc_java9485.constants.mechanisms.HoodConsts.PID.*;
 
 import frc.frc_java9485.motors.rev.SparkFlexMotor;
 import frc.frc_java9485.motors.rev.SparkMaxMotor;
@@ -53,6 +57,7 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
     private TurretGoal goal = TurretGoal.MANUAL;
 
     private final InterpolatingDoubleTreeMap map;
+    private final InterpolatingDoubleTreeMap rpm_map;
 
     private SparkMaxSim turnTurretSim;
 
@@ -64,7 +69,7 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
 
     private final SparkInputsAutoLogged hoodInputs;
     private final SparkInputsAutoLogged turnTurretInputs;
-    private final SparkInputsAutoLogged fuelToTurretInputs;
+    private final SparkInputsAutoLogged indexerInputs;
 
     private final SparkInputsAutoLogged leftMotorInputs;
     private final SparkInputsAutoLogged rightMotorInputs;
@@ -82,7 +87,7 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
         this.hoodMotor = new SparkMaxMotor(HOOD_MOTOR_ID, "hood motor");
 
         this.turn_turret = new SparkMaxMotor(TURN_TURRET, "turn turret");
-        this.indexer = new SparkMaxMotor(FUEL_TO_TURRET, "catch fuel to turret");
+        this.indexer = new SparkMaxMotor(INDEXER, "catch fuel to turret");
 
         this.hoodMotor.resetPositionByEncoder(MIN_POSITION);
         this.turn_turret.resetPositionByEncoder(0);
@@ -95,9 +100,12 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
         this.map = new InterpolatingDoubleTreeMap();
         this.putValues();
 
+        this.rpm_map = new InterpolatingDoubleTreeMap();
+        this.putRPMValues();
+
         this.hoodInputs = new SparkInputsAutoLogged();
         this.turnTurretInputs = new SparkInputsAutoLogged();
-        this.fuelToTurretInputs = new SparkInputsAutoLogged();
+        this.indexerInputs = new SparkInputsAutoLogged();
 
         this.leftMotorInputs = new SparkInputsAutoLogged();
         this.rightMotorInputs = new SparkInputsAutoLogged();
@@ -158,7 +166,7 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
         hoodMotor.setIdleMode(IdleMode.kBrake);
         hoodMotor.burnFlash();
 
-        indexer.setCurrentLimit(FUEL_TO_TURRET_CURRENT_LIMIT);
+        indexer.setCurrentLimit(INDEXER_CURRENT_LIMIT);
         indexer.setIdleMode(IdleMode.kCoast);
         indexer.burnFlash();
     }
@@ -167,6 +175,13 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
         map.put(7.276, MAX_TURN_POSITION); // esquerda
         map.put(0.871, MIN_TURN_POSITION); // direita
         map.put(3.990, 0.0); //central
+    }
+
+    private void putRPMValues(){
+        rpm_map.put(0.5, 3000.0);
+        rpm_map.put(1.0, 2500.0);
+        rpm_map.put(2.0, 2000.0);
+        rpm_map.put(2.5, 1500.0);
     }
 
     @Override
@@ -288,7 +303,7 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
 
         hoodMotor.updateInputs(hoodInputs);
         turn_turret.updateInputs(turnTurretInputs);
-        indexer.updateInputs(fuelToTurretInputs);
+        indexer.updateInputs(indexerInputs);
 
         left_motor.updateInputs(leftMotorInputs);
         right_motor.updateInputs(rightMotorInputs);
@@ -298,6 +313,7 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
     @Override
     public void periodic() {
         proccesInput();
+        
         flyWheelController.setSetpoint(shooterSetpoint);
         double shooterOutput = flyWheelController.calculate(-right_motor.getRPM());
 

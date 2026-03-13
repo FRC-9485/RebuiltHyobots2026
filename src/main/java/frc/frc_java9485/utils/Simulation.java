@@ -10,7 +10,8 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.frc_java9485.constants.FieldConsts;
+import static frc.frc_java9485.constants.FieldConsts.FieldMeansureds.*;
+import static frc.frc_java9485.constants.FieldConsts.SimulationPoses.*;
 
 public class Simulation {
   private static Simulation m_instance;
@@ -81,17 +82,17 @@ public class Simulation {
 
   private Translation2d flipFuelToRed(Translation2d translation) {
     translation = AllianceFlip.flipTranslation2dToRed(translation);
-    return new Translation2d(translation.getX(), (FieldConsts.FIELD_WIDTH_METERS - 0.122) - translation.getY());
+    return new Translation2d(translation.getX(), (FIELD_WIDTH_METERS - 0.122) - translation.getY());
   }
 
   private void generateMiddleFuels() {
     Translation2d centerLine =
         new Translation2d(
-            FieldConsts.FIELD_CENTER_POSE.getX(), FieldConsts.FIELD_CENTER_POSE.getY());
+            FIELD_CENTER_POSE.getX(), FIELD_CENTER_POSE.getY());
 
     Translation2d startTopLeft =
         new Translation2d(
-            (centerLine.getX() - 0.7935), (FieldConsts.FIELD_WIDTH_METERS / 2) + 0.0375);
+            (centerLine.getX() - 0.7935), (FIELD_WIDTH_METERS / 2) + 0.0375);
 
     int rows = 15;
     int columns = 12;
@@ -102,12 +103,12 @@ public class Simulation {
           Translation2d position =
               i == 1
                   ? new Translation2d(
-                      startTopLeft.getX() + (x * FieldConsts.FUEL_SPACING),
-                      startTopLeft.getY() + (y * FieldConsts.FUEL_SPACING))
+                      startTopLeft.getX() + (x * FUEL_SPACING),
+                      startTopLeft.getY() + (y * FUEL_SPACING))
                   : new Translation2d(
                       startTopLeft.getX()
-                          + ((x * FieldConsts.FUEL_SPACING) - FieldConsts.FUEL_SPACING / 2),
-                      startTopLeft.getY() + (y * FieldConsts.FUEL_SPACING));
+                          + ((x * FUEL_SPACING) - FUEL_SPACING / 2),
+                      startTopLeft.getY() + (y * FUEL_SPACING));
 
           arena.addGamePiece(new RebuiltFuelOnField(i == 1 ? position : flipFuelToRed(position)));
         }

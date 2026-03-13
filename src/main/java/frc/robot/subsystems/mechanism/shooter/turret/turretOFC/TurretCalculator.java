@@ -8,11 +8,12 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
-import static frc.frc_java9485.constants.mechanisms.TurretConsts.*;
+import static frc.frc_java9485.constants.mechanisms.TurretConsts.Configs.*;
+import static frc.frc_java9485.constants.mechanisms.TurretConsts.Setpoint.*;
 
 import org.littletonrobotics.junction.Logger;
 
-import static frc.frc_java9485.constants.FieldConsts.*;
+import static frc.frc_java9485.constants.FieldConsts.HubMeansured.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;

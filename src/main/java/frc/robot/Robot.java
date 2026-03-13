@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.net.WebServer;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -8,7 +9,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.frc_java9485.constants.FieldConsts;
+import static frc.frc_java9485.constants.FieldConsts.FieldMeansureds.*;
+import static frc.frc_java9485.constants.FieldConsts.HubMeansured.*;
+import static frc.frc_java9485.constants.FieldConsts.SimulationPoses.*;
 import frc.frc_java9485.constants.RobotConsts;
 import frc.frc_java9485.utils.Elastic;
 import frc.frc_java9485.utils.HubTracker;
@@ -16,6 +19,11 @@ import frc.frc_java9485.utils.Elastic.Notification;
 import frc.frc_java9485.utils.Elastic.Notification.NotificationLevel;
 import frc.frc_java9485.utils.Simulation;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+
+import static edu.wpi.first.units.Units.Seconds;
+
+import java.util.Optional;
+
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
@@ -31,12 +39,11 @@ public class Robot extends LoggedRobot {
   private final Timer timer;
   private final PowerDistribution powerDistribution;
 
+  private final Optional<Time> shiftTime = HubTracker.timeRemainingInCurrentShift();
+
   private Simulation simulator;
   private final SwerveSubsystem swerve;
   private final RobotContainer m_robotContainer;
-
-  // AddressableLED m_led;
-  // AddressableLEDBuffer m_ledBuffer;
 
   public Robot() {
     switch (RobotConsts.CURRENT_ROBOT_MODE) {
@@ -63,16 +70,9 @@ public class Robot extends LoggedRobot {
     currentMatchTime = 0.00;
     runnedAutonomous = false;
 
-    // m_led = new AddressableLED(1);
-    // m_ledBuffer = new AddressableLEDBuffer(30);
-    // // m_led.setLength(m_ledBuffer.getLength());
-
-    // // m_led.setData(m_ledBuffer);
-    // m_led.start();
-
-    // LEDPattern red = LEDPattern.solid(Color.kGreen);
-    // red.applyTo(m_ledBuffer);
-    // // m_led.setData(m_ledBuffer);
+    if(shiftTime.isPresent()){
+      SmartDashboard.putNumber("time do shift", shiftTime.get().in(Seconds));
+    }
   }
 
   @Override
@@ -119,27 +119,27 @@ public class Robot extends LoggedRobot {
         switch (alliancePosition) {
           case Blue1:
           System.out.println("resetando...");
-            swerve.resetOdometry(FieldConsts.BLUE_LEFT_START_POSE);
+            swerve.resetOdometry(BLUE_LEFT_START_POSE);
             break;
           case Blue2:
-            swerve.resetOdometry(FieldConsts.BLUE_CENTER_START_POSE);
+            swerve.resetOdometry(BLUE_CENTER_START_POSE);
             break;
           case Blue3:
-            swerve.resetOdometry(FieldConsts.BLUE_RIGHT_START_POSE);
+            swerve.resetOdometry(BLUE_RIGHT_START_POSE);
             break;
 
           case Red1:
-            swerve.resetOdometry(FieldConsts.RED_LEFT_START_POSE);
+            swerve.resetOdometry(RED_LEFT_START_POSE);
             break;
           case Red2:
-            swerve.resetOdometry(FieldConsts.RED_CENTER_START_POSE);
+            swerve.resetOdometry(RED_CENTER_START_POSE);
             break;
           case Red3:
-            swerve.resetOdometry(FieldConsts.RED_RIGHT_START_POSE);
+            swerve.resetOdometry(RED_RIGHT_START_POSE);
             break;
 
           case Unknown:
-            swerve.resetOdometry(FieldConsts.FIELD_CENTER_POSE);
+            swerve.resetOdometry(FIELD_CENTER_POSE);
             break;
         }
       }
