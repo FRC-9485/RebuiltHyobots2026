@@ -48,6 +48,7 @@ public class SuperStructure extends SubsystemBase{
   public enum Actions {
     SHOOT_FUEL,
     OPEN_INTAKE,
+    SPELL_FUELS,
     SEMI_INTAKE,
     CATCH_FUEL,
     CLOSE_INTAKE,
@@ -74,6 +75,11 @@ public class SuperStructure extends SubsystemBase{
         case SEMI_INTAKE:
             intake.enablePivot(SETPOINT_MIDDLE);
             intake.catchFuel(0.5);
+            break;
+
+        case SPELL_FUELS:
+            intake.catchFuel(-0.7);
+            index.spellFuels();
             break;
 
         case OPEN_INTAKE:
@@ -137,11 +143,7 @@ public class SuperStructure extends SubsystemBase{
           break;
 
         case OPEN_INTAKE:
-        if(!conveyor.conveyorInLimit()){
-            currentAction = Actions.OPEN_CONVEYOR;
-          } else {
             currentAction = Actions.OPEN_INTAKE;
-          }
           break;
 
         case CATCH_FUEL:
@@ -149,11 +151,7 @@ public class SuperStructure extends SubsystemBase{
           break;
 
         case CLOSE_INTAKE:
-        if(!conveyor.conveyorInLimit()){
-          currentAction = Actions.OPEN_INTAKE;
-          } else {
             currentAction = Actions.CLOSE_INTAKE;
-          }
           break;
 
         case LOCK_CONVEYOR:

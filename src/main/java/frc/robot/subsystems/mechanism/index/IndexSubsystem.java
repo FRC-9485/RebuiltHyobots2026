@@ -40,6 +40,11 @@ public class IndexSubsystem extends SubsystemBase implements IndexIO{
     }
 
     @Override
+    public void spellFuels() {
+        index.setSpeed(MAX_SPEED);
+    }
+
+    @Override
     public void updateInputs(IndexInputs indexInputs) {
         indexInputs.current = index.getCurrent();
         indexInputs.indexSpeed = index.getRPM();

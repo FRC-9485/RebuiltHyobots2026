@@ -96,8 +96,7 @@ public class SwerveSubsystem extends SubsystemBase implements SwerveIO {
 
       swerveDrive = new SwerveParser(directory).createSwerveDrive(MAX_SPEED);
       swerveDrive.setMotorIdleMode(false);
-      swerveDrive.setHeadingCorrection(false
-      );
+      swerveDrive.setHeadingCorrection(false);
       swerveDrive.setCosineCompensator(false);
 
       if (CURRENT_ROBOT_MODE == RobotModes.SIM) {

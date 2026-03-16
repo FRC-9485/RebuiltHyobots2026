@@ -34,11 +34,11 @@ public interface MechanismJoystickIO {
 
   public Trigger getDownPOV();
 
-  public Trigger rightTrigger(); // jogar
+  public Trigger rightTrigger();
 
-  public Trigger leftTrigger(); // pegar
+  public Trigger leftTrigger();
 
-  public Trigger backRight(); // climber
+  public Trigger backRight();
 
-  public Trigger backLeft(); // climber
+  public Trigger backLeft();
 }

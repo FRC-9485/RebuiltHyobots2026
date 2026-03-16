@@ -18,7 +18,7 @@ public class IntakeConsts {
       public static final double SETPOINT_UP = 250.00;
       public static final double SETPOINT_MIDDLE = 200;
       public static final double SETPOINT_DOWN = 16;
-  
+
       public static final double STOPPED_FUEL_SPEED = 0;
       public static final double COLLECT_FUEL_SPEED = 0.7;
     }
@@ -31,7 +31,7 @@ public class IntakeConsts {
         .withContinuous(-180, 180)
         .withPhysical(0.05, 0)
         .withFeedforward(0.015, 0);
-  
+
       public static final TunableControlConstants PIVOT_CONSTANTS =
           new TunableControlConstants("Throw Intake Consts",  PIVOT_CONTROL_CONSTANTS);
     }

@@ -1,8 +1,15 @@
 package frc.robot;
 
+import static frc.frc_java9485.constants.JoystickConsts.MECHANISM_DEADBAND;
+import static frc.frc_java9485.constants.RobotConsts.isSimulation;
+import static frc.frc_java9485.constants.mechanisms.HoodConsts.Setpoint.MAX_POSITION;
+import static frc.frc_java9485.constants.mechanisms.TurretConsts.Setpoint.MAX_TURN_POSITION;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
 import frc.frc_java9485.autonomous.AutoChooser;
 import frc.frc_java9485.constants.mechanisms.DriveConsts;
 import frc.frc_java9485.joystick.driver.DriverJoystick;
@@ -17,10 +24,6 @@ import frc.robot.subsystems.mechanism.index.IndexSubsystem;
 import frc.robot.subsystems.mechanism.intake.IntakeSubsystem;
 import frc.robot.subsystems.mechanism.shooter.turret.turretOFC.TurretSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
-
-import static frc.frc_java9485.constants.RobotConsts.*;
-import static frc.frc_java9485.constants.mechanisms.HoodConsts.Setpoint.*;
-import static frc.frc_java9485.constants.mechanisms.TurretConsts.Setpoint.*;
 
 public class RobotContainer {
   private final IndexSubsystem index;
@@ -45,12 +48,13 @@ public class RobotContainer {
     turret = new TurretSubsystem();
     index = IndexSubsystem.getInstance();
     conveyor = ConveyorSubsystem.getInstance();
+
     superStructure = new SuperStructure();
 
     driverJoystick = DriverJoystick.getInstance();
     mechanismJoystick = MechanismJoystick.getInstance();
 
-    autoChooser = new AutoChooser("Autonomous Chooser", "Con e intake");
+    autoChooser = new AutoChooser("Autonomous Chooser", "abrir s jogar");
     namedCommands = RegisterNamedCommands.getInstance();
 
     swerveSubsystem.setDefaultCommand(
@@ -61,8 +65,8 @@ public class RobotContainer {
             DriveConsts.FIELD_ORIENTED));
 
     turret.setDefaultCommand(turret.normalTurretCommand(
-      () -> mechanismJoystick.getLeftX(),
-      () -> mechanismJoystick.getRightY(),
+      () -> MathUtil.applyDeadband(mechanismJoystick.getLeftX(), MECHANISM_DEADBAND),
+      () -> MathUtil.applyDeadband(mechanismJoystick.getRightY(), MECHANISM_DEADBAND),
       () -> mechanismJoystick.getRightTrigger(),
       () -> mechanismJoystick.getRightBumper(),
       () -> mechanismJoystick.y().getAsBoolean()
@@ -99,13 +103,17 @@ public class RobotContainer {
     mechanismJoystick.leftBumper().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.OPEN_INTAKE), superStructure));
 
     mechanismJoystick.getUpPOV().whileTrue(
-      Commands.run(() -> turret.turnToMapSetpoint(0), turret)
-      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(MIN_POSITION, 2420, () -> mechanismJoystick.getRightTrigger() > 0)))
+      Commands.run(() -> turret.turnToMapSetpoint(0), turret) // torreta
+      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(0.2, // capuz
+                                                                2500,  //RPM
+                                                                () -> mechanismJoystick.getRightTrigger() > 0)))
     );
 
     mechanismJoystick.getRightPOV().whileTrue(
-      Commands.run(() -> turret.turnToMapSetpoint(-16), turret)
-      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(0.5, 2820, () -> mechanismJoystick.getRightTrigger() > 0)))
+      Commands.run(() -> turret.turnToMapSetpoint(-16), turret) // torreta
+      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(0.5, // capuz
+                                                                2820, // RPM
+                                                                () -> mechanismJoystick.getRightTrigger() > 0)))
     );
 
     mechanismJoystick.getDownPOV().whileTrue(
@@ -113,8 +121,10 @@ public class RobotContainer {
     );
 
     mechanismJoystick.getLeftPOV().whileTrue(
-      Commands.run(() -> turret.turnToMapSetpoint(MAX_TURN_POSITION), turret)
-      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(MAX_POSITION, 3000, () -> mechanismJoystick.getRightTrigger() > 0)))
+      Commands.run(() -> turret.turnToMapSetpoint(MAX_TURN_POSITION), turret) // torreta
+      .alongWith(Commands.run(() -> turret.turnHoodFromSetpoint(MAX_POSITION, // capuz
+                                                                3000, // RPM
+                                                                () -> mechanismJoystick.getRightTrigger() > 0)))
     );
 
     mechanismJoystick.leftTrigger().onTrue(Commands.run(() -> superStructure.alternActions(Actions.CATCH_FUEL), superStructure))
@@ -129,7 +139,7 @@ public class RobotContainer {
     .onFalse(Commands.runOnce(() -> superStructure.alternActions(Actions.LOCK_CONVEYOR), superStructure));
 
     //remapear controle
-    mechanismJoystick.backRight().onTrue(Commands.runOnce(() -> superStructure.alternActions(Actions.SEMI_INTAKE), superStructure));
+    // mechanismJoystick.backRight().whileTrue(Commands.run(() -> superStructure.alternActions(Actions.SPELL_FUELS), superStructure));
   }
 
   private void configureSimBindings() {

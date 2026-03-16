@@ -32,8 +32,6 @@
 //     private Matrix<N4, N1> curStdDevs;
 //     private List<PhotonPipelineResult> currentResults;
 
-
-
 //     private final PhotonCamera camera;
 
 //     private PhotonCameraSim cameraSim;

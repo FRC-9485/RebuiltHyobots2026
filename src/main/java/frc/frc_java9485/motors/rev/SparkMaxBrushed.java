@@ -119,7 +119,7 @@ public class SparkMaxBrushed implements SparkIO{
 
   @Override
   public RelativeEncoder getEncoder() {
-    return motor.getAlternateEncoder();
+    return motor.getEncoder();
   }
 
   @Override

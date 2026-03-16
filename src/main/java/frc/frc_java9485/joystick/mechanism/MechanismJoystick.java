@@ -6,13 +6,13 @@ import frc.frc_java9485.constants.JoystickConsts;
 
 public class MechanismJoystick implements MechanismJoystickIO {
   private final CommandXboxController joystick;
-  private static MechanismJoystick mInstnace;
+  private static MechanismJoystick mInstance;
 
   public static MechanismJoystick getInstance() {
-    if (mInstnace == null) {
-      mInstnace = new MechanismJoystick();
+    if (mInstance == null) {
+      mInstance = new MechanismJoystick();
     }
-    return mInstnace;
+    return mInstance;
   }
 
   private MechanismJoystick() {

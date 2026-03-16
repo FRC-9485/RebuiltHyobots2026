@@ -21,7 +21,7 @@ public class HoodConsts {
         .withProfile(300, 200)
         .withContinuous(-180, 180)
         .withTolerance(0.02);
-    
+
         public static final TunableControlConstants TUNABLE_CONSTANTS =
             new TunableControlConstants("hood constants", CONTROL_CONSTANTS);
     }

@@ -7,6 +7,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -33,6 +34,9 @@ import static frc.frc_java9485.constants.mechanisms.HoodConsts.PID.*;
 import frc.frc_java9485.motors.rev.SparkFlexMotor;
 import frc.frc_java9485.motors.rev.SparkMaxMotor;
 import frc.frc_java9485.motors.rev.io.SparkInputsAutoLogged;
+import frc.frc_java9485.utils.Elastic;
+import frc.frc_java9485.utils.Elastic.Notification;
+import frc.frc_java9485.utils.Elastic.Notification.NotificationLevel;
 import frc.frc_java9485.utils.TunableControls.TunablePIDController;
 import frc.frc_java9485.utils.TunableControls.TunableProfiledController;
 import frc.robot.subsystems.vision.LimelightHelpers;
@@ -66,6 +70,7 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
     private double turretSetpoint = 0;
     private double shooterSetpoint = 0;
     private boolean automatic = false;
+    private boolean offMechanism = false;
 
     private final SparkInputsAutoLogged hoodInputs;
     private final SparkInputsAutoLogged turnTurretInputs;
@@ -157,6 +162,9 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
         right_motor.setInverted(false);
         right_motor.burnFlash();
 
+        turn_turret.setClosedLoopFeedbackSensor(FeedbackSensor.kPrimaryEncoder);
+        turn_turret.burnFlash();
+
         left_motor.setCurrentLimit(SHOOTER_CURRENT_LIMIT);
         left_motor.setIdleMode(IdleMode.kBrake);
         left_motor.setInverted(false);
@@ -225,7 +233,7 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
             double output = hoodController.calculate(hoodMotor.getPosition());
 
             if(tag.getAsBoolean()){
-                indexer.setSpeed(-0.5);
+                indexer.setSpeed(-0.35);
             }
             hoodMotor.setSpeed(output);
             shooterSetpoint = -motor;
@@ -250,7 +258,7 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
             shooterSetpoint = -motor;
 
             if(flyWheelController.atSetpoint() && motor > 0){
-                indexer.setSpeed(-0.4);
+                indexer.setSpeed(-0.35);
             }
         }
     }
@@ -292,9 +300,7 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
         hoodSetpoint = hoodMotor.getPosition();
         turretSetpoint = turn_turret.getPosition();
 
-        if(hoodSetpoint == hoodMotor.getPosition() && turretSetpoint == turn_turret.getPosition()){
-            automatic = !automatic;
-        }
+        automatic = !automatic;
     }
 
     private void proccesInput(){
@@ -313,13 +319,12 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
     @Override
     public void periodic() {
         proccesInput();
-        
+
         flyWheelController.setSetpoint(shooterSetpoint);
         double shooterOutput = flyWheelController.calculate(-right_motor.getRPM());
 
-        System.out.println("RPM: " + left_motor.getRPM());
         System.out.println("position: " + turn_turret.getPosition());
-
+        System.out.println("RPM: " + left_motor.getRPM());
         if (shooterSetpoint == 0) {
             left_motor.setRPM(0);
             right_motor.setRPM(0);
@@ -327,17 +332,6 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
             left_motor.setRPM(shooterOutput);
             right_motor.setRPM(-shooterOutput);
         }
-
-        // if(shooterSetpoint == 0){
-        //     leftController.setSetpoint(0, ControlType.kVelocity);
-        //     rightController.setSetpoint(0, ControlType.kVelocity);
-        // } else {
-        //     leftController.setSetpoint(-shooterSetpoint, ControlType.kVelocity);
-        //     rightController.setSetpoint(shooterSetpoint, ControlType.kVelocity);
-        // }
-
-        // System.out.println("RPM: " + left_motor.getRate());
-        // System.out.println("setpoint: " + leftController.getSetpoint());
     }
 
     @Override
@@ -424,10 +418,10 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
                 if(spellFuels.getAsBoolean()){
                     indexer.setSpeed(0.6);
                 } else {
-                    indexer.setSpeed(-0.6 * shooterInput);
+                    indexer.setSpeed(-0.35 * shooterInput);
                 }
 
-            } else if(automatic){
+            } else if(automatic == true){
                 turretSetpoint = 0.0;
                 automatic_turret_controller.setGoal(turretSetpoint);
 
@@ -486,19 +480,23 @@ public class TurretSubsystem extends SubsystemBase implements TurretIO{
                     right_motor.setRPM(-shooterOutput);
                 }
 
-
-                indexer.setSpeed(-0.4 * shoot);
+                indexer.setSpeed(-0.35 * shoot);
 
                 if(spellFuels.getAsBoolean() || inbuxing()){
-                    indexer.setSpeed(0.4);
+                    indexer.setSpeed(0.35);
                 } else {
-                    indexer.setSpeed(-0.4 * shoot);
+                    indexer.setSpeed(-0.35 * shoot);
                 }
-            } else {
+            } else if(goal != TurretGoal.MANUAL && automatic == false){
+
+                left_motor.setRPM(0);
+                right_motor.setRPM(0);
+                indexer.setSpeed(0);
                 turn_turret.setVoltage(0);
-                indexer.setVoltage(0);
-                left_motor.setVoltage(0);
-                right_motor.setVoltage(0);
+
+                Elastic.sendNotification(new Notification(NotificationLevel.WARNING, "mecanismos desligado", "os mecanismos foram deligado"));
+                System.out.println("disconected");
+                offMechanism = true;
             }
         });
     }

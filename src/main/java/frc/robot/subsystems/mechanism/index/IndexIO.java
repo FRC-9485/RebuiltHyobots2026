@@ -24,5 +24,7 @@ public interface IndexIO {
     public void stopIndex();
     public Command turnOnCommand(DoubleSupplier speed);
 
+    public void spellFuels();
+
     public boolean isCollecting();
 }

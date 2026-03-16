@@ -8,10 +8,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.frc_java9485.constants.JoystickConsts;
 
 public class DriverJoystick implements DriverJoystickIO {
-  CommandXboxController joystick;
+  private final CommandXboxController joystick;
   private static DriverJoystick mInstance = null;
-
-  private int invert = 1;
 
   private DriverJoystick() {
     this.joystick = new CommandXboxController(JoystickConsts.DRIVER_PORT);
@@ -28,15 +26,16 @@ public class DriverJoystick implements DriverJoystickIO {
   public double getPerfomanceByAlliance(double speed) {
     var alliance = DriverStation.getAlliance().get();
     if (DriverStation.getAlliance().isPresent() && alliance == Alliance.Blue) {
-      return speed;
+      return -speed;
     }
-    return -speed;
+    return speed;
   }
 
   @Override
   public double getRightTrigger() {
       return joystick.getRightTriggerAxis();
   }
+
 
   @Override
   public double getLeftTrigger() {
@@ -52,7 +51,7 @@ public class DriverJoystick implements DriverJoystickIO {
     } else if (isLowMode()) {
       return MathUtil.applyDeadband(
               getPerfomanceByAlliance(joystick.getLeftY()), JoystickConsts.DRIVER_DEADBAND)
-          * 0.2;
+          * 0.4;
     } else {
       return MathUtil.applyDeadband(
               getPerfomanceByAlliance(joystick.getLeftY()), JoystickConsts.DRIVER_DEADBAND)
@@ -69,7 +68,7 @@ public class DriverJoystick implements DriverJoystickIO {
     } else if (isLowMode()) {
       return MathUtil.applyDeadband(
               getPerfomanceByAlliance(joystick.getLeftX()), JoystickConsts.DRIVER_DEADBAND)
-          * 0.2;
+          * 0.4;
     } else {
       return MathUtil.applyDeadband(
               getPerfomanceByAlliance(joystick.getLeftX()), JoystickConsts.DRIVER_DEADBAND)
@@ -86,7 +85,7 @@ public class DriverJoystick implements DriverJoystickIO {
     } else if (isLowMode()) {
       return MathUtil.applyDeadband(
               getPerfomanceByAlliance(joystick.getRightX()), JoystickConsts.DRIVER_DEADBAND)
-          * 0.2;
+          * 0.4;
     } else {
       return MathUtil.applyDeadband(
               getPerfomanceByAlliance(joystick.getRightX()), JoystickConsts.DRIVER_DEADBAND)
@@ -103,7 +102,7 @@ public class DriverJoystick implements DriverJoystickIO {
     } else if (isLowMode()) {
       return MathUtil.applyDeadband(
               getPerfomanceByAlliance(joystick.getRightY()), JoystickConsts.DRIVER_DEADBAND)
-          * 0.2;
+          * 0.4;
     } else {
       return MathUtil.applyDeadband(
               getPerfomanceByAlliance(joystick.getRightY()), JoystickConsts.DRIVER_DEADBAND)
